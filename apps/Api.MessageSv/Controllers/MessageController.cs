@@ -18,7 +18,8 @@ namespace Api.MessageSv.Controllers
         public async Task<ActionResult> RetrieveLineMessage([FromBody] object content, string id)
         {
             await Task.Yield();
-            await _lineMessagin.RetriveLineMessage(content, id);
+            string signature = HttpContext.Request.Headers["X-Line-Signature"].ToString();
+            await _lineMessagin.RetriveLineMessage(content, signature, id);
             return Ok();
         }
     }

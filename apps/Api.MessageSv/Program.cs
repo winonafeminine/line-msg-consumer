@@ -10,6 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ILineMessaging, LineMessagingService>();
+builder.Services.AddSingleton<ILineMessageValidation, LineMessageValidation>();
 
 var app = builder.Build();
 
