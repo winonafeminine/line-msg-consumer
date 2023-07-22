@@ -1,0 +1,19 @@
+{
+    "name": "api.user-sv-swagger",
+    "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+    "targets": {
+        "build": {
+            "executor": "nx:noop",
+            "outputs": ["libs/generated/api.user-sv-swagger"]
+        },
+        "codegen": {
+            "executor": "@nx-dotnet/core:openapi-codegen",
+            "options": {
+                "openapiJsonPath": "libs/generated/api.user-sv-swagger/swagger.json",
+                "outputProject": "generated-api.user-sv-types"
+            },
+            "dependsOn": ["^swagger"]
+        }
+    },
+    "implicitDependencies": ["Api.UserSv"]
+}
