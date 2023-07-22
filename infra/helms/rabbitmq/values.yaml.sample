@@ -1,0 +1,24 @@
+global:
+  secrets:
+    defaultUser: ''
+    defaultPass: ''
+
+secret:
+  name: rabbitmq-secret
+  data:
+    hostName: ''
+
+service:
+  name: rabbitmq-sv
+  ports:
+    amqp: 5672
+    management: 15672
+    nodePort: 30001
+  type: NodePort
+
+deployment:
+  name: rabbitmq-depl
+  image:
+    repo: rabbitmq
+    tag: 3-management
+  
