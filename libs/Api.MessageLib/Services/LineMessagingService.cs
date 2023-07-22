@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using Api.CommonLib.Exceptions;
 using Api.CommonLib.Models;
+using Api.CommonLib.Stores;
 using Api.MessageLib.Interfaces;
 using Api.MessageLib.Models;
 using Microsoft.AspNetCore.Http;
@@ -90,7 +91,8 @@ namespace Api.MessageLib.Services
             try
             {
                 string messageModelStr = JsonConvert.SerializeObject(messageModel);
-                string routingKey = "lmc.message.create";
+                IDictionary<string, string> msgRoutingKeys = RoutingKeys.Message;
+                string routingKey = msgRoutingKeys["create"];
                 _publisher.Publish(messageModelStr, routingKey, null);
                 _logger.LogInformation($"Message pulished\nRouting key: {routingKey}");
             }

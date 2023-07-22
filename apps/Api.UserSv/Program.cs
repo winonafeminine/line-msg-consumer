@@ -1,4 +1,6 @@
 using Api.CommonLib.Exceptions;
+using Api.UserLib.Interfaces;
+using Api.UserLib.Services;
 using Api.UserSv.HostedServices;
 using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
@@ -39,6 +41,7 @@ builder.Services.AddScoped<IMessagePublisher>(x =>
         ExchangeType.Topic // exchange type
     ));
 builder.Services.AddHostedService<UserDataCollector>();
+builder.Services.AddSingleton<IUserMessage, UserMessageService>();
 
 var app = builder.Build();
 
