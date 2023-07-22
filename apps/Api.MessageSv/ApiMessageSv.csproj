@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\libs\Api.MessageLib\ApiMessageLib.csproj" />
-    <ProjectReference Include="..\..\libs\Api.CommonLib\ApiCommonLib.csproj" />
   </ItemGroup>
 
 </Project>
