@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Api.MessageLib.Interfaces;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Api.MessageLib.Services
 {
@@ -17,7 +18,7 @@ namespace Api.MessageLib.Services
         {
             await Task.Yield();
             _logger.LogInformation($"Client ID: {id}");
-            _logger.LogInformation(JsonSerializer.Serialize(content));
+            _logger.LogInformation(JsonConvert.SerializeObject(content));
             _lineValidation.Validate(signature, content);
             return;
         }

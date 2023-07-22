@@ -5,6 +5,7 @@ using Api.MessageLib.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Api.MessageLib.Services
 {
@@ -28,7 +29,7 @@ namespace Api.MessageLib.Services
             // the request body need to be string
             // var requestBody = JsonSerializer.Serialize(reqBody);
             // var requestBody = JsonConvert.SerializeObject(reqBody);
-            var bodyBytes = Encoding.UTF8.GetBytes(body.ToString()!);
+            var bodyBytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(body));
             var hmacBytes = hmac.ComputeHash(bodyBytes);
 
             // Compare the computed HMAC to the one sent in the request headers
