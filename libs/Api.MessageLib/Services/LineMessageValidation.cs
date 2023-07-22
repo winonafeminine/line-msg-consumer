@@ -1,6 +1,8 @@
 using System.Security.Cryptography;
 using System.Text;
+using Api.CommonLib.Exceptions;
 using Api.MessageLib.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -42,8 +44,12 @@ namespace Api.MessageLib.Services
             {
                 // Request is not valid
                 // Console.WriteLine("Failed!");
-                _logger.LogError("Failed validate the signature!");
-                throw new Exception("Failed validate the signature!");
+                _logger.LogError("Failed validating the signature!");
+                throw new ErrorResponseException(
+                    StatusCodes.Status401Unauthorized,
+                    "Failed validating the signature!",
+                    new List<Error>()
+                );
             }
         }
     }
