@@ -7,6 +7,9 @@ using Api.MessageLib.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using Newtonsoft.Json;
 using Simple.RabbitMQ;
 
@@ -17,14 +20,19 @@ namespace Api.MessageLib.Services
         private readonly ILogger<LineMessagingService> _logger;
         private readonly ILineMessageValidation _lineValidation;
         private readonly IMessagePublisher _publisher;
-
         private readonly IHostEnvironment _env;
-        public LineMessagingService(ILogger<LineMessagingService> logger, ILineMessageValidation lineValidation, IMessagePublisher publisher, IHostEnvironment env)
+        private readonly IMongoCollection<BsonDocument> _messageCols;
+        public LineMessagingService(ILogger<LineMessagingService> logger, ILineMessageValidation lineValidation,
+            IMessagePublisher publisher, IHostEnvironment env, IOptions<MessageMongoConfigModel> mongoConfig)
         {
             _logger = logger;
             _lineValidation = lineValidation;
             _publisher = publisher;
             _env = env;
+
+            IMongoClient mongoClient = new MongoClient(mongoConfig.Value.HostName);
+            IMongoDatabase mongodb = mongoClient.GetDatabase(mongoConfig.Value.DatabaseName);
+            _messageCols = mongodb.GetCollection<BsonDocument>(mongoConfig.Value.Collections!.Message);
         }
 
         private string GetValFromJson(string strContent, string keyName, string pattern)
@@ -87,6 +95,12 @@ namespace Api.MessageLib.Services
                 MessageType = MessageTypes.Receive,
                 MessageObject = content
             };
+            
+            BsonDocument document = BsonDocument.Parse(
+                JsonConvert.SerializeObject(messageModel)
+            );
+
+            await _messageCols.InsertOneAsync(document);
 
             try
             {
@@ -94,7 +108,7 @@ namespace Api.MessageLib.Services
                 IDictionary<string, string> msgRoutingKeys = RoutingKeys.Message;
                 string routingKey = msgRoutingKeys["create"];
                 _publisher.Publish(messageModelStr, routingKey, null);
-                _logger.LogInformation($"Message pulished\nRouting key: {routingKey}");
+                // _logger.LogInformation($"Message pulished\nRouting key: {routingKey}");
             }
             finally
             {

@@ -1,5 +1,6 @@
 using Api.CommonLib.Exceptions;
 using Api.MessageLib.Interfaces;
+using Api.MessageLib.Models;
 using Api.MessageLib.Services;
 using Api.MessageSv.HostedServices;
 using Newtonsoft.Json.Serialization;
@@ -45,6 +46,7 @@ builder.Services.AddScoped<IMessagePublisher>(x =>
         ExchangeType.Topic // exchange type
     ));
 builder.Services.AddHostedService<MessageDataCollector>();
+builder.Services.Configure<MessageMongoConfigModel>(configuration.GetSection("MongoConfig"));
 
 var app = builder.Build();
 

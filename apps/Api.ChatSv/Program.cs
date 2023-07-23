@@ -1,3 +1,4 @@
+using Api.ChatLib.Models;
 using Api.ChatLib.Services;
 using Api.ChatSv.HostedServices;
 using Api.CommonLib.Exceptions;
@@ -36,6 +37,7 @@ builder.Services.AddSingleton<IMessageSubscriber>(x =>
     ));
 builder.Services.AddSingleton<IMessageConsumer, ChatMessageConsumerService>();
 builder.Services.AddHostedService<ChatDataCollector>();
+builder.Services.Configure<ChatMongoConfigModel>(configuration.GetSection("MongoConfig"));
 
 var app = builder.Build();
 
