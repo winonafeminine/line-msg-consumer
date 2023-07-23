@@ -1,5 +1,5 @@
 using Api.CommonLib.Exceptions;
-using Api.UserLib.Interfaces;
+using Api.CommonLib.Interfaces;
 using Api.UserLib.Services;
 using Api.UserSv.HostedServices;
 using Newtonsoft.Json.Serialization;
@@ -41,7 +41,7 @@ builder.Services.AddScoped<IMessagePublisher>(x =>
         ExchangeType.Topic // exchange type
     ));
 builder.Services.AddHostedService<UserDataCollector>();
-builder.Services.AddSingleton<IUserMessage, UserMessageService>();
+builder.Services.AddSingleton<IMessageConsumer, UserMessageConsumerService>();
 
 var app = builder.Build();
 

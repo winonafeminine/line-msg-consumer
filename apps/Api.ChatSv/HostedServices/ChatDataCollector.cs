@@ -2,19 +2,19 @@ using Api.CommonLib.Interfaces;
 using Api.CommonLib.Stores;
 using Simple.RabbitMQ;
 
-namespace Api.UserSv.HostedServices
+namespace Api.ChatSv.HostedServices
 {
-    public class UserDataCollector : IHostedService
+    public class ChatDataCollector : IHostedService
     {
-        private readonly ILogger<UserDataCollector> _logger;
+        private readonly ILogger<ChatDataCollector> _logger;
         private readonly IMessageSubscriber _subscriber;
-        private readonly IMessageConsumer _userMsgConsumer;
+        private readonly IMessageConsumer _chatMsgConsumer;
 
-        public UserDataCollector(ILogger<UserDataCollector> logger, IMessageSubscriber subscriber, IMessageConsumer userMsgConsumer)
+        public ChatDataCollector(ILogger<ChatDataCollector> logger, IMessageSubscriber subscriber, IMessageConsumer chatMsgConsumer)
         {
             _logger = logger;
             _subscriber = subscriber;
-            _userMsgConsumer = userMsgConsumer;
+            _chatMsgConsumer = chatMsgConsumer;
         }
         public async Task StartAsync(CancellationToken cancellationToken)
         {
@@ -27,9 +27,9 @@ namespace Api.UserSv.HostedServices
             // await Task.Yield();
             // _logger.LogInformation($"Routing key: {routingKey}\nMessage: {message}");
             IDictionary<string, string> msgRoutingKeys = RoutingKeys.Message;
-            if(routingKey == msgRoutingKeys["create"])
+            if (routingKey == msgRoutingKeys["create"])
             {
-                await _userMsgConsumer.ConsumeMessageCreate(message);
+                await _chatMsgConsumer.ConsumeMessageCreate(message);
             }
             return true;
         }

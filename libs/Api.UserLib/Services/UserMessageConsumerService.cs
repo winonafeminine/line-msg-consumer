@@ -1,20 +1,20 @@
+using Api.CommonLib.Interfaces;
 using Api.MessageLib.Models;
 using Api.UserLib.DTOs;
-using Api.UserLib.Interfaces;
 using Api.UserLib.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace Api.UserLib.Services
 {
-    public class UserMessageService : IUserMessage
+    public class UserMessageConsumerService : IMessageConsumer
     {
-        private readonly ILogger<UserMessageService> _logger;
-        public UserMessageService(ILogger<UserMessageService> logger)
+        private readonly ILogger<UserMessageConsumerService> _logger;
+        public UserMessageConsumerService(ILogger<UserMessageConsumerService> logger)
         {
             _logger = logger;
         }
-        public async Task HandleMessageCreate(string message)
+        public async Task ConsumeMessageCreate(string message)
         {
             await Task.Yield();
             // mapping to the MessageModel
