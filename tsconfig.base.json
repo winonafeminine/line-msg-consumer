@@ -15,6 +15,9 @@
         "skipDefaultLibCheck": true,
         "baseUrl": ".",
         "paths": {
+            "@line-msg-consumer/generated/api.chat-sv-types": [
+                "libs/generated/api.chat-sv-types/src/index.ts"
+            ],
             "@line-msg-consumer/generated/api.message-sv-types": [
                 "libs/generated/api.message-sv-types/src/index.ts"
             ],

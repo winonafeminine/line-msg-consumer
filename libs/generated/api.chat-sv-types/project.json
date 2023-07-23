@@ -1,0 +1,41 @@
+{
+    "name": "generated-api.chat-sv-types",
+    "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "libs/generated/api.chat-sv-types/src",
+    "projectType": "library",
+    "targets": {
+        "build": {
+            "executor": "@nx/js:tsc",
+            "outputs": ["{options.outputPath}"],
+            "options": {
+                "outputPath": "dist/libs/generated/api.chat-sv-types",
+                "main": "libs/generated/api.chat-sv-types/src/index.ts",
+                "tsConfig": "libs/generated/api.chat-sv-types/tsconfig.lib.json",
+                "assets": ["libs/generated/api.chat-sv-types/*.md"]
+            }
+        },
+        "lint": {
+            "executor": "@nx/linter:eslint",
+            "outputs": ["{options.outputFile}"],
+            "options": {
+                "lintFilePatterns": ["libs/generated/api.chat-sv-types/**/*.ts"]
+            }
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+            "options": {
+                "jestConfig": "libs/generated/api.chat-sv-types/jest.config.ts",
+                "passWithNoTests": true
+            },
+            "configurations": {
+                "ci": {
+                    "ci": true,
+                    "codeCoverage": true
+                }
+            }
+        }
+    },
+    "tags": [],
+    "implicitDependencies": ["api.chat-sv-swagger"]
+}
