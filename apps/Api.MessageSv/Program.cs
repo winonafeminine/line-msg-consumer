@@ -1,8 +1,10 @@
 using Api.CommonLib.Exceptions;
+using Api.CommonLib.Models;
 using Api.MessageLib.Interfaces;
 using Api.MessageLib.Models;
 using Api.MessageLib.Services;
 using Api.MessageSv.HostedServices;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
 using Simple.RabbitMQ;
@@ -46,7 +48,9 @@ builder.Services.AddScoped<IMessagePublisher>(x =>
         ExchangeType.Topic // exchange type
     ));
 builder.Services.AddHostedService<MessageDataCollector>();
+builder.Services.AddHostedService<MessageRpcServer>();
 builder.Services.Configure<MessageMongoConfigModel>(configuration.GetSection("MongoConfig"));
+builder.Services.Configure<RabbitmqConfigModel>(configuration.GetSection("RabbitMQConfig"));
 
 var app = builder.Build();
 

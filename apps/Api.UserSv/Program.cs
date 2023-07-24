@@ -1,5 +1,8 @@
 using Api.CommonLib.Exceptions;
 using Api.CommonLib.Interfaces;
+using Api.CommonLib.Models;
+using Api.MessageLib.Interfaces;
+using Api.MessageLib.RPCs;
 using Api.UserLib.Models;
 using Api.UserLib.Services;
 using Api.UserSv.HostedServices;
@@ -44,6 +47,9 @@ builder.Services.AddScoped<IMessagePublisher>(x =>
 builder.Services.AddHostedService<UserDataCollector>();
 builder.Services.AddSingleton<IMessageConsumer, UserMessageConsumerService>();
 builder.Services.Configure<UserMongoConfigModel>(configuration.GetSection("MongoConfig"));
+builder.Services.Configure<RabbitmqConfigModel>(configuration.GetSection("RabbitMQConfig"));
+builder.Services.AddSingleton<IMessageRpcClient, MessageRpcClient>();
+
 
 var app = builder.Build();
 
