@@ -1,7 +1,8 @@
 using Api.CommonLib.Interfaces;
-using Api.MessageLib.Interfaces;
+using Api.CommonLib.Stores;
 using Api.MessageLib.Models;
 using Api.MessageLib.RPCs;
+using Api.MessageLib.Settings;
 using Api.UserLib.DTOs;
 using Api.UserLib.Models;
 using Microsoft.Extensions.Logging;
@@ -16,10 +17,10 @@ namespace Api.UserLib.Services
     {
         private readonly ILogger<UserMessageConsumerService> _logger;
         private readonly IMongoCollection<BsonDocument> _userCols;
-        private readonly IMessageRpcClient _messageRpc;
+        private readonly MessageRpcClient _messageRpc;
         public UserMessageConsumerService(ILogger<UserMessageConsumerService> logger,
             IOptions<UserMongoConfigModel> mongoConfig,
-            IMessageRpcClient messageRpc)
+            MessageRpcClient messageRpc)
         {
             _logger = logger;
             IMongoClient mongoClient = new MongoClient(mongoConfig.Value.HostName);
@@ -50,8 +51,14 @@ namespace Api.UserLib.Services
             _logger.LogInformation($"User saved!");
 
             try{
-                var response = await _messageRpc.CallAsync("100");
-                _logger.LogInformation(" [.] Got '{0}'", response);
+                IDictionary<string, string> messageQueue = RpcQueueNames.Message;
+                var response = _messageRpc.SendRPCRequest(
+                    JsonConvert.SerializeObject(userModel), 
+                    messageQueue["GetChannel"]
+                );
+
+                // var response = await rpcClient.CallAsync("100");
+                _logger.LogInformation(response);
             }catch{
                 _logger.LogError("RPC error");
             }

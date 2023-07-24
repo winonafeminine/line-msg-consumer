@@ -1,69 +1,75 @@
-using System.Collections.Concurrent;
 using System.Text;
 using Api.CommonLib.Models;
-using Api.MessageLib.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
 namespace Api.MessageLib.RPCs
 {
-    public class MessageRpcClient : IMessageRpcClient
+    public class MessageRpcClient
     {
-        private const string QUEUE_NAME = "rpc_queue";
-        private readonly IConnection connection;
-        private readonly IModel channel;
-        private readonly string replyQueueName;
-        private readonly ConcurrentDictionary<string, TaskCompletionSource<string>> callbackMapper = new();
+        private readonly IConnection _connection;
+        private readonly IModel _channel;
         private readonly IOptions<RabbitmqConfigModel> _rabbitmqConfig;
 
-        public MessageRpcClient(IOptions<RabbitmqConfigModel> rabbitmqConfig)
+        public MessageRpcClient(IConfiguration configuration, IOptions<RabbitmqConfigModel> rabbitmqConfig)
         {
             _rabbitmqConfig = rabbitmqConfig;
-
-            var factory = new ConnectionFactory { Uri=new Uri(_rabbitmqConfig.Value.HostName!) };
-
-            connection = factory.CreateConnection();
-            channel = connection.CreateModel();
-            // declare a server-named queue
-            replyQueueName = "rpc_queue";
-            var consumer = new EventingBasicConsumer(channel);
-            consumer.Received += (model, ea) =>
+            var factory = new ConnectionFactory
             {
-                if (!callbackMapper.TryRemove(ea.BasicProperties.CorrelationId, out var tcs))
-                    return;
-                var body = ea.Body.ToArray();
-                var response = Encoding.UTF8.GetString(body);
-                tcs.TrySetResult(response);
+                Uri = new Uri(_rabbitmqConfig.Value.HostName!)
             };
 
-            channel.BasicConsume(consumer: consumer,
-                                 queue: replyQueueName,
-                                 autoAck: true);
+            _connection = factory.CreateConnection();
+            _channel = _connection.CreateModel();
         }
 
-        public Task<string> CallAsync(string message, CancellationToken cancellationToken = default)
+        public string SendRPCRequest(string message, string queueName)
         {
-            IBasicProperties props = channel.CreateBasicProperties();
+            // Declare a callback queue to receive the RPC response
+            var callbackQueueName = _channel.QueueDeclare().QueueName;
             var correlationId = Guid.NewGuid().ToString();
+
+            // Set up the properties for the RPC request
+            var props = _channel.CreateBasicProperties();
             props.CorrelationId = correlationId;
-            props.ReplyTo = replyQueueName;
+            props.ReplyTo = callbackQueueName;
+
+            // Convert the message to a byte array and publish it
             var messageBytes = Encoding.UTF8.GetBytes(message);
-            var tcs = new TaskCompletionSource<string>();
-            callbackMapper.TryAdd(correlationId, tcs);
+            _channel.BasicPublish(
+                exchange: "",
+                routingKey: queueName,
+                basicProperties: props,
+                body: messageBytes
+            );
 
-            channel.BasicPublish(exchange: string.Empty,
-                                 routingKey: QUEUE_NAME,
-                                 basicProperties: props,
-                                 body: messageBytes);
+            // Set up a consumer to receive the RPC response
+            var responseConsumer = new EventingBasicConsumer(_channel);
+            string? response = null;
+            responseConsumer.Received += (model, ea) =>
+            {
+                if (ea.BasicProperties.CorrelationId == correlationId)
+                {
+                    var responseBytes = ea.Body.ToArray();
+                    response = Encoding.UTF8.GetString(responseBytes);
+                }
+            };
 
-            cancellationToken.Register(() => callbackMapper.TryRemove(correlationId, out _));
-            return tcs.Task;
-        }
+            _channel.BasicConsume(
+                queue: callbackQueueName,
+                autoAck: true,
+                consumer: responseConsumer
+            );
 
-        public void Dispose()
-        {
-            connection.Close();
+            // Wait for the response and return it
+            while (response == null)
+            {
+                // You can add a timeout logic here to prevent an infinite loop
+            }
+
+            return response;
         }
     }
 }

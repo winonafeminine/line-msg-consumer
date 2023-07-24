@@ -3,6 +3,7 @@ using Api.CommonLib.Models;
 using Api.MessageLib.Interfaces;
 using Api.MessageLib.Models;
 using Api.MessageLib.Services;
+using Api.MessageLib.Settings;
 using Api.MessageSv.HostedServices;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Serialization;
@@ -51,6 +52,7 @@ builder.Services.AddHostedService<MessageDataCollector>();
 builder.Services.AddHostedService<MessageRpcServer>();
 builder.Services.Configure<MessageMongoConfigModel>(configuration.GetSection("MongoConfig"));
 builder.Services.Configure<RabbitmqConfigModel>(configuration.GetSection("RabbitMQConfig"));
+builder.Services.Configure<LineChannelSetting>(configuration.GetSection("LineConfig:Channel"));
 
 var app = builder.Build();
 

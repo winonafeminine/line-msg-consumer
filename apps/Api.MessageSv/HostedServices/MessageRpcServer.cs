@@ -1,6 +1,9 @@
 using System.Text;
 using Api.CommonLib.Models;
+using Api.CommonLib.Stores;
+using Api.MessageLib.Settings;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
@@ -8,87 +11,72 @@ namespace Api.MessageSv.HostedServices
 {
     public class MessageRpcServer : IHostedService
     {
-        private readonly ILogger<MessageRpcServer> _logger;
+        private readonly IConnection _connection;
+        private readonly IModel _channel;
+        private readonly string _queueName;
         private readonly IOptions<RabbitmqConfigModel> _rabbitmqConfig;
-        public MessageRpcServer(ILogger<MessageRpcServer> logger, IOptions<RabbitmqConfigModel> rabbitmqConfig)
+        public MessageRpcServer(IOptions<RabbitmqConfigModel> rabbitmqConfig)
         {
-            _logger = logger;
             _rabbitmqConfig = rabbitmqConfig;
-        }
-        public void GetFibonacy()
-        {
-            var factory = new ConnectionFactory { Uri=new Uri(_rabbitmqConfig.Value.HostName!) };
-            using var connection = factory.CreateConnection();
-            using var channel = connection.CreateModel();
-
-            channel.QueueDeclare(queue: "rpc_queue",
-                                 durable: false,
-                                 exclusive: false,
-                                 autoDelete: false,
-                                 arguments: null);
-            channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
-            var consumer = new EventingBasicConsumer(channel);
-            channel.BasicConsume(queue: "rpc_queue",
-                                 autoAck: false,
-                                 consumer: consumer);
-            _logger.LogInformation(" [x] Awaiting RPC requests");
-
-            consumer.Received += (model, ea) =>
+            var factory = new ConnectionFactory
             {
-                string response = string.Empty;
-
-                var body = ea.Body.ToArray();
-                var props = ea.BasicProperties;
-                var replyProps = channel.CreateBasicProperties();
-                replyProps.CorrelationId = props.CorrelationId;
-
-                try
-                {
-                    var message = Encoding.UTF8.GetString(body);
-                    int n = int.Parse(message);
-                    _logger.LogInformation($" [.] Fib({message})");
-                    response = Fib(n).ToString();
-                }
-                catch (Exception e)
-                {
-                    _logger.LogInformation($" [.] {e.Message}");
-                    response = string.Empty;
-                }
-                finally
-                {
-                    var responseBytes = Encoding.UTF8.GetBytes(response);
-                    channel.BasicPublish(exchange: string.Empty,
-                                         routingKey: props.ReplyTo,
-                                         basicProperties: replyProps,
-                                         body: responseBytes);
-                    channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-                }
+                Uri = new Uri(_rabbitmqConfig.Value.HostName!)
             };
 
-            _logger.LogInformation(" Press [enter] to exit.");
+            _connection = factory.CreateConnection();
+            _channel = _connection.CreateModel();
+            
+            IDictionary<string, string> messageQueue = RpcQueueNames.Message;
+            _queueName = messageQueue["GetChannel"]; // Match the queue name used in RPCController
+            _channel.QueueDeclare(queue: _queueName,
+                                  durable: false,
+                                  exclusive: false,
+                                  autoDelete: false,
+                                  arguments: null);
 
-            // Assumes only valid positive integer input.
-            // Don't expect this one to work for big numbers, and it's probably the slowest recursive implementation possible.
-            static int Fib(int n)
-            {
-                if (n is 0 or 1)
-                {
-                    return n;
-                }
-
-                return Fib(n - 1) + Fib(n - 2);
-            }
+            _channel.BasicQos(0, 1, false);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            GetFibonacy();
+            var consumer = new EventingBasicConsumer(_channel);
+            _channel.BasicConsume(queue: _queueName,
+                                  autoAck: false,
+                                  consumer: consumer);
+
+            consumer.Received += (model, ea) =>
+            {
+                var message = Encoding.UTF8.GetString(ea.Body.ToArray());
+
+                // Process the RPC request and get the response
+                var response = ProcessRequest(message);
+
+                var replyProps = _channel.CreateBasicProperties();
+                replyProps.CorrelationId = ea.BasicProperties.CorrelationId;
+
+                var responseBytes = Encoding.UTF8.GetBytes(response);
+                _channel.BasicPublish(exchange: "",
+                                     routingKey: ea.BasicProperties.ReplyTo,
+                                     basicProperties: replyProps,
+                                     body: responseBytes);
+
+                _channel.BasicAck(deliveryTag: ea.DeliveryTag,
+                                  multiple: false);
+            };
             return Task.CompletedTask;
+        }
+
+        // Add your custom RPC request processing logic here
+        private string ProcessRequest(string message)
+        {
+            // Example: Echo the message back as the response
+            return "RPC Response: " + message;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            _connection.Close();
+            return Task.CompletedTask;
         }
     }
 }
