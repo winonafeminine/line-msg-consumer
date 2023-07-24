@@ -42,7 +42,7 @@ namespace Api.MessageLib.Services
             if (match.Success)
             {
                 keyName = match.Groups[1].Value.Replace("\\", "");
-                _logger.LogInformation($"{keyName}: " + keyName);
+                // _logger.LogInformation($"{keyName}: " + keyName);
                 return keyName;
             }
             else

@@ -1,5 +1,6 @@
 using Api.ChatLib.DTOs;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
 namespace Api.ChatLib.Models
@@ -10,7 +11,8 @@ namespace Api.ChatLib.Models
         {
             ChatId=ObjectId.GenerateNewId().ToString();
         }
-        [JsonProperty("_id", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("_id")]
+        [BsonElement("_id")]
         public virtual string? ChatId { get; set; }
     }
 }

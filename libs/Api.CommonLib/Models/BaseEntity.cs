@@ -1,4 +1,5 @@
 using Api.CommonLib.Services;
+using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
 namespace Api.CommonLib.Models
@@ -12,9 +13,11 @@ namespace Api.CommonLib.Models
             ModifiedDate = currentTime.DateTime;
         }
         [JsonProperty("created_date")]
+        [BsonElement("created_date")]
         public DateTime CreatedDate { get; set; }
 
         [JsonProperty("modified_date")]
+        [BsonElement("modified_date")]
         public DateTime ModifiedDate { get; set; }
     }
 }

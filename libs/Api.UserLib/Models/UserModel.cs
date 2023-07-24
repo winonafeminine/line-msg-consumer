@@ -1,5 +1,6 @@
 using Api.UserLib.DTOs;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
 namespace Api.UserLib.Models
@@ -10,7 +11,8 @@ namespace Api.UserLib.Models
         {
             UserId=ObjectId.GenerateNewId().ToString();
         }
-        [JsonProperty("_id", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("_id")]
+        [BsonElement("_id")]
         public virtual string? UserId { get; set; }
     }
 }

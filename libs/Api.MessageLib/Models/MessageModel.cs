@@ -1,5 +1,6 @@
 using Api.MessageLib.DTOs;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
 namespace Api.MessageLib.Models
@@ -10,7 +11,8 @@ namespace Api.MessageLib.Models
         {
             MessageId=ObjectId.GenerateNewId().ToString();
         }
-        [JsonProperty("_id", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("_id")]
+        [BsonElement("_id")]
         public virtual string? MessageId { get; set; }
     }
 }
