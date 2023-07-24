@@ -1,6 +1,8 @@
 using System.Text;
+using Api.CommonLib.DTOs;
 using Api.CommonLib.Models;
 using Api.CommonLib.Stores;
+using Api.MessageLib.Interfaces;
 using Api.MessageLib.Settings;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -15,7 +17,8 @@ namespace Api.MessageSv.HostedServices
         private readonly IModel _channel;
         private readonly string _queueName;
         private readonly IOptions<RabbitmqConfigModel> _rabbitmqConfig;
-        public MessageRpcServer(IOptions<RabbitmqConfigModel> rabbitmqConfig)
+        private readonly IServiceProvider _serviceProvider;
+        public MessageRpcServer(IOptions<RabbitmqConfigModel> rabbitmqConfig, IServiceProvider serviceProvider)
         {
             _rabbitmqConfig = rabbitmqConfig;
             var factory = new ConnectionFactory
@@ -25,9 +28,9 @@ namespace Api.MessageSv.HostedServices
 
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
-            
-            IDictionary<string, string> messageQueue = RpcQueueNames.Message;
-            _queueName = messageQueue["GetChannel"]; // Match the queue name used in RPCController
+
+            string messageQueue = RpcQueueNames.Message;
+            _queueName = messageQueue; // Match the queue name used in RPCController
             _channel.QueueDeclare(queue: _queueName,
                                   durable: false,
                                   exclusive: false,
@@ -35,6 +38,7 @@ namespace Api.MessageSv.HostedServices
                                   arguments: null);
 
             _channel.BasicQos(0, 1, false);
+            _serviceProvider = serviceProvider;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -67,10 +71,24 @@ namespace Api.MessageSv.HostedServices
         }
 
         // Add your custom RPC request processing logic here
-        private string ProcessRequest(string message)
+        private string ProcessRequest(string request)
         {
-            // Example: Echo the message back as the response
-            return "RPC Response: " + message;
+            using(var scope = _serviceProvider.CreateScope())
+            {
+                // Example: Echo the request back as the response
+                CommonRpcRequest commonRequest = JsonConvert
+                    .DeserializeObject<CommonRpcRequest>(request)!;
+
+                if(commonRequest.Action == RpcActions.Message["GetChannel"])
+                {
+                    ILineMessaging lineMessaging = scope.ServiceProvider
+                        .GetRequiredService<ILineMessaging>();
+                    LineChannelSetting channelSetting = lineMessaging.GetChannel();
+                    return JsonConvert.SerializeObject(channelSetting);
+                }
+            }
+
+            return string.Empty;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

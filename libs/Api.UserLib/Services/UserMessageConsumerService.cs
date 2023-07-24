@@ -51,14 +51,11 @@ namespace Api.UserLib.Services
             _logger.LogInformation($"User saved!");
 
             try{
-                IDictionary<string, string> messageQueue = RpcQueueNames.Message;
-                var response = _messageRpc.SendRPCRequest(
-                    JsonConvert.SerializeObject(userModel), 
-                    messageQueue["GetChannel"]
-                );
+                string messageQueue = RpcQueueNames.Message;
+                var response = _messageRpc.GetChannel();
 
                 // var response = await rpcClient.CallAsync("100");
-                _logger.LogInformation(response);
+                _logger.LogInformation(JsonConvert.SerializeObject(response));
             }catch{
                 _logger.LogError("RPC error");
             }

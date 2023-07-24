@@ -1,7 +1,9 @@
+using Api.MessageLib.Settings;
+
 namespace Api.MessageLib.Interfaces
 {
-    public interface IMessageRpcClient : IDisposable
+    public interface IMessageRpcClient
     {
-        public Task<string> CallAsync(string message, CancellationToken cancellationToken = default);
+        public LineChannelSetting GetChannel();
     }
 }

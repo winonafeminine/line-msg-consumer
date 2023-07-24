@@ -4,6 +4,7 @@ using Api.CommonLib.Models;
 using Api.CommonLib.Stores;
 using Api.MessageLib.Interfaces;
 using Api.MessageLib.Models;
+using Api.MessageLib.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -22,8 +23,9 @@ namespace Api.MessageLib.Services
         private readonly IMessagePublisher _publisher;
         private readonly IHostEnvironment _env;
         private readonly IMongoCollection<BsonDocument> _messageCols;
+        private readonly IOptions<LineChannelSetting> _channelSetting;
         public LineMessagingService(ILogger<LineMessagingService> logger, ILineMessageValidation lineValidation,
-            IMessagePublisher publisher, IHostEnvironment env, IOptions<MessageMongoConfigModel> mongoConfig)
+            IMessagePublisher publisher, IHostEnvironment env, IOptions<MessageMongoConfigModel> mongoConfig, IOptions<LineChannelSetting> channelSetting)
         {
             _logger = logger;
             _lineValidation = lineValidation;
@@ -33,6 +35,7 @@ namespace Api.MessageLib.Services
             IMongoClient mongoClient = new MongoClient(mongoConfig.Value.HostName);
             IMongoDatabase mongodb = mongoClient.GetDatabase(mongoConfig.Value.DatabaseName);
             _messageCols = mongodb.GetCollection<BsonDocument>(mongoConfig.Value.Collections!.Message);
+            _channelSetting = channelSetting;
         }
 
         private string GetValFromJson(string strContent, string keyName, string pattern)
@@ -116,6 +119,15 @@ namespace Api.MessageLib.Services
                 _publisher.Dispose();
             }
             return;
+        }
+
+        public LineChannelSetting GetChannel()
+        {
+            return new LineChannelSetting{
+                SecretId=_channelSetting.Value.SecretId,
+                ClientId=_channelSetting.Value.ClientId,
+                ChannelAccessToken=_channelSetting.Value.ChannelAccessToken,
+            };
         }
     }
 }
