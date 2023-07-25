@@ -34,6 +34,10 @@ namespace Api.UserLib.DTOs
         [BsonElement("email")]
         public virtual string? Email { get; set; }
 
+        [JsonProperty("picture_url")]
+        [BsonElement("picture_url")]
+        public virtual string? PictureUrl { get; set; }
+
         [JsonProperty("latest_message")]
         [BsonElement("latest_message")]
         public virtual UserLatestMessageDto? LatestMessage { get; set; }
