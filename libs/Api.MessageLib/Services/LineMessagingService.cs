@@ -1,10 +1,10 @@
 using System.Text.RegularExpressions;
 using Api.CommonLib.Exceptions;
 using Api.CommonLib.Models;
+using Api.CommonLib.Setttings;
 using Api.CommonLib.Stores;
 using Api.MessageLib.Interfaces;
 using Api.MessageLib.Models;
-using Api.MessageLib.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

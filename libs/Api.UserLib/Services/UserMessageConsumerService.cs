@@ -1,9 +1,7 @@
 using Api.CommonLib.Interfaces;
+using Api.CommonLib.Models;
+using Api.CommonLib.Setttings;
 using Api.CommonLib.Stores;
-using Api.MessageLib.Models;
-using Api.MessageLib.RPCs;
-using Api.MessageLib.Settings;
-using Api.UserLib.DTOs;
 using Api.UserLib.Interfaces;
 using Api.UserLib.Models;
 using Microsoft.Extensions.Logging;
@@ -18,11 +16,11 @@ namespace Api.UserLib.Services
     {
         private readonly ILogger<UserMessageConsumerService> _logger;
         private readonly IMongoCollection<BsonDocument> _userCols;
-        private readonly MessageRpcClient _messageRpc;
+        private readonly IMessageRpcClient _messageRpc;
         private readonly ILineUserInfo _lineUserInfo;
         public UserMessageConsumerService(ILogger<UserMessageConsumerService> logger,
             IOptions<UserMongoConfigModel> mongoConfig,
-            MessageRpcClient messageRpc,
+            IMessageRpcClient messageRpc,
             ILineUserInfo lineUserInfo)
         {
             _logger = logger;
@@ -51,7 +49,7 @@ namespace Api.UserLib.Services
                 ClientId=msgModel.ClientId,
                 GroupId=msgModel.GroupId,
                 GroupUserId=msgModel.GroupUserId,
-                LatestMessage=new UserLatestMessageDto{
+                LatestMessage=new UserLatestMessageModel{
                     IsRead=false,
                     MessageId=msgModel.MessageId
                 }

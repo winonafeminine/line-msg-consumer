@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Api.MessageLib.Settings
+namespace Api.CommonLib.Setttings
 {
     public class LineChannelSetting
     {

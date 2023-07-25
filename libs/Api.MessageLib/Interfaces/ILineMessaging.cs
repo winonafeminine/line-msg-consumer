@@ -1,4 +1,5 @@
-using Api.MessageLib.Settings;
+
+using Api.CommonLib.Setttings;
 
 namespace Api.MessageLib.Interfaces
 {

@@ -1,7 +1,7 @@
 using Api.ChatLib.DTOs;
 using Api.ChatLib.Models;
 using Api.CommonLib.Interfaces;
-using Api.MessageLib.Models;
+using Api.CommonLib.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;

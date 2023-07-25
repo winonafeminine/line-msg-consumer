@@ -1,12 +1,11 @@
 using Api.CommonLib.DTOs;
 using Api.CommonLib.Interfaces;
+using Api.CommonLib.Models;
+using Api.CommonLib.Setttings;
 using Api.CommonLib.Stores;
-using Api.MessageLib.Interfaces;
-using Api.MessageLib.Settings;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
-namespace Api.MessageLib.RPCs
+namespace Api.CommonLib.RPCs
 {
     public class MessageRpcClient : IMessageRpcClient
     {
@@ -15,6 +14,11 @@ namespace Api.MessageLib.RPCs
         public MessageRpcClient(ICommonRpcClient commonRpcClient)
         {
             _commonRpcClient = commonRpcClient;
+        }
+
+        public Task AddUser(UserModel user)
+        {
+            throw new NotImplementedException();
         }
 
         public LineChannelSetting GetChannel()

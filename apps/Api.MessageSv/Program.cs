@@ -1,9 +1,9 @@
 using Api.CommonLib.Exceptions;
 using Api.CommonLib.Models;
+using Api.CommonLib.Setttings;
 using Api.MessageLib.Interfaces;
 using Api.MessageLib.Models;
 using Api.MessageLib.Services;
-using Api.MessageLib.Settings;
 using Api.MessageSv.HostedServices;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Serialization;

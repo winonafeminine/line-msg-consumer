@@ -1,9 +1,9 @@
 using System.Text;
 using Api.CommonLib.DTOs;
 using Api.CommonLib.Models;
+using Api.CommonLib.Setttings;
 using Api.CommonLib.Stores;
 using Api.MessageLib.Interfaces;
-using Api.MessageLib.Settings;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
