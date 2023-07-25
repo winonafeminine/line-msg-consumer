@@ -4,7 +4,6 @@ using Api.CommonLib.Models;
 using Api.CommonLib.Setttings;
 using Api.CommonLib.Stores;
 using Api.MessageLib.Interfaces;
-using Api.MessageLib.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -25,7 +24,7 @@ namespace Api.MessageLib.Services
         private readonly IMongoCollection<BsonDocument> _messageCols;
         private readonly IOptions<LineChannelSetting> _channelSetting;
         public LineMessagingService(ILogger<LineMessagingService> logger, ILineMessageValidation lineValidation,
-            IMessagePublisher publisher, IHostEnvironment env, IOptions<MessageMongoConfigModel> mongoConfig, IOptions<LineChannelSetting> channelSetting)
+            IMessagePublisher publisher, IHostEnvironment env, IOptions<MongoConfigSetting> mongoConfig, IOptions<LineChannelSetting> channelSetting)
         {
             _logger = logger;
             _lineValidation = lineValidation;
@@ -34,7 +33,7 @@ namespace Api.MessageLib.Services
 
             IMongoClient mongoClient = new MongoClient(mongoConfig.Value.HostName);
             IMongoDatabase mongodb = mongoClient.GetDatabase(mongoConfig.Value.DatabaseName);
-            _messageCols = mongodb.GetCollection<BsonDocument>(mongoConfig.Value.Collections!.Message);
+            _messageCols = mongodb.GetCollection<BsonDocument>(MongoConfigSetting.Collections["Message"]);
             _channelSetting = channelSetting;
         }
 

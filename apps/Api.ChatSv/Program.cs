@@ -1,8 +1,8 @@
-using Api.ChatLib.Models;
 using Api.ChatLib.Services;
 using Api.ChatSv.HostedServices;
 using Api.CommonLib.Exceptions;
 using Api.CommonLib.Interfaces;
+using Api.CommonLib.Setttings;
 using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
 using Simple.RabbitMQ;
@@ -37,7 +37,7 @@ builder.Services.AddSingleton<IMessageSubscriber>(x =>
     ));
 builder.Services.AddSingleton<IMessageConsumer, ChatMessageConsumerService>();
 builder.Services.AddHostedService<ChatDataCollector>();
-builder.Services.Configure<ChatMongoConfigModel>(configuration.GetSection("MongoConfig"));
+builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
 
 var app = builder.Build();
 

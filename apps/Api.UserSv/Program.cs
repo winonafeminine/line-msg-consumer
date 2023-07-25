@@ -2,8 +2,8 @@ using Api.CommonLib.Exceptions;
 using Api.CommonLib.Interfaces;
 using Api.CommonLib.Models;
 using Api.CommonLib.RPCs;
+using Api.CommonLib.Setttings;
 using Api.UserLib.Interfaces;
-using Api.UserLib.Models;
 using Api.UserLib.Services;
 using Api.UserSv.HostedServices;
 using Newtonsoft.Json.Serialization;
@@ -46,11 +46,11 @@ builder.Services.AddScoped<IMessagePublisher>(x =>
     ));
 builder.Services.AddHostedService<UserDataCollector>();
 builder.Services.AddSingleton<IMessageConsumer, UserMessageConsumerService>();
-builder.Services.Configure<UserMongoConfigModel>(configuration.GetSection("MongoConfig"));
-builder.Services.Configure<RabbitmqConfigModel>(configuration.GetSection("RabbitMQConfig"));
 builder.Services.AddSingleton<IMessageRpcClient, MessageRpcClient>();
 builder.Services.AddSingleton<ICommonRpcClient, CommonRpcClient>();
 builder.Services.AddSingleton<ILineUserInfo, LineUserInfoService>();
+builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
+builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
 
 
 var app = builder.Build();

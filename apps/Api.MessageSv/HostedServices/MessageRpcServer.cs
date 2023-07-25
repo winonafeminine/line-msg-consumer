@@ -16,9 +16,9 @@ namespace Api.MessageSv.HostedServices
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly string _queueName;
-        private readonly IOptions<RabbitmqConfigModel> _rabbitmqConfig;
+        private readonly IOptions<RabbitmqConfigSetting> _rabbitmqConfig;
         private readonly IServiceProvider _serviceProvider;
-        public MessageRpcServer(IOptions<RabbitmqConfigModel> rabbitmqConfig, IServiceProvider serviceProvider)
+        public MessageRpcServer(IOptions<RabbitmqConfigSetting> rabbitmqConfig, IServiceProvider serviceProvider)
         {
             _rabbitmqConfig = rabbitmqConfig;
             var factory = new ConnectionFactory

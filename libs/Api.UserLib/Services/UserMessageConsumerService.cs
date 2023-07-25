@@ -3,7 +3,6 @@ using Api.CommonLib.Models;
 using Api.CommonLib.Setttings;
 using Api.CommonLib.Stores;
 using Api.UserLib.Interfaces;
-using Api.UserLib.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -19,14 +18,14 @@ namespace Api.UserLib.Services
         private readonly IMessageRpcClient _messageRpc;
         private readonly ILineUserInfo _lineUserInfo;
         public UserMessageConsumerService(ILogger<UserMessageConsumerService> logger,
-            IOptions<UserMongoConfigModel> mongoConfig,
+            IOptions<MongoConfigSetting> mongoConfig,
             IMessageRpcClient messageRpc,
             ILineUserInfo lineUserInfo)
         {
             _logger = logger;
             IMongoClient mongoClient = new MongoClient(mongoConfig.Value.HostName);
             IMongoDatabase mongodb = mongoClient.GetDatabase(mongoConfig.Value.DatabaseName);
-            _userCols = mongodb.GetCollection<BsonDocument>(mongoConfig.Value.Collections!.User);
+            _userCols = mongodb.GetCollection<BsonDocument>(MongoConfigSetting.Collections["User"]);
             _messageRpc = messageRpc;
             _lineUserInfo = lineUserInfo;
         }

@@ -2,6 +2,7 @@ using Api.ChatLib.DTOs;
 using Api.ChatLib.Models;
 using Api.CommonLib.Interfaces;
 using Api.CommonLib.Models;
+using Api.CommonLib.Setttings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -14,12 +15,12 @@ namespace Api.ChatLib.Services
     {
         private readonly ILogger<ChatMessageConsumerService> _logger;
         private readonly IMongoCollection<BsonDocument> _chatCols;
-        public ChatMessageConsumerService(ILogger<ChatMessageConsumerService> logger, IOptions<ChatMongoConfigModel> mongoConfig)
+        public ChatMessageConsumerService(ILogger<ChatMessageConsumerService> logger, IOptions<MongoConfigSetting> mongoConfig)
         {
             _logger = logger;
             IMongoClient mongoClient = new MongoClient(mongoConfig.Value.HostName);
             IMongoDatabase mongodb = mongoClient.GetDatabase(mongoConfig.Value.DatabaseName);
-            _chatCols = mongodb.GetCollection<BsonDocument>(mongoConfig.Value.Collections!.Chat);
+            _chatCols = mongodb.GetCollection<BsonDocument>(MongoConfigSetting.Collections["Chat"]);
         }
         public async Task ConsumeMessageCreate(string message)
         {

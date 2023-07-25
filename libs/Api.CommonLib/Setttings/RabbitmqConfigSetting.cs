@@ -1,4 +1,4 @@
-namespace Api.CommonLib.Models
+namespace Api.CommonLib.Setttings
 {
     // "HostName": "amqp://root:password@192.168.49.2:30001",
     // "ExchangeName": "lmc_message_exchange",
@@ -8,17 +8,17 @@ namespace Api.CommonLib.Models
     //     "PrefetchCount": 100,
     //     "AutoAck": false
     // }
-    public class RabbitmqConfigModel
+    public class RabbitmqConfigSetting
     {
         public virtual string? HostName { get; set; }
         public virtual string? ExchangeName { get; set; }
         public virtual string? RoutingKey { get; set; }
         public virtual string? QueueName { get; set; }
-        public virtual RabbitmqConfigPropertiesModel? Properties { get; set; }
+        public virtual RabbitmqConfigPropertiesSetting? Properties { get; set; }
 
     }
 
-    public class RabbitmqConfigPropertiesModel
+    public class RabbitmqConfigPropertiesSetting
     {
         public virtual ushort PrefetchCount { get; set; }
         public virtual bool AutoAck { get; set; }

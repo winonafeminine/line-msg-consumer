@@ -1,6 +1,6 @@
 using System.Text;
 using Api.CommonLib.Interfaces;
-using Api.CommonLib.Models;
+using Api.CommonLib.Setttings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
@@ -12,9 +12,9 @@ namespace Api.CommonLib.RPCs
     {
         private readonly IConnection _connection;
         private readonly IModel _channel;
-        private readonly IOptions<RabbitmqConfigModel> _rabbitmqConfig;
+        private readonly IOptions<RabbitmqConfigSetting> _rabbitmqConfig;
 
-        public CommonRpcClient(IConfiguration configuration, IOptions<RabbitmqConfigModel> rabbitmqConfig)
+        public CommonRpcClient(IConfiguration configuration, IOptions<RabbitmqConfigSetting> rabbitmqConfig)
         {
             _rabbitmqConfig = rabbitmqConfig;
             var factory = new ConnectionFactory
