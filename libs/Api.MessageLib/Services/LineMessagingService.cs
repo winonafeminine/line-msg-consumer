@@ -78,7 +78,7 @@ namespace Api.MessageLib.Services
             pattern = @"""type"":\s*""([^""]+)""";
             string eventType = GetValFromJson(strContent, "type", pattern);
 
-            string lineUserId = string.Empty;
+            string groupUserId = string.Empty;
             string messageType = string.Empty;
 
             // check if the event type=message
@@ -86,7 +86,7 @@ namespace Api.MessageLib.Services
             {
                 // get the line userId
                 pattern = @"""userId"":\s*""([^""]+)""";
-                lineUserId = GetValFromJson(strContent, "userId", pattern);
+                groupUserId = GetValFromJson(strContent, "userId", pattern);
             }
 
 
@@ -94,7 +94,7 @@ namespace Api.MessageLib.Services
             {
                 ClientId = id,
                 GroupId = groupId,
-                LineUserId = lineUserId,
+                GroupUserId = groupUserId,
                 MessageType = MessageTypes.Receive,
                 MessageObject = content
             };

@@ -14,6 +14,10 @@ namespace Api.UserLib.DTOs
         [BsonElement("group_id")]
         public virtual string? GroupId { get; set; }
 
+        [JsonProperty("group_user_id")]
+        [BsonElement("group_user_id")]
+        public virtual string? GroupUserId { get; set; }
+
         [JsonProperty("line_user_id")]
         [BsonElement("line_user_id")]
         public virtual string? LineUserId { get; set; }

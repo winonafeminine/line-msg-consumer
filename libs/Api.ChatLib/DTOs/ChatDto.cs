@@ -36,9 +36,9 @@ namespace Api.ChatLib.DTOs
         [BsonElement("text")]
         public virtual string? Text { get; set; }
 
-        [JsonProperty("line_user_id")]
-        [BsonElement("line_user_id")]
-        public virtual string? LineUserId { get; set; }
+        [JsonProperty("group_user_id")]
+        [BsonElement("group_user_id")]
+        public virtual string? GroupUserId { get; set; }
 
         [JsonProperty("latest_date")]
         [BsonElement("latest_date")]

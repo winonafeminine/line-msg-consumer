@@ -2,7 +2,6 @@ using Api.CommonLib.Interfaces;
 using Api.CommonLib.Stores;
 using Api.MessageLib.Models;
 using Api.MessageLib.RPCs;
-using Api.MessageLib.Settings;
 using Api.UserLib.DTOs;
 using Api.UserLib.Models;
 using Microsoft.Extensions.Logging;
@@ -38,7 +37,7 @@ namespace Api.UserLib.Services
             UserModel userModel = new UserModel{
                 ClientId=msgModel.ClientId,
                 GroupId=msgModel.GroupId,
-                LineUserId=msgModel.LineUserId,
+                GroupUserId=msgModel.GroupUserId,
                 LatestMessage=new UserLatestMessageDto{
                     IsRead=false,
                     MessageId=msgModel.MessageId
@@ -54,7 +53,6 @@ namespace Api.UserLib.Services
                 string messageQueue = RpcQueueNames.Message;
                 var response = _messageRpc.GetChannel();
 
-                // var response = await rpcClient.CallAsync("100");
                 _logger.LogInformation(JsonConvert.SerializeObject(response));
             }catch{
                 _logger.LogError("RPC error");

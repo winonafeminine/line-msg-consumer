@@ -36,7 +36,7 @@ namespace Api.ChatLib.Services
                 LatestMessage = new ChatLatestMessageDto
                 {
                     MessageId = msgModel.MessageId,
-                    LineUserId = msgModel.LineUserId,
+                    GroupUserId = msgModel.GroupUserId,
                     LatestDate = msgModel.CreatedDate,
                     // get the text from message object
                 }
