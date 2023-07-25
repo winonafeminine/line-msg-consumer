@@ -6,6 +6,6 @@ namespace Api.CommonLib.Interfaces
     public interface IMessageRpcClient
     {
         public LineChannelSetting GetChannel();
-        public Task AddUser(UserModel user);
+        public Response AddUser(UserModel user);
     }
 }

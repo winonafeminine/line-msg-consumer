@@ -61,7 +61,7 @@ namespace Api.UserLib.Services
                 response = _messageRpc.GetChannel();
                 // _logger.LogInformation(JsonConvert.SerializeObject(response));
             }catch{
-                _logger.LogError("RPC error");
+                _logger.LogError("Failed getting channel");
             }
 
             var userInfo = await _lineUserInfo.GetGroupMemberProfile(userModel.GroupId!, userModel.GroupUserId!, response.ChannelAccessToken!);
@@ -74,6 +74,13 @@ namespace Api.UserLib.Services
                 BsonDocument.Parse(JsonConvert.SerializeObject(userModel))
             );
 
+            // create user in APi.MessageSv
+            Response addUserResponse = new Response();
+            try{
+                addUserResponse = _messageRpc.AddUser(userModel);
+            }catch{
+                _logger.LogError("Failed adding user");
+            }
             _logger.LogInformation($"New User saved!");
             return;
         }

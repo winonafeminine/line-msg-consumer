@@ -79,12 +79,25 @@ namespace Api.MessageSv.HostedServices
                 CommonRpcRequest commonRequest = JsonConvert
                     .DeserializeObject<CommonRpcRequest>(request)!;
 
+                // get the channel details
                 if(commonRequest.Action == RpcActions.Message["GetChannel"])
                 {
                     ILineMessaging lineMessaging = scope.ServiceProvider
                         .GetRequiredService<ILineMessaging>();
                     LineChannelSetting channelSetting = lineMessaging.GetChannel();
                     return JsonConvert.SerializeObject(channelSetting);
+                }
+
+                // create a new user
+                else if(commonRequest.Action == RpcActions.Message["CreateUser"])
+                {
+                    ILineMessaging lineMessaging = scope.ServiceProvider
+                        .GetRequiredService<ILineMessaging>();
+                    
+                    string strUser = JsonConvert.SerializeObject(commonRequest.Body);
+                    UserModel user = JsonConvert.DeserializeObject<UserModel>(strUser)!;
+                    Response response = lineMessaging.AddUser(user);
+                    return JsonConvert.SerializeObject(response);
                 }
             }
 

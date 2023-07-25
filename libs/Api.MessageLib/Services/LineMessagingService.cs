@@ -22,6 +22,7 @@ namespace Api.MessageLib.Services
         private readonly IMessagePublisher _publisher;
         private readonly IHostEnvironment _env;
         private readonly IMongoCollection<BsonDocument> _messageCols;
+        private readonly IMongoCollection<BsonDocument> _userCols;
         private readonly IOptions<LineChannelSetting> _channelSetting;
         public LineMessagingService(ILogger<LineMessagingService> logger, ILineMessageValidation lineValidation,
             IMessagePublisher publisher, IHostEnvironment env, IOptions<MongoConfigSetting> mongoConfig, IOptions<LineChannelSetting> channelSetting)
@@ -34,6 +35,7 @@ namespace Api.MessageLib.Services
             IMongoClient mongoClient = new MongoClient(mongoConfig.Value.HostName);
             IMongoDatabase mongodb = mongoClient.GetDatabase(mongoConfig.Value.DatabaseName);
             _messageCols = mongodb.GetCollection<BsonDocument>(MongoConfigSetting.Collections["Message"]);
+            _userCols = mongodb.GetCollection<BsonDocument>(MongoConfigSetting.Collections["User"]);
             _channelSetting = channelSetting;
         }
 
@@ -81,7 +83,7 @@ namespace Api.MessageLib.Services
             string messageType = string.Empty;
 
             // check if the event type=message
-            if(eventType == LineEventTypes.Message)
+            if (eventType == LineEventTypes.Message)
             {
                 // get the line userId
                 pattern = @"""userId"":\s*""([^""]+)""";
@@ -97,7 +99,7 @@ namespace Api.MessageLib.Services
                 MessageType = MessageTypes.Receive,
                 MessageObject = content
             };
-            
+
             BsonDocument document = BsonDocument.Parse(
                 JsonConvert.SerializeObject(messageModel)
             );
@@ -122,10 +124,41 @@ namespace Api.MessageLib.Services
 
         public LineChannelSetting GetChannel()
         {
-            return new LineChannelSetting{
-                SecretId=_channelSetting.Value.SecretId,
-                ClientId=_channelSetting.Value.ClientId,
-                ChannelAccessToken=_channelSetting.Value.ChannelAccessToken,
+            return new LineChannelSetting
+            {
+                SecretId = _channelSetting.Value.SecretId,
+                ClientId = _channelSetting.Value.ClientId,
+                ChannelAccessToken = _channelSetting.Value.ChannelAccessToken,
+            };
+        }
+
+        public Response AddUser(UserModel user)
+        {
+            // find the existing user
+            var existingUsers = _userCols.Find<BsonDocument>(x => x["group_user_id"] == user.GroupUserId)
+                .ToList();
+
+            if (existingUsers.Any())
+            {
+                _logger.LogError("User existed!");
+                return new Response
+                {
+                    StatusCode = StatusCodes.Status409Conflict,
+                    Message = "User existed!"
+                };
+            }
+
+            BsonDocument document = BsonDocument.Parse(
+                JsonConvert.SerializeObject(user)
+            );
+
+            _userCols.InsertOne(document);
+            _logger.LogInformation("New User added!");
+            return new Response
+            {
+                Message = "New User added!",
+                Data = user,
+                StatusCode = StatusCodes.Status201Created
             };
         }
     }
