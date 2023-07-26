@@ -5,8 +5,6 @@ using Api.CommonLib.Setttings;
 using Api.CommonLib.Stores;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
-using MongoDB.Driver;
 using Newtonsoft.Json;
 
 namespace Api.CommonLib.RPCs
@@ -19,10 +17,23 @@ namespace Api.CommonLib.RPCs
         public MessageRpcClient(ICommonRpcClient commonRpcClient, IOptions<MongoConfigSetting> mongoConfig, ILogger<MessageRpcClient> logger)
         {
             _commonRpcClient = commonRpcClient;
-
-            IMongoClient mongoClient = new MongoClient(mongoConfig.Value.HostName);
-            IMongoDatabase mongodb = mongoClient.GetDatabase(mongoConfig.Value.DatabaseName);
             _logger = logger;
+        }
+
+        public Response AddChat(ChatModel chat)
+        {
+            CommonRpcRequest rpcRequest = new CommonRpcRequest{
+                Action=RpcActions.Message["CreateChat"],
+                Body=chat
+            };
+
+            string request = JsonConvert.SerializeObject(rpcRequest);
+
+            string strResponse = _commonRpcClient
+                .SendRPCRequest(request, RpcQueueNames.Message);
+            
+            Response response = JsonConvert.DeserializeObject<Response>(strResponse)!;
+            return response;
         }
 
         public Response AddUser(UserModel user)

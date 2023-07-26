@@ -7,5 +7,6 @@ namespace Api.CommonLib.Interfaces
     {
         public LineChannelSetting GetChannel();
         public Response AddUser(UserModel user);
+        public Response AddChat(ChatModel chat);
     }
 }

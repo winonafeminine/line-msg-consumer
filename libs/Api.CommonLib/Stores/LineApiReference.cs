@@ -9,9 +9,14 @@ namespace Api.CommonLib.Stores
         public static string Bot = "bot";
         public static string Group = "group";
         public static string Member = "member";
+        public static string Summary = "summary";
         public static string GetGroupMemberProfile(string groupId, string userId)
         {
             return Path.Combine(ApiUrl, ApiVersion, Bot, Group, groupId, Member, userId);
+        }
+        public static string GetGroupSummary(string groupId)
+        {
+            return Path.Combine(ApiUrl, ApiVersion, Bot, Group, groupId, Summary);
         }
     }
 }

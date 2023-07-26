@@ -2,7 +2,6 @@ using Api.CommonLib.Interfaces;
 using Api.CommonLib.Models;
 using Api.CommonLib.Setttings;
 using Api.CommonLib.Stores;
-using Api.UserLib.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -17,12 +16,12 @@ namespace Api.UserLib.Services
         private readonly ILogger<UserMessageConsumerService> _logger;
         private readonly IMongoCollection<BsonDocument> _userCols;
         private readonly IMessageRpcClient _messageRpc;
-        private readonly ILineUserInfo _lineUserInfo;
+        private readonly ILineGroupInfo _lineUserInfo;
         private readonly IUserRepository _userRepo;
         public UserMessageConsumerService(ILogger<UserMessageConsumerService> logger,
             IOptions<MongoConfigSetting> mongoConfig,
             IMessageRpcClient messageRpc,
-            ILineUserInfo lineUserInfo,
+            ILineGroupInfo lineUserInfo,
             IUserRepository userRepo)
         {
             _logger = logger;

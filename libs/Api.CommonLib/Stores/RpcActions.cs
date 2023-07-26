@@ -5,6 +5,7 @@ namespace Api.CommonLib.Stores
         public static IDictionary<string, string> Message = new Dictionary<string, string>{
             { "GetChannel", "GetChannelAction" },
             { "CreateUser", "CreateUserAction" },
+            { "CreateChat", "CreateChatAction" },
         };
     }
 }

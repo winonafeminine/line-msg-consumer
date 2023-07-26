@@ -1,5 +1,6 @@
 using System.Text;
 using Api.CommonLib.DTOs;
+using Api.CommonLib.Interfaces;
 using Api.CommonLib.Models;
 using Api.CommonLib.Setttings;
 using Api.CommonLib.Stores;
@@ -18,7 +19,8 @@ namespace Api.MessageSv.HostedServices
         private readonly string _queueName;
         private readonly IOptions<RabbitmqConfigSetting> _rabbitmqConfig;
         private readonly IServiceProvider _serviceProvider;
-        public MessageRpcServer(IOptions<RabbitmqConfigSetting> rabbitmqConfig, IServiceProvider serviceProvider)
+        private readonly IChatRepository _chatRepo;
+        public MessageRpcServer(IOptions<RabbitmqConfigSetting> rabbitmqConfig, IServiceProvider serviceProvider, IChatRepository chatRepo)
         {
             _rabbitmqConfig = rabbitmqConfig;
             var factory = new ConnectionFactory
@@ -39,6 +41,7 @@ namespace Api.MessageSv.HostedServices
 
             _channel.BasicQos(0, 1, false);
             _serviceProvider = serviceProvider;
+            _chatRepo = chatRepo;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -97,6 +100,15 @@ namespace Api.MessageSv.HostedServices
                     string strUser = JsonConvert.SerializeObject(commonRequest.Body);
                     UserModel user = JsonConvert.DeserializeObject<UserModel>(strUser)!;
                     Response response = lineMessaging.AddUser(user);
+                    return JsonConvert.SerializeObject(response);
+                }
+
+                // create a new chat
+                else if(commonRequest.Action == RpcActions.Message["CreateChat"])
+                {
+                    string strChat = JsonConvert.SerializeObject(commonRequest.Body);
+                    ChatModel chat = JsonConvert.DeserializeObject<ChatModel>(strChat)!;
+                    Response response = _chatRepo.AddChat(chat);
                     return JsonConvert.SerializeObject(response);
                 }
             }

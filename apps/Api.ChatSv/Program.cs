@@ -2,6 +2,8 @@ using Api.ChatLib.Services;
 using Api.ChatSv.HostedServices;
 using Api.CommonLib.Exceptions;
 using Api.CommonLib.Interfaces;
+using Api.CommonLib.RPCs;
+using Api.CommonLib.Services;
 using Api.CommonLib.Setttings;
 using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
@@ -38,6 +40,11 @@ builder.Services.AddSingleton<IMessageSubscriber>(x =>
 builder.Services.AddSingleton<IMessageConsumer, ChatMessageConsumerService>();
 builder.Services.AddHostedService<ChatDataCollector>();
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
+builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
+builder.Services.AddSingleton<ILineGroupInfo, LineGroupInfoService>();
+builder.Services.AddSingleton<ICommonRpcClient, CommonRpcClient>();
+builder.Services.AddSingleton<IMessageRpcClient, MessageRpcClient>();
+builder.Services.AddSingleton<IChatRepository, ChatRepository>();
 
 var app = builder.Build();
 
