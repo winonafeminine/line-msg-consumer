@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Api.CommonLib.Exceptions;
+using Api.CommonLib.Interfaces;
 using Api.CommonLib.Models;
 using Api.CommonLib.Setttings;
 using Api.CommonLib.Stores;
@@ -22,10 +23,10 @@ namespace Api.MessageLib.Services
         private readonly IMessagePublisher _publisher;
         private readonly IHostEnvironment _env;
         private readonly IMongoCollection<BsonDocument> _messageCols;
-        private readonly IMongoCollection<BsonDocument> _userCols;
         private readonly IOptions<LineChannelSetting> _channelSetting;
+        private readonly IUserRepository _userRepo;
         public LineMessagingService(ILogger<LineMessagingService> logger, ILineMessageValidation lineValidation,
-            IMessagePublisher publisher, IHostEnvironment env, IOptions<MongoConfigSetting> mongoConfig, IOptions<LineChannelSetting> channelSetting)
+            IMessagePublisher publisher, IHostEnvironment env, IOptions<MongoConfigSetting> mongoConfig, IOptions<LineChannelSetting> channelSetting, IUserRepository userRepo)
         {
             _logger = logger;
             _lineValidation = lineValidation;
@@ -35,8 +36,8 @@ namespace Api.MessageLib.Services
             IMongoClient mongoClient = new MongoClient(mongoConfig.Value.HostName);
             IMongoDatabase mongodb = mongoClient.GetDatabase(mongoConfig.Value.DatabaseName);
             _messageCols = mongodb.GetCollection<BsonDocument>(MongoConfigSetting.Collections["Message"]);
-            _userCols = mongodb.GetCollection<BsonDocument>(MongoConfigSetting.Collections["User"]);
             _channelSetting = channelSetting;
+            _userRepo = userRepo;
         }
 
         private string GetValFromJson(string strContent, string keyName, string pattern)
@@ -61,7 +62,7 @@ namespace Api.MessageLib.Services
         }
         public async Task RetriveLineMessage(object content, string signature, string id)
         {
-            await Task.Yield();
+            // await Task.Yield();
 
             // only calculate the signature in production mode
             if (!_env.IsDevelopment())
@@ -134,32 +135,7 @@ namespace Api.MessageLib.Services
 
         public Response AddUser(UserModel user)
         {
-            // find the existing user
-            var existingUsers = _userCols.Find<BsonDocument>(x => x["group_user_id"] == user.GroupUserId)
-                .ToList();
-
-            if (existingUsers.Any())
-            {
-                _logger.LogError("User existed!");
-                return new Response
-                {
-                    StatusCode = StatusCodes.Status409Conflict,
-                    Message = "User existed!"
-                };
-            }
-
-            BsonDocument document = BsonDocument.Parse(
-                JsonConvert.SerializeObject(user)
-            );
-
-            _userCols.InsertOne(document);
-            _logger.LogInformation("New User added!");
-            return new Response
-            {
-                Message = "New User added!",
-                Data = user,
-                StatusCode = StatusCodes.Status201Created
-            };
+            return _userRepo.AddUser(user);
         }
     }
 }

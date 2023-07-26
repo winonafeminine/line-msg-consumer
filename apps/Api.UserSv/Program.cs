@@ -1,7 +1,7 @@
 using Api.CommonLib.Exceptions;
 using Api.CommonLib.Interfaces;
-using Api.CommonLib.Models;
 using Api.CommonLib.RPCs;
+using Api.CommonLib.Services;
 using Api.CommonLib.Setttings;
 using Api.UserLib.Interfaces;
 using Api.UserLib.Services;
@@ -51,6 +51,7 @@ builder.Services.AddSingleton<ICommonRpcClient, CommonRpcClient>();
 builder.Services.AddSingleton<ILineUserInfo, LineUserInfoService>();
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
+builder.Services.AddSingleton<IUserRepository, UserRepository>();
 
 
 var app = builder.Build();
