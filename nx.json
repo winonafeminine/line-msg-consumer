@@ -14,6 +14,8 @@
                     "codegen",
                     "swagger",
                     "codegen",
+                    "swagger",
+                    "codegen",
                     "swagger"
                 ]
             }
@@ -23,6 +25,8 @@
         "build": {
             "dependsOn": [
                 "^build",
+                "codegen",
+                "^codegen",
                 "codegen",
                 "^codegen",
                 "codegen",
