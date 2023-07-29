@@ -49,6 +49,9 @@
                 "^production",
                 "{workspaceRoot}/jest.preset.js"
             ]
+        },
+        "e2e": {
+            "inputs": ["default", "^production"]
         }
     },
     "namedInputs": {
@@ -63,5 +66,22 @@
         ],
         "sharedGlobals": []
     },
-    "plugins": ["@nx-dotnet/core"]
+    "plugins": ["@nx-dotnet/core"],
+    "generators": {
+        "@nx/react": {
+            "application": {
+                "style": "none",
+                "linter": "eslint",
+                "bundler": "webpack",
+                "babel": true
+            },
+            "component": {
+                "style": "none"
+            },
+            "library": {
+                "style": "none",
+                "linter": "eslint"
+            }
+        }
+    }
 }
