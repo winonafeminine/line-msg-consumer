@@ -1,0 +1,17 @@
+deployment:
+  name: lmc-api-user-depl
+  image:
+    repo: 13angs/lmc.api.user.sv
+    tag: latest
+  env:
+    rabbitMQConfig:
+      properties:
+        prefetchCount: 100
+    aspnetCoreEnv: 'Development'
+
+service:
+  name: lmc-api-user-sv
+  ports:
+    default: 5000
+    nodePort: 30101
+  type: NodePort
