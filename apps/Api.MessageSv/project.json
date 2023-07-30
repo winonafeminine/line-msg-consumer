@@ -31,16 +31,33 @@
         }
       }
     },
+    "publish": {
+      "executor": "@nx-dotnet/core:publish",
+      "outputs": [
+        "{workspaceRoot}/dist/apps/Api.MessageSv"
+      ],
+      "options": {
+        "configuration": "Release",
+        "noDependencies": false,
+        "selfContained": false,
+        "noBuild": false,
+        "noRestore": false
+      }
+    },
     "lint": {
       "executor": "@nx-dotnet/core:format"
     },
     "swagger": {
       "executor": "@nx-dotnet/core:update-swagger",
-      "outputs": ["options.output"],
+      "outputs": [
+        "options.output"
+      ],
       "options": {
         "output": "libs/generated/api.message-sv-swagger/swagger.json"
       },
-      "dependsOn": ["build"]
+      "dependsOn": [
+        "build"
+      ]
     }
   },
   "tags": []
