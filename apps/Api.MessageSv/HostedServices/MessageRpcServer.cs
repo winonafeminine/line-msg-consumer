@@ -20,7 +20,8 @@ namespace Api.MessageSv.HostedServices
         private readonly IOptions<RabbitmqConfigSetting> _rabbitmqConfig;
         private readonly IServiceProvider _serviceProvider;
         private readonly IChatRepository _chatRepo;
-        public MessageRpcServer(IOptions<RabbitmqConfigSetting> rabbitmqConfig, IServiceProvider serviceProvider, IChatRepository chatRepo)
+        private readonly ILogger<MessageRpcServer> _logger;
+        public MessageRpcServer(IOptions<RabbitmqConfigSetting> rabbitmqConfig, IServiceProvider serviceProvider, IChatRepository chatRepo, ILogger<MessageRpcServer> logger)
         {
             _rabbitmqConfig = rabbitmqConfig;
             var factory = new ConnectionFactory
@@ -42,6 +43,7 @@ namespace Api.MessageSv.HostedServices
             _channel.BasicQos(0, 1, false);
             _serviceProvider = serviceProvider;
             _chatRepo = chatRepo;
+            _logger = logger;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -76,6 +78,7 @@ namespace Api.MessageSv.HostedServices
         // Add your custom RPC request processing logic here
         private string ProcessRequest(string request)
         {
+            _logger.LogInformation("Executing message rpc...");
             using(var scope = _serviceProvider.CreateScope())
             {
                 // Example: Echo the request back as the response

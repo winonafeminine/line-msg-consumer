@@ -70,6 +70,7 @@ namespace Api.ChatLib.Services
             {
                 return;
             }
+            _logger.LogInformation($"Group name: {groupSummary.GroupName}");
 
             // add chat in lmc_message_db
             Response chatReponse = new Response();

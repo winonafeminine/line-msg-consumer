@@ -1,0 +1,59 @@
+apiVersion: skaffold/v4beta6
+kind: Config
+build:
+  artifacts:
+    - image: 13angs/lmc.api.message.sv
+      context: .
+      docker:
+        dockerfile: ./apps/Api.MessageSv/Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: "apps/Api.MessageSv/**/*.cs"
+    - image: 13angs/lmc.api.user.sv
+      context: .
+      docker:
+        dockerfile: ./apps/Api.UserSv/Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: "apps/Api.UserSv/**/*.cs"
+    - image: 13angs/lmc.api.chat.sv
+      context: .
+      docker:
+        dockerfile: ./apps/Api.ChatSv/Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: "apps/Api.ChatSv/**/*.cs"
+    - image: 13angs/lmc.api.auth.sv
+      context: .
+      docker:
+        dockerfile: ./apps/Api.AuthSv/Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: "apps/Api.AuthSv/**/*.cs"
+    - image: 13angs/lmc.app.main.app
+      context: .
+      docker:
+        dockerfile: ./apps/app.main.app/Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: "apps/app.main.app/**/*.tsx"
+  local:
+    push: false # This flag will push the image to Docker Hub
+deploy:
+  helm:
+    releases:
+      - name: api.message.sv
+        chartPath: infra/helms/api.message.sv
+      - name: api.user.sv
+        chartPath: infra/helms/api.user.sv
+      - name: api.chat.sv
+        chartPath: infra/helms/api.chat.sv
+      - name: api.auth.sv
+        chartPath: infra/helms/api.auth.sv
+      - name: app.main.app
+        chartPath: infra/helms/app.main.app
