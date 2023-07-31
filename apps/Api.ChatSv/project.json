@@ -31,6 +31,19 @@
                 }
             }
         },
+        "publish": {
+            "executor": "@nx-dotnet/core:publish",
+            "outputs": [
+              "{workspaceRoot}/dist/apps/Api.ChatSv"
+            ],
+            "options": {
+              "configuration": "Release",
+              "noDependencies": false,
+              "selfContained": false,
+              "noBuild": false,
+              "noRestore": false
+            }
+          },
         "lint": {
             "executor": "@nx-dotnet/core:format"
         },
