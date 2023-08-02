@@ -49,6 +49,8 @@ builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("Rabb
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
 builder.Services.Configure<LineChannelSetting>(configuration.GetSection("LineConfig:Channel"));
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddSingleton<IUserChatRepository, UserChatRepository>();
+builder.Services.AddSingleton<IScopePublisher, ScopePublisher>();
 
 
 var app = builder.Build();

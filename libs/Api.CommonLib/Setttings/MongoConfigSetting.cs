@@ -8,6 +8,7 @@ namespace Api.CommonLib.Setttings
             { "Message", "lmc_messages" },
             { "User", "lmc_users" },
             { "Chat", "lmc_chats" },
+            { "UserChat", "lmc_user_chats" },
         };
     }
 }

@@ -11,5 +11,8 @@ namespace Api.CommonLib.Stores
         public static IDictionary<string, string> Chat = new Dictionary<string, string>{
             { "create", "lmc.chat.create" }
         };
+        public static IDictionary<string, string> UserChat = new Dictionary<string, string>{
+            { "create", "lmc.user_chat.create" }
+        };
     }
 }
