@@ -37,7 +37,7 @@ builder.Services.AddSingleton<IMessageSubscriber>(x =>
         autoAck: bool.Parse(configuration["RabbitMQConfig:Properties:AutoAck"]),
         prefetchCount: ushort.Parse(configuration["RabbitMQConfig:Properties:PrefetchCount"])
     ));
-builder.Services.AddScoped<IMessagePublisher>(x =>
+builder.Services.AddSingleton<IMessagePublisher>(x =>
     new MessagePublisher(
         x.GetRequiredService<IBasicConnection>(),
         configuration["RabbitMQConfig:ExchangeName"], // exhange name
@@ -50,6 +50,7 @@ builder.Services.AddSingleton<ICommonRpcClient, CommonRpcClient>();
 builder.Services.AddSingleton<ILineGroupInfo, LineGroupInfoService>();
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
+builder.Services.Configure<LineChannelSetting>(configuration.GetSection("LineConfig:Channel"));
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 
 

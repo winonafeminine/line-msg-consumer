@@ -30,20 +30,6 @@ namespace Api.CommonLib.Services
         // run synchronously
         public Response AddUser(UserModel user)
         {
-            // find the existing user
-            var existingUsers = _userCols.Find<BsonDocument>(x => x["group_user_id"] == user.GroupUserId)
-                .ToList();
-
-            if (existingUsers.Any())
-            {
-                // _logger.LogError("User existed!");
-                return new Response
-                {
-                    StatusCode = StatusCodes.Status409Conflict,
-                    Message = "User existed!"
-                };
-            }
-
             BsonDocument document = BsonDocument.Parse(
                 JsonConvert.SerializeObject(user)
             );
@@ -62,20 +48,6 @@ namespace Api.CommonLib.Services
         // run asynchronously
         public async Task<Response> AddUserAsync(UserModel user)
         {
-            // find the existing user
-            var existingUsers = await _userCols.Find<BsonDocument>(x => x["group_user_id"] == user.GroupUserId)
-                .ToListAsync();
-
-            if (existingUsers.Any())
-            {
-                _logger.LogError("User existed!");
-                throw new ErrorResponseException(
-                    StatusCodes.Status409Conflict,
-                    "User existed!",
-                    new List<Error>()
-                );
-            }
-
             BsonDocument document = BsonDocument.Parse(
                 JsonConvert.SerializeObject(user)
             );
@@ -87,6 +59,29 @@ namespace Api.CommonLib.Services
                 Message = "New User added!",
                 Data = user,
                 StatusCode = StatusCodes.Status201Created
+            };
+        }
+
+        public Response FindUser(string userId)
+        {
+            // find the existing user
+            var existingUsers = _userCols.Find<BsonDocument>(x => x["group_user_id"] == userId)
+                .ToList();
+
+            if (existingUsers.Any())
+            {
+                // _logger.LogError("User existed!");
+                return new Response
+                {
+                    StatusCode = StatusCodes.Status409Conflict,
+                    Message = "User existed!"
+                };
+            }
+
+            return new Response
+            {
+                StatusCode = StatusCodes.Status404NotFound,
+                Message = "User not found"
             };
         }
     }
