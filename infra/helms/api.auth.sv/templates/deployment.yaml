@@ -27,3 +27,20 @@ spec:
                 secretKeyRef:
                   name: rabbitmq-secret
                   key: hostName
+            - name: LineConfig__Channel__SecretId
+              valueFrom:
+                secretKeyRef:
+                  name: lmc-api-message-secret
+                  key: lineConfigChannelSecretId
+            - name: ASPNETCORE_ENVIRONMENT
+              value: {{ .Values.deployment.env.aspnetCoreEnv }}
+            - name: LineConfig__Channel__ClientId
+              valueFrom:
+                secretKeyRef:
+                  name: lmc-api-message-secret
+                  key: lineConfigChannelClientId
+            - name: LineConfig__Channel__ChannelAccessToken
+              valueFrom:
+                secretKeyRef:
+                  name: lmc-api-message-secret
+                  key: lineConfigChannelChannelAccessToken

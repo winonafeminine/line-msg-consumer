@@ -4,6 +4,7 @@ using Api.AuthLib.Models;
 using Api.AuthLib.Settings;
 using Api.CommonLib.Interfaces;
 using Api.CommonLib.Models;
+using Api.CommonLib.Setttings;
 using Api.CommonLib.Stores;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -16,24 +17,24 @@ namespace Api.AuthLib.Services
     {
         private IList<LineAuthStateModel> _authState;
         private readonly ILogger<AuthRepository> _logger;
-        private readonly IMessageRpcClient _messageRpc;
         private readonly IOptions<AuthLineConfigSetting> _lineConfigSetting;
-        public AuthRepository(ILogger<AuthRepository> logger, IMessageRpcClient messageRpc, IOptions<AuthLineConfigSetting> lineConfigSetting)
+        private readonly IOptions<LineChannelSetting> _channelSetting;
+        public AuthRepository(ILogger<AuthRepository> logger, IOptions<AuthLineConfigSetting> lineConfigSetting, IOptions<LineChannelSetting> channelSetting)
         {
             _authState = new List<LineAuthStateModel>();
             _logger = logger;
-            _messageRpc = messageRpc;
             _lineConfigSetting = lineConfigSetting;
+            _channelSetting = channelSetting;
         }
         public Response CreateLineAuthState(AuthDto auth)
         {
             // throw new NotImplementedException();
             // generate the state
             string state = ObjectId.GenerateNewId().ToString();
-            var messageRpcResponse = _messageRpc.GetChannel();
+            // var messageRpcResponse = _messageRpc.GetChannel();
             string lmcRedirectUri = System.Net.WebUtility.UrlEncode(_lineConfigSetting.Value.RedirectUri!);
             string lineRedirectUri = LineApiReference
-                .GetLineAuthorizationUrl(messageRpcResponse.ClientId!, lmcRedirectUri, state);
+                .GetLineAuthorizationUrl(_channelSetting.Value.ClientId!, lmcRedirectUri, state);
             _authState.Add(
                 new LineAuthStateModel{
                     State=state,

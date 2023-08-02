@@ -45,8 +45,6 @@ builder.Services.AddSingleton<IMessagePublisher>(x =>
     ));
 builder.Services.AddHostedService<UserDataCollector>();
 builder.Services.AddSingleton<IMessageConsumer, UserMessageConsumerService>();
-builder.Services.AddSingleton<IMessageRpcClient, MessageRpcClient>();
-builder.Services.AddSingleton<ICommonRpcClient, CommonRpcClient>();
 builder.Services.AddSingleton<ILineGroupInfo, LineGroupInfoService>();
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));

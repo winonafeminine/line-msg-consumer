@@ -2,8 +2,6 @@ using Api.AuthLib.Interfaces;
 using Api.AuthLib.Services;
 using Api.AuthLib.Settings;
 using Api.CommonLib.Exceptions;
-using Api.CommonLib.Interfaces;
-using Api.CommonLib.RPCs;
 using Api.CommonLib.Setttings;
 using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
@@ -42,9 +40,8 @@ builder.Services.AddScoped<IMessagePublisher>(x =>
         configuration["RabbitMQConfig:ExchangeName"], // exhange name
         ExchangeType.Topic // exchange type
     ));
-builder.Services.AddSingleton<IMessageRpcClient, MessageRpcClient>();
-builder.Services.AddSingleton<ICommonRpcClient, CommonRpcClient>();
 builder.Services.Configure<AuthLineConfigSetting>(configuration.GetSection("LineConfig"));
+builder.Services.Configure<LineChannelSetting>(configuration.GetSection("LineConfig:Channel"));
 builder.Services.AddSingleton<IAuthRepository, AuthRepository>();
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
 
