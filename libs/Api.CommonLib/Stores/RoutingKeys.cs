@@ -8,5 +8,8 @@ namespace Api.CommonLib.Stores
         public static IDictionary<string, string> User = new Dictionary<string, string>{
             { "create", "lmc.user.create" }
         };
+        public static IDictionary<string, string> Chat = new Dictionary<string, string>{
+            { "create", "lmc.chat.create" }
+        };
     }
 }

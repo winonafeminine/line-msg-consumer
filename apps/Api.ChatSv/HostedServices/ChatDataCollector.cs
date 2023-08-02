@@ -25,7 +25,7 @@ namespace Api.ChatSv.HostedServices
         public async Task<bool> ProcessMessage(string message, IDictionary<string, object> headers, string routingKey)
         {
             // await Task.Yield();
-            _logger.LogInformation($"Routing key: {routingKey}\nMessage: {message}");
+            // _logger.LogInformation($"Routing key: {routingKey}\nMessage: {message}");
             IDictionary<string, string> msgRoutingKeys = RoutingKeys.Message;
             if (routingKey == msgRoutingKeys["create"])
             {

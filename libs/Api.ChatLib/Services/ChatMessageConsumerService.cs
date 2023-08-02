@@ -2,10 +2,13 @@ using Api.CommonLib.DTOs;
 using Api.CommonLib.Interfaces;
 using Api.CommonLib.Models;
 using Api.CommonLib.Setttings;
+using Api.CommonLib.Stores;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Simple.RabbitMQ;
 
 namespace Api.ChatLib.Services
 {
@@ -13,15 +16,17 @@ namespace Api.ChatLib.Services
     {
         private readonly ILogger<ChatMessageConsumerService> _logger;
         private readonly ILineGroupInfo _lineGroupProfile;
-        private readonly IMessageRpcClient _msgRpcClient;
         private readonly IChatRepository _chatRepo;
-        public ChatMessageConsumerService(ILogger<ChatMessageConsumerService> logger, IOptions<MongoConfigSetting> mongoConfig, 
-            ILineGroupInfo lineGroupProfile, IMessageRpcClient msgRpcClient, IChatRepository chatRepo)
+        private readonly IOptions<LineChannelSetting> _channelSetting;
+        private readonly IServiceProvider _serviceProvider;
+        public ChatMessageConsumerService(ILogger<ChatMessageConsumerService> logger, IOptions<MongoConfigSetting> mongoConfig,
+            ILineGroupInfo lineGroupProfile, IChatRepository chatRepo, IOptions<LineChannelSetting> channelSetting, IServiceProvider serviceProvider)
         {
             _logger = logger;
             _lineGroupProfile = lineGroupProfile;
-            _msgRpcClient = msgRpcClient;
             _chatRepo = chatRepo;
+            _channelSetting = channelSetting;
+            _serviceProvider = serviceProvider;
         }
         public async Task ConsumeMessageCreate(string message)
         {
@@ -29,6 +34,8 @@ namespace Api.ChatLib.Services
             // mapping to the MessageModel
             MessageModel msgModel = JsonConvert
                 .DeserializeObject<MessageModel>(message)!;
+            
+            // _logger.LogInformation(message);
 
             ChatModel chatModel = new ChatModel
             {
@@ -44,44 +51,37 @@ namespace Api.ChatLib.Services
                 }
             };
 
-            // get the channel detail
-            var channelResponse = new LineChannelSetting();
-            try{
-                channelResponse = _msgRpcClient.GetChannel();
-            }catch{
-                _logger.LogError("Failed getting channel");
-            }
-
-            // get group summary from line
-            GetGroupSummaryDto groupSummary = await _lineGroupProfile.GetGroupSummary(chatModel.Group.GroupId!, channelResponse.ChannelAccessToken!);
-            // await _chatCols.InsertOneAsync(
-            //     BsonDocument.Parse(JsonConvert.SerializeObject(chatModel))
-            // );
-            
-            
-            chatModel.Group.GroupName=groupSummary.GroupName;
-            chatModel.Group.PictureUrl=groupSummary.PictureUrl;
-
-            // add chat in lmc_chat_db
-            Response response = _chatRepo.AddChat(chatModel);
-
+            // check if group existed
+            Response response = _chatRepo.FindChat(chatModel.Group.GroupId!);
             // chat exist!
             if(response.StatusCode == StatusCodes.Status409Conflict)
             {
                 return;
             }
-            _logger.LogInformation($"Group name: {groupSummary.GroupName}");
 
-            // add chat in lmc_message_db
-            Response chatReponse = new Response();
+            // _logger.LogInformation(_channelSetting.Value.ChannelAccessToken);
+            // get group summary from line
+            GetGroupSummaryDto groupSummary = await _lineGroupProfile.GetGroupSummary(chatModel.Group.GroupId!, _channelSetting.Value.ChannelAccessToken!);
+            // await _chatCols.InsertOneAsync(
+            //     BsonDocument.Parse(JsonConvert.SerializeObject(chatModel))
+            // );
             
-            try{
-                chatReponse = _msgRpcClient.AddChat(chatModel);
-            }catch{
-                _logger.LogInformation("Failed adding chat!");
+            chatModel.Group.GroupName=groupSummary.GroupName;
+            chatModel.Group.PictureUrl=groupSummary.PictureUrl;
+
+            // add chat in lmc_chat_db
+            response = _chatRepo.AddChat(chatModel);
+
+            // _logger.LogInformation($"Group name: {groupSummary.GroupName}");
+
+            // publish the chat
+            using(var scope = _serviceProvider.CreateScope())
+            {
+                string routingKey = RoutingKeys.Chat["create"];
+                string strChatModel = JsonConvert.SerializeObject(chatModel);
+                var publisher = scope.ServiceProvider.GetRequiredService<IMessagePublisher>();
+                publisher.Publish(strChatModel, routingKey, null);
             }
-            
-            _logger.LogInformation($"Chat saved!");
             return;
         }
     }

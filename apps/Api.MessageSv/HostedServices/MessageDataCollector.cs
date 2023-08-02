@@ -30,7 +30,7 @@ namespace Api.MessageSv.HostedServices
             // consume the user message when user is created
             if(routingKey == RoutingKeys.User["create"])
             {
-                _logger.LogInformation($"Routing key: {routingKey}\nMessage: {message}");
+                // _logger.LogInformation($"Routing key: {routingKey}\nMessage: {message}");
                 UserModel userModel = new UserModel();
                 try{
                     userModel = JsonConvert.DeserializeObject<UserModel>(message)!;

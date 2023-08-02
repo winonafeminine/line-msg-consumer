@@ -27,20 +27,6 @@ namespace Api.CommonLib.Services
         }
         public Response AddChat(ChatModel chat)
         {
-            // find the existing user
-            var existingChats = _chatCols.Find<BsonDocument>(x => x["group"]["group_id"] == chat.Group!.GroupId)
-                .ToList();
-
-            if (existingChats.Any())
-            {
-                // _logger.LogError("Chat existed!");
-                return new Response
-                {
-                    StatusCode = StatusCodes.Status409Conflict,
-                    Message = "Chat existed!"
-                };
-            }
-
             string strChat = JsonConvert.SerializeObject(chat);
             BsonDocument document = BsonDocument.Parse(
                 strChat
@@ -53,6 +39,28 @@ namespace Api.CommonLib.Services
                 Message = "New Chat added!",
                 Data = chat,
                 StatusCode = StatusCodes.Status201Created
+            };
+        }
+        public Response FindChat(string groupId)
+        {
+            // find the existing user
+            var existingChats = _chatCols.Find<BsonDocument>(x => x["group"]["group_id"] == groupId)
+                .ToList();
+
+            if (existingChats.Any())
+            {
+                // _logger.LogError("Chat existed!");
+                return new Response
+                {
+                    StatusCode = StatusCodes.Status409Conflict,
+                    Message = "Group existed!"
+                };
+            }
+            
+            return new Response
+            {
+                Message = "Group not found",
+                StatusCode = StatusCodes.Status404NotFound
             };
         }
     }

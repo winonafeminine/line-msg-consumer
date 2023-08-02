@@ -1,6 +1,5 @@
 using Api.CommonLib.Exceptions;
 using Api.CommonLib.Interfaces;
-using Api.CommonLib.RPCs;
 using Api.CommonLib.Services;
 using Api.CommonLib.Setttings;
 using Api.UserLib.Services;
