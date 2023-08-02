@@ -43,6 +43,7 @@ builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("Rabb
 builder.Services.Configure<LineChannelSetting>(configuration.GetSection("LineConfig:Channel"));
 builder.Services.AddSingleton<ILineGroupInfo, LineGroupInfoService>();
 builder.Services.AddSingleton<IChatRepository, ChatRepository>();
+builder.Services.AddSingleton<IUserChatRepository, UserChatRepository>();
 
 var app = builder.Build();
 
