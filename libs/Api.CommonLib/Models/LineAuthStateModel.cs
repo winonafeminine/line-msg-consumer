@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Api.AuthLib.Models
+namespace Api.CommonLib.Models
 {
     public class LineAuthStateModel
     {
@@ -19,7 +19,13 @@ namespace Api.AuthLib.Models
         [JsonProperty("access_token", NullValueHandling=NullValueHandling.Ignore)]
         public virtual string? AccessToken { get; set; }
 
-        [JsonProperty("line_group_id", NullValueHandling=NullValueHandling.Ignore)]
-        public virtual string? LineGroupId { get; set; }
+        [JsonProperty("group_user_id", NullValueHandling=NullValueHandling.Ignore)]
+        public virtual string? GroupUserId { get; set; }
+
+        [JsonProperty("code", NullValueHandling=NullValueHandling.Ignore)]
+        public virtual string? Code { get; set; }
+
+        [JsonProperty("line_access_token", NullValueHandling=NullValueHandling.Ignore)]
+        public virtual string? LineAccessToken { get; set; }
     }
 }

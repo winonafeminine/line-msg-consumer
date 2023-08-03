@@ -9,5 +9,8 @@ namespace Api.AuthLib.DTOs
 
         [JsonProperty("line_redirect_uri", NullValueHandling=NullValueHandling.Ignore)]
         public virtual string? LineRedirectUri { get; set; }
+
+        [JsonProperty("code", NullValueHandling=NullValueHandling.Ignore)]
+        public virtual string? Code { get; set; }
     }
 }

@@ -8,11 +8,15 @@ namespace Api.CommonLib.Stores
         public static string ApiVersion = "v2";
         public static string DataApiVersion = "v2";
         public static string LoginVersion = "v2.1";
+        public static string Oauth = "oauth2";
         public static string Bot = "bot";
         public static string Group = "group";
         public static string Member = "member";
         public static string Summary = "summary";
         public static string Authorize = "authorize";
+        public static string Token = "token";
+        public static string Verify = "verify";
+        public static string Profile = "profile";
         public static string GetGroupMemberProfile(string groupId, string userId)
         {
             return Path.Combine(ApiUrl, ApiVersion, Bot, Group, groupId, Member, userId);
@@ -29,6 +33,19 @@ namespace Api.CommonLib.Stores
             string scope = "profile%20openid%20email";
             string queryParam = $"{Authorize}?response_type={responseType}&client_id={clientId}&redirect_uri={redirectUri}&state={state}&scope={scope}";
             return Path.Combine(AuthUrl, LoginVersion, queryParam);
+        }
+        public static string GetLineLoginIssueTokenUrl()
+        {
+            return Path.Combine(ApiUrl, Oauth, LoginVersion, Token);
+        }
+        public static string GetLineLoginTokenVerifyUrl(string accessToken)
+        {
+            string queryParam = $"{Verify}?access_token={accessToken}";
+            return Path.Combine(ApiUrl, Oauth, LoginVersion, queryParam);
+        }
+        public static string GetLineLoginUserProfileUrl()
+        {
+            return Path.Combine(ApiUrl, ApiVersion, Profile);
         }
     }
 }

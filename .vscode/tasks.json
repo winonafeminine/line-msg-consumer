@@ -37,5 +37,17 @@
             ],
             "problemMatcher": "$msCompile"
         },
+        {
+            "label": "Api.AuthSv.Build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/apps/Api.AuthSv/ApiAuthSv.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
     ]
 }

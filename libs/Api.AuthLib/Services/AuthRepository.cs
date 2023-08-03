@@ -1,10 +1,10 @@
 using Api.AuthLib.DTOs;
 using Api.AuthLib.Interfaces;
-using Api.AuthLib.Models;
-using Api.AuthLib.Settings;
+using Api.CommonLib.DTOs;
+using Api.CommonLib.Exceptions;
 using Api.CommonLib.Interfaces;
 using Api.CommonLib.Models;
-using Api.CommonLib.Setttings;
+using Api.CommonLib.Settings;
 using Api.CommonLib.Stores;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -18,13 +18,13 @@ namespace Api.AuthLib.Services
         private IList<LineAuthStateModel> _authState;
         private readonly ILogger<AuthRepository> _logger;
         private readonly IOptions<AuthLineConfigSetting> _lineConfigSetting;
-        private readonly IOptions<LineChannelSetting> _channelSetting;
-        public AuthRepository(ILogger<AuthRepository> logger, IOptions<AuthLineConfigSetting> lineConfigSetting, IOptions<LineChannelSetting> channelSetting)
+        private readonly ILineGroupInfo _lineGroup;
+        public AuthRepository(ILogger<AuthRepository> logger, IOptions<AuthLineConfigSetting> lineConfigSetting, ILineGroupInfo lineGroup)
         {
             _authState = new List<LineAuthStateModel>();
             _logger = logger;
             _lineConfigSetting = lineConfigSetting;
-            _channelSetting = channelSetting;
+            _lineGroup = lineGroup;
         }
         public Response CreateLineAuthState(AuthDto auth)
         {
@@ -34,7 +34,7 @@ namespace Api.AuthLib.Services
             // var messageRpcResponse = _messageRpc.GetChannel();
             string lmcRedirectUri = System.Net.WebUtility.UrlEncode(_lineConfigSetting.Value.RedirectUri!);
             string lineRedirectUri = LineApiReference
-                .GetLineAuthorizationUrl(_channelSetting.Value.ClientId!, lmcRedirectUri, state);
+                .GetLineAuthorizationUrl(_lineConfigSetting.Value.ClientId!, lmcRedirectUri, state);
             _authState.Add(
                 new LineAuthStateModel{
                     State=state,
@@ -56,6 +56,47 @@ namespace Api.AuthLib.Services
             return new Response{
                 Data=_authState,
                 StatusCode=StatusCodes.Status200OK
+            };
+        }
+
+        public async Task<Response> UpdateLineAuthState(string state, AuthDto auth)
+        {
+            LineAuthStateModel lineAuthState = _authState
+                .FirstOrDefault(x=>x.State==state)!;
+
+            string responseMessage = "";
+
+            if(lineAuthState == null)
+            {
+                responseMessage = "State not found";
+                _logger.LogError(responseMessage);
+                throw new ErrorResponseException(
+                    StatusCodes.Status404NotFound,
+                    responseMessage,
+                    new List<Error>()
+                );
+            }
+
+            // issue line login access token
+            LineLoginIssueTokenResponseDto tokenResponse = await _lineGroup.IssueLineLoginAccessToken(auth.Code!);
+
+            // generate the platform access token
+
+            // get line user profile
+            LineLoginUserProfileResponseDto userProfile = await _lineGroup.GetLineLoginUserProfile(tokenResponse.AccessToken!);
+
+
+            // save the data in memory
+            lineAuthState.Code=auth.Code;
+            lineAuthState.LineAccessToken=tokenResponse.AccessToken;
+            lineAuthState.GroupUserId=userProfile.UserId;
+
+            return new Response{
+                StatusCode=StatusCodes.Status200OK,
+                Data=new LineAuthStateModel{
+                    State=lineAuthState.State,
+                    GroupUserId=lineAuthState.GroupUserId
+                }
             };
         }
     }

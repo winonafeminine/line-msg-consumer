@@ -1,7 +1,9 @@
 using Api.AuthLib.Interfaces;
 using Api.AuthLib.Services;
-using Api.AuthLib.Settings;
 using Api.CommonLib.Exceptions;
+using Api.CommonLib.Interfaces;
+using Api.CommonLib.Services;
+using Api.CommonLib.Settings;
 using Api.CommonLib.Setttings;
 using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
@@ -40,10 +42,10 @@ builder.Services.AddScoped<IMessagePublisher>(x =>
         configuration["RabbitMQConfig:ExchangeName"], // exhange name
         ExchangeType.Topic // exchange type
     ));
-builder.Services.Configure<AuthLineConfigSetting>(configuration.GetSection("LineConfig"));
-builder.Services.Configure<LineChannelSetting>(configuration.GetSection("LineConfig:Channel"));
+builder.Services.Configure<AuthLineConfigSetting>(configuration.GetSection("LineConfig:LineLogin"));
 builder.Services.AddSingleton<IAuthRepository, AuthRepository>();
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
+builder.Services.AddSingleton<ILineGroupInfo, LineGroupInfoService>();
 
 var app = builder.Build();
 
