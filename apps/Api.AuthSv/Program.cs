@@ -1,10 +1,10 @@
 using Api.AuthLib.Interfaces;
 using Api.AuthLib.Services;
-using Api.CommonLib.Exceptions;
-using Api.CommonLib.Interfaces;
+using Api.AuthLib.Settings;
 using Api.CommonLib.Services;
-using Api.CommonLib.Settings;
 using Api.CommonLib.Setttings;
+using Api.ReferenceLib.Exceptions;
+using Api.ReferenceLib.Interfaces;
 using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
 using Simple.RabbitMQ;

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Api.CommonLib\ApiCommonLib.csproj" />
+    <ProjectReference Include="..\Api.ReferenceLib\ApiReferenceLib.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

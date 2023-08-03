@@ -1,5 +1,5 @@
 using Api.AuthLib.DTOs;
-using Api.CommonLib.Models;
+using Api.ReferenceLib.Models;
 
 namespace Api.AuthLib.Interfaces
 {

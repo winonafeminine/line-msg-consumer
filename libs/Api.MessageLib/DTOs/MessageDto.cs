@@ -1,4 +1,4 @@
-using Api.CommonLib.Models;
+using Api.ReferenceLib.Models;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 

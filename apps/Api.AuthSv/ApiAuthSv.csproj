@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\libs\Api.AuthLib\ApiAuthLib.csproj" />
+    <ProjectReference Include="..\..\libs\Api.CommonLib\ApiCommonLib.csproj" />
   </ItemGroup>
 
 </Project>

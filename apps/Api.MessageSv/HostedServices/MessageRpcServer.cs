@@ -1,10 +1,13 @@
 using System.Text;
-using Api.CommonLib.DTOs;
 using Api.CommonLib.Interfaces;
 using Api.CommonLib.Models;
 using Api.CommonLib.Setttings;
 using Api.CommonLib.Stores;
-using Api.MessageLib.Interfaces;
+using Api.ReferenceLib.DTOs;
+using Api.ReferenceLib.Interfaces;
+using Api.ReferenceLib.Models;
+using Api.ReferenceLib.Setttings;
+using Api.UserLib.Models;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RabbitMQ.Client;

@@ -1,4 +1,5 @@
-using Api.CommonLib.Models;
+using Api.ReferenceLib.Models;
+using Api.UserLib.Models;
 
 namespace Api.CommonLib.Interfaces
 {

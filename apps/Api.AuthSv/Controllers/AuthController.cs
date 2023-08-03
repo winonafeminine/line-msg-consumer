@@ -1,6 +1,6 @@
 using Api.AuthLib.DTOs;
 using Api.AuthLib.Interfaces;
-using Api.CommonLib.Models;
+using Api.ReferenceLib.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.AuthSv.Controllers

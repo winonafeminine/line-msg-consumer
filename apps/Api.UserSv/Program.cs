@@ -1,8 +1,9 @@
-using Api.CommonLib.Exceptions;
 using Api.CommonLib.Interfaces;
 using Api.CommonLib.Services;
 using Api.CommonLib.Setttings;
-using Api.UserLib.Services;
+using Api.ReferenceLib.Exceptions;
+using Api.ReferenceLib.Interfaces;
+using Api.ReferenceLib.Setttings;
 using Api.UserSv.HostedServices;
 using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;

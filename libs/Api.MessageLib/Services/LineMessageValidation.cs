@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
-using Api.CommonLib.Exceptions;
 using Api.MessageLib.Interfaces;
+using Api.ReferenceLib.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

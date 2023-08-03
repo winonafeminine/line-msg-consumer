@@ -1,4 +1,4 @@
-using Api.MessageLib.Interfaces;
+using Api.CommonLib.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.MessageSv.Controllers

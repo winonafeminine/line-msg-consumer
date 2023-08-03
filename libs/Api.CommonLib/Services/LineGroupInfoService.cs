@@ -1,8 +1,8 @@
-using Api.CommonLib.DTOs;
-using Api.CommonLib.Exceptions;
-using Api.CommonLib.Interfaces;
-using Api.CommonLib.Settings;
-using Api.CommonLib.Stores;
+using Api.AuthLib.Settings;
+using Api.ReferenceLib.DTOs;
+using Api.ReferenceLib.Exceptions;
+using Api.ReferenceLib.Interfaces;
+using Api.ReferenceLib.Stores;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
