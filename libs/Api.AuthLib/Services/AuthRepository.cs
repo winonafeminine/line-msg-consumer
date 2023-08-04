@@ -1,12 +1,14 @@
 using Api.AuthLib.DTOs;
 using Api.AuthLib.Interfaces;
 using Api.AuthLib.Settings;
+using Api.AuthLib.Stores;
 using Api.ReferenceLib.DTOs;
 using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Interfaces;
 using Api.ReferenceLib.Models;
 using Api.ReferenceLib.Stores;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -19,12 +21,16 @@ namespace Api.AuthLib.Services
         private readonly ILogger<AuthRepository> _logger;
         private readonly IOptions<AuthLineConfigSetting> _lineConfigSetting;
         private readonly ILineGroupInfo _lineGroup;
-        public AuthRepository(ILogger<AuthRepository> logger, IOptions<AuthLineConfigSetting> lineConfigSetting, ILineGroupInfo lineGroup)
+        private readonly IJwtToken _jwtToken;
+        private readonly IHostEnvironment _hostEnv;
+        public AuthRepository(ILogger<AuthRepository> logger, IOptions<AuthLineConfigSetting> lineConfigSetting, ILineGroupInfo lineGroup, IJwtToken jwtToken, IHostEnvironment hostEnv)
         {
             _authState = new List<LineAuthStateModel>();
             _logger = logger;
             _lineConfigSetting = lineConfigSetting;
             _lineGroup = lineGroup;
+            _jwtToken = jwtToken;
+            _hostEnv = hostEnv;
         }
         public Response CreateLineAuthState(AuthDto auth)
         {
@@ -36,37 +42,41 @@ namespace Api.AuthLib.Services
             string lineRedirectUri = LineApiReference
                 .GetLineAuthorizationUrl(_lineConfigSetting.Value.ClientId!, lmcRedirectUri, state);
             _authState.Add(
-                new LineAuthStateModel{
-                    State=state,
-                    AppRedirectUri=auth.AppRedirectUri
+                new LineAuthStateModel
+                {
+                    State = state,
+                    AppRedirectUri = auth.AppRedirectUri
                 }
             );
 
-            return new Response{
-                Data=new AuthDto{
-                    LineRedirectUri=lineRedirectUri
+            return new Response
+            {
+                Data = new AuthDto
+                {
+                    LineRedirectUri = lineRedirectUri
                 },
-                StatusCode=StatusCodes.Status201Created
+                StatusCode = StatusCodes.Status201Created
             };
 
         }
 
         public Response GetLineAuthStates()
         {
-            return new Response{
-                Data=_authState,
-                StatusCode=StatusCodes.Status200OK
+            return new Response
+            {
+                Data = _authState,
+                StatusCode = StatusCodes.Status200OK
             };
         }
 
         public async Task<Response> UpdateLineAuthState(string state, AuthDto auth)
         {
             LineAuthStateModel lineAuthState = _authState
-                .FirstOrDefault(x=>x.State==state)!;
+                .FirstOrDefault(x => x.State == state)!;
 
             string responseMessage = "";
 
-            if(lineAuthState == null)
+            if (lineAuthState == null)
             {
                 responseMessage = "State not found";
                 _logger.LogError(responseMessage);
@@ -78,24 +88,44 @@ namespace Api.AuthLib.Services
             }
 
             // issue line login access token
-            LineLoginIssueTokenResponseDto tokenResponse = await _lineGroup.IssueLineLoginAccessToken(auth.Code!);
-
-            // generate the platform access token
+            LineLoginIssueTokenResponseDto tokenResponse = new LineLoginIssueTokenResponseDto();
 
             // get line user profile
-            LineLoginUserProfileResponseDto userProfile = await _lineGroup.GetLineLoginUserProfile(tokenResponse.AccessToken!);
+            LineLoginUserProfileResponseDto userProfile = new LineLoginUserProfileResponseDto();
 
+            // generate the platform_id
+            string platformId = ObjectId.GenerateNewId().ToString();
+
+            // generate the platform access token
+            string secretKey = SecretKeyGenerator.GenerateSecretKey();
+            string accessToken = _jwtToken.GenerateJwtToken(secretKey, JwtIssuers.Platform, platformId);
+
+            if (!_hostEnv.IsDevelopment())
+            {
+                // issue line login access token
+                tokenResponse = await _lineGroup.IssueLineLoginAccessToken(auth.Code!);
+                // get line user profile
+                userProfile = await _lineGroup.GetLineLoginUserProfile(tokenResponse.AccessToken!);
+            }
 
             // save the data in memory
-            lineAuthState.Code=auth.Code;
-            lineAuthState.LineAccessToken=tokenResponse.AccessToken;
-            lineAuthState.GroupUserId=userProfile.UserId;
+            lineAuthState.Code = auth.Code;
+            lineAuthState.LineAccessToken = tokenResponse.AccessToken;
+            lineAuthState.GroupUserId = userProfile.UserId;
+            lineAuthState.SecretKey = secretKey;
+            lineAuthState.AccessToken = accessToken;
+            lineAuthState.PlatformId = platformId;
 
-            return new Response{
-                StatusCode=StatusCodes.Status200OK,
-                Data=new LineAuthStateModel{
-                    State=lineAuthState.State,
-                    GroupUserId=lineAuthState.GroupUserId
+            return new Response
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Data = new LineAuthStateModel
+                {
+                    State = lineAuthState.State,
+                    GroupUserId = lineAuthState.GroupUserId,
+                    AccessToken = accessToken,
+                    PlatformId = platformId,
+                    AppRedirectUri = lineAuthState.AppRedirectUri
                 }
             };
         }

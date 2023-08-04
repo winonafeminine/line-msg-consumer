@@ -13,8 +13,8 @@ namespace Api.ReferenceLib.Models
         [JsonProperty("line_redirect_uri", NullValueHandling=NullValueHandling.Ignore)]
         public virtual string? LineRedirectUri { get; set; }
 
-        [JsonProperty("secret_id", NullValueHandling=NullValueHandling.Ignore)]
-        public virtual string? SecretId { get; set; }
+        [JsonProperty("secret_key", NullValueHandling=NullValueHandling.Ignore)]
+        public virtual string? SecretKey { get; set; }
 
         [JsonProperty("access_token", NullValueHandling=NullValueHandling.Ignore)]
         public virtual string? AccessToken { get; set; }
@@ -27,5 +27,8 @@ namespace Api.ReferenceLib.Models
 
         [JsonProperty("line_access_token", NullValueHandling=NullValueHandling.Ignore)]
         public virtual string? LineAccessToken { get; set; }
+
+        [JsonProperty("platform_id", NullValueHandling=NullValueHandling.Ignore)]
+        public virtual string? PlatformId { get; set; }
     }
 }

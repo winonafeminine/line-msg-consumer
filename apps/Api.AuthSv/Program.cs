@@ -48,6 +48,7 @@ builder.Services.AddSingleton<IAuthRepository, AuthRepository>();
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
 builder.Services.AddSingleton<ILineGroupInfo, LineGroupInfoService>();
 builder.Services.AddGrpc();
+builder.Services.AddSingleton<IJwtToken, JwtTokenService>();
 
 var app = builder.Build();
 
