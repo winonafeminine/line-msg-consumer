@@ -1,4 +1,6 @@
+using Api.AuthLib.Protos;
 using Api.CommonLib.Interfaces;
+using Grpc.Net.Client;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.MessageSv.Controllers
@@ -21,6 +23,18 @@ namespace Api.MessageSv.Controllers
             string signature = HttpContext.Request.Headers["X-Line-Signature"].ToString();
             await _lineMessagin.RetriveLineMessage(content, signature, id);
             return Ok();
+        }
+
+        [HttpGet]
+        [Route("messages")]
+        public async Task<ActionResult> GetMessages()
+        {
+            // The port number must match the port of the gRPC server.
+            using var channel = GrpcChannel.ForAddress("http://localhost:5171");
+            var client = new Greeter.GreeterClient(channel);
+            var reply = await client.SayHelloAsync(
+                              new HelloRequest { Name = "GreeterClient" });
+            return Ok(reply);
         }
     }
 }

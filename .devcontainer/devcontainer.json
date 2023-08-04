@@ -35,7 +35,8 @@
 				"ms-dotnettools.csharp",
 				"kreativ-software.csharpextensions",
 				"mongodb.mongodb-vscode",
-				"rohinivsenthil.rabbitrace"
+				"rohinivsenthil.rabbitrace",
+				"zxh404.vscode-proto3"
 			]
 		}
 	}

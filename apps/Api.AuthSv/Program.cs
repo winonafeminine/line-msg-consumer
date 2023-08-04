@@ -1,6 +1,7 @@
 using Api.AuthLib.Interfaces;
 using Api.AuthLib.Services;
 using Api.AuthLib.Settings;
+using Api.AuthSv.Grpcs;
 using Api.CommonLib.Services;
 using Api.CommonLib.Setttings;
 using Api.ReferenceLib.Exceptions;
@@ -46,6 +47,7 @@ builder.Services.Configure<AuthLineConfigSetting>(configuration.GetSection("Line
 builder.Services.AddSingleton<IAuthRepository, AuthRepository>();
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
 builder.Services.AddSingleton<ILineGroupInfo, LineGroupInfoService>();
+builder.Services.AddGrpc();
 
 var app = builder.Build();
 
@@ -63,5 +65,6 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGrpcService<GreeterService>();
 
 app.Run();
