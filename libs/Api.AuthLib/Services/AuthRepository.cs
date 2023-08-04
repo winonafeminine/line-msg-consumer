@@ -1,5 +1,6 @@
 using Api.AuthLib.DTOs;
 using Api.AuthLib.Interfaces;
+using Api.AuthLib.Models;
 using Api.AuthLib.Settings;
 using Api.AuthLib.Stores;
 using Api.ReferenceLib.DTOs;

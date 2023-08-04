@@ -2,10 +2,15 @@ using Api.AuthLib.Interfaces;
 using Api.AuthLib.Services;
 using Api.AuthLib.Settings;
 using Api.AuthSv.Grpcs;
+using Api.AuthSv.HostedServices;
 using Api.CommonLib.Services;
 using Api.CommonLib.Setttings;
+using Api.PlatformLib.Interfaces;
+using Api.PlatformLib.Services;
 using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Interfaces;
+using Api.ReferenceLib.Services;
+using Api.ReferenceLib.Setttings;
 using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
 using Simple.RabbitMQ;
@@ -27,6 +32,7 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // Register message subscriber
+builder.Services.AddSingleton<IBasicConnection>(new BasicConnection(configuration["RabbitMQConfig:HostName"], true));
 builder.Services.AddSingleton<IMessageSubscriber>(x =>
     new MessageSubscriber(
         x.GetRequiredService<IBasicConnection>(),
@@ -49,6 +55,10 @@ builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("Rabb
 builder.Services.AddSingleton<ILineGroupInfo, LineGroupInfoService>();
 builder.Services.AddGrpc();
 builder.Services.AddSingleton<IJwtToken, JwtTokenService>();
+builder.Services.AddSingleton<IScopePublisher, ScopePublisher>();
+builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
+builder.Services.AddSingleton<IPlatformRepository, PlatformRepository>();
+builder.Services.AddHostedService<AuthDataCollector>();
 
 var app = builder.Build();
 

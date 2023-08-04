@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Api.ReferenceLib.Models
+namespace Api.AuthLib.Models
 {
     public class LineAuthStateModel
     {
