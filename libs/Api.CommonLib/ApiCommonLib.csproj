@@ -4,6 +4,7 @@
     <ProjectReference Include="..\Api.ChatLib\ApiChatLib.csproj" />
     <ProjectReference Include="..\Api.MessageLib\ApiMessageLib.csproj" />
     <ProjectReference Include="..\Api.UserLib\ApiUserLib.csproj" />
+    <ProjectReference Include="..\Api.PlatformLib\ApiPlatformLib.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>

@@ -1,0 +1,28 @@
+{
+    "name": "Api.PlatformLib",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "projectType": "library",
+    "sourceRoot": "libs/Api.PlatformLib",
+    "targets": {
+        "build": {
+            "executor": "@nx-dotnet/core:build",
+            "outputs": [
+                "{workspaceRoot}/dist/libs/Api.PlatformLib",
+                "{workspaceRoot}/dist/intermediates/libs/Api.PlatformLib"
+            ],
+            "options": {
+                "configuration": "Debug",
+                "noDependencies": true
+            },
+            "configurations": {
+                "production": {
+                    "configuration": "Release"
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nx-dotnet/core:format"
+        }
+    },
+    "tags": []
+}
