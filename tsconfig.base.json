@@ -24,6 +24,9 @@
             "@line-msg-consumer/generated/api.message-sv-types": [
                 "libs/generated/api.message-sv-types/src/index.ts"
             ],
+            "@line-msg-consumer/generated/api.platform-sv-types": [
+                "libs/generated/api.platform-sv-types/src/index.ts"
+            ],
             "@line-msg-consumer/generated/api.user-sv-types": [
                 "libs/generated/api.user-sv-types/src/index.ts"
             ]
