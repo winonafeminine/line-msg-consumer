@@ -1,4 +1,4 @@
-namespace Api.CommonLib.Interfaces
+namespace Api.ReferenceLib.Interfaces
 {
     public interface IScopePublisher
     {

@@ -1,4 +1,4 @@
-namespace Api.CommonLib.Stores
+namespace Api.ReferenceLib.Stores
 {
     public class RoutingKeys
     {
@@ -13,6 +13,9 @@ namespace Api.CommonLib.Stores
         };
         public static IDictionary<string, string> UserChat = new Dictionary<string, string>{
             { "create", "lmc.user_chat.create" }
+        };
+        public static IDictionary<string, string> Auth = new Dictionary<string, string>{
+            { "update", "lmc.auth.update" }
         };
     }
 }

@@ -1,8 +1,8 @@
-using Api.CommonLib.Interfaces;
+using Api.ReferenceLib.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Simple.RabbitMQ;
 
-namespace Api.CommonLib.Services
+namespace Api.ReferenceLib.Services
 {
     public class ScopePublisher : IScopePublisher
     {

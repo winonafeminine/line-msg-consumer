@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
+using Newtonsoft.Json;
 
 namespace Api.AuthLib.Services
 {
@@ -23,7 +24,8 @@ namespace Api.AuthLib.Services
         private readonly ILineGroupInfo _lineGroup;
         private readonly IJwtToken _jwtToken;
         private readonly IHostEnvironment _hostEnv;
-        public AuthRepository(ILogger<AuthRepository> logger, IOptions<AuthLineConfigSetting> lineConfigSetting, ILineGroupInfo lineGroup, IJwtToken jwtToken, IHostEnvironment hostEnv)
+        private readonly IScopePublisher _publisher;
+        public AuthRepository(ILogger<AuthRepository> logger, IOptions<AuthLineConfigSetting> lineConfigSetting, ILineGroupInfo lineGroup, IJwtToken jwtToken, IHostEnvironment hostEnv, IScopePublisher publisher)
         {
             _authState = new List<LineAuthStateModel>();
             _logger = logger;
@@ -31,6 +33,7 @@ namespace Api.AuthLib.Services
             _lineGroup = lineGroup;
             _jwtToken = jwtToken;
             _hostEnv = hostEnv;
+            _publisher = publisher;
         }
         public Response CreateLineAuthState(AuthDto auth)
         {
@@ -116,6 +119,11 @@ namespace Api.AuthLib.Services
             lineAuthState.AccessToken = accessToken;
             lineAuthState.PlatformId = platformId;
 
+            // publish the LineAuthStateModel
+            string strLineAuthState = JsonConvert.SerializeObject(lineAuthState);
+            string routingKey = RoutingKeys.Auth["update"];
+            _publisher.Publish(strLineAuthState, routingKey, null);
+            
             return new Response
             {
                 StatusCode = StatusCodes.Status200OK,

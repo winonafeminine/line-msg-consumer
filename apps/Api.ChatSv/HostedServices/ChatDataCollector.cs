@@ -1,6 +1,6 @@
 using Api.CommonLib.Interfaces;
-using Api.CommonLib.Stores;
 using Api.ReferenceLib.Interfaces;
+using Api.ReferenceLib.Stores;
 using Api.UserLib.Models;
 using Newtonsoft.Json;
 using Simple.RabbitMQ;

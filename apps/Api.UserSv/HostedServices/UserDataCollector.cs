@@ -1,5 +1,5 @@
-using Api.CommonLib.Stores;
 using Api.ReferenceLib.Interfaces;
+using Api.ReferenceLib.Stores;
 using Simple.RabbitMQ;
 
 namespace Api.UserSv.HostedServices
