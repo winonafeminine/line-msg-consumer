@@ -1,4 +1,5 @@
 using Api.ReferenceLib.Models;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
@@ -8,6 +9,8 @@ namespace Api.PlatformLib.Models
     {
         [JsonProperty("_id")]
         [BsonElement("_id")]
+        [BsonId]
+        [BsonRepresentation(BsonType.String)]
         public virtual string? PlatformId { get; set; }
 
         [JsonProperty("platform_name")]

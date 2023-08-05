@@ -1,6 +1,7 @@
 using Api.PlatformLib.Interfaces;
 using Api.PlatformLib.Services;
 using Api.PlatformSv.HostedServices;
+using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Setttings;
 using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
@@ -43,6 +44,7 @@ builder.Services.AddScoped<IMessagePublisher>(x =>
     ));
 builder.Services.AddSingleton<IPlatformRepository, PlatformRepository>();
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
+builder.Services.AddSingleton<IPlatformService, PlatformService>();
 
 var app = builder.Build();
 
@@ -51,6 +53,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}else{
+    app.UseResponseExceptionHandler();
 }
 
 // app.UseHttpsRedirection();

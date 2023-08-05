@@ -1,6 +1,7 @@
 using Api.AuthLib.Models;
 using Api.PlatformLib.Interfaces;
 using Api.PlatformLib.Models;
+using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Models;
 using Api.ReferenceLib.Stores;
 using Newtonsoft.Json;
@@ -33,14 +34,21 @@ namespace Api.PlatformSv.HostedServices
                 LineAuthStateModel authModel = JsonConvert
                     .DeserializeObject<LineAuthStateModel>(message)!;
 
-                Response platformResponse = await _platformRepo.Find(authModel.PlatformId!);
+                PlatformModel platformModel = new PlatformModel();
+                try{
+                    platformModel = await _platformRepo.Find(authModel.PlatformId!);
 
-                if(platformResponse.StatusCode == StatusCodes.Status409Conflict)
-                {
-                    _logger.LogWarning(platformResponse.Message);
-                    return true;
+                    if(platformModel != null)
+                    {
+                        _logger.LogError("Platform exist!");
+                        return true;
+                    }
+                }catch (ErrorResponseException ex){
+                    _logger.LogInformation(ex.Description);
+                    platformModel = new PlatformModel();
                 }
-                PlatformModel platformModel = new PlatformModel{
+
+                platformModel = new PlatformModel{
                     PlatformId=authModel.PlatformId,
                     AccessToken=authModel.AccessToken,
                     SecretKey=authModel.SecretKey

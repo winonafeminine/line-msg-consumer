@@ -1,5 +1,6 @@
 using Api.PlatformLib.Interfaces;
 using Api.PlatformLib.Models;
+using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Models;
 using Api.ReferenceLib.Setttings;
 using Microsoft.AspNetCore.Http;
@@ -40,26 +41,43 @@ namespace Api.PlatformLib.Services
             };
         }
 
-        public async Task<Response> Find(string platformId)
+        public async Task<PlatformModel> Find(string platformId)
         {
             // find the existing user
-            var existingPlatforms = await _platformCols.Find<BsonDocument>(x => x["_id"] == platformId)
-                .ToListAsync();
+            var existingPlatform = await _platformCols
+                .Find<BsonDocument>(x => x["_id"] == platformId)
+                .As<PlatformModel>()
+                .FirstOrDefaultAsync();
 
-            if (existingPlatforms.Any())
+            if (existingPlatform != null)
             {
                 // _logger.LogError("Platform existed!");
-                return new Response
-                {
-                    StatusCode = StatusCodes.Status409Conflict,
-                    Message = "Platform existed!"
-                };
+                return existingPlatform;
             }
 
-            return new Response
-            {
-                StatusCode = StatusCodes.Status404NotFound,
-                Message = "Platform not found"
+            throw new ErrorResponseException(
+                StatusCodes.Status404NotFound,
+                $"Platform with id {platformId} not found",
+                new List<Error>()
+            );
+        }
+
+        public async Task<Response> ReplacePlatform(PlatformModel platformModel)
+        {
+            string resMessage = string.Empty;
+            string strDoc = JsonConvert.SerializeObject(platformModel);
+            BsonDocument document = BsonDocument.Parse(
+                strDoc
+            );
+
+            var filter = Builders<BsonDocument>.Filter.Eq(x=>x["_id"], platformModel.PlatformId);
+            var updateResult = await _platformCols.ReplaceOneAsync(filter, document);
+            resMessage = $"Successfully replace the platform";
+            _logger.LogInformation(resMessage);
+            
+            return new Response{
+                StatusCode=StatusCodes.Status200OK,
+                Message=resMessage
             };
         }
     }
