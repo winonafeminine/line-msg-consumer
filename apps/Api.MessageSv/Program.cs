@@ -1,3 +1,5 @@
+using Api.AuthLib.Grpcs;
+using Api.AuthLib.Interfaces;
 using Api.CommonLib.Interfaces;
 using Api.CommonLib.Services;
 using Api.CommonLib.Setttings;
@@ -6,6 +8,7 @@ using Api.MessageLib.Services;
 using Api.MessageSv.HostedServices;
 using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Interfaces;
+using Api.ReferenceLib.Settings;
 using Api.ReferenceLib.Setttings;
 using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
@@ -53,9 +56,11 @@ builder.Services.AddHostedService<MessageDataCollector>();
 builder.Services.AddHostedService<MessageRpcServer>();
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
 builder.Services.Configure<LineChannelSetting>(configuration.GetSection("LineConfig:Channel"));
+builder.Services.Configure<GrpcConfigSetting>(configuration.GetSection("GrpcConfig"));
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IChatRepository, ChatRepository>();
+builder.Services.AddSingleton<IAuthGrpcClientService, AuthGrpcClientService>();
 
 var app = builder.Build();
 

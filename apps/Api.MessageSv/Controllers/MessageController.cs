@@ -1,3 +1,4 @@
+using Api.AuthLib.Interfaces;
 using Api.AuthLib.Protos;
 using Api.CommonLib.Interfaces;
 using Grpc.Net.Client;
@@ -10,9 +11,11 @@ namespace Api.MessageSv.Controllers
     public class MessagesController : ControllerBase
     {
         private readonly ILineMessaging _lineMessagin;
-        public MessagesController(ILineMessaging lineMessagin)
+        private readonly IAuthGrpcClientService _authGrpcClient;
+        public MessagesController(ILineMessaging lineMessagin, IAuthGrpcClientService authGrpcClient)
         {
             _lineMessagin = lineMessagin;
+            _authGrpcClient = authGrpcClient;
         }
 
         [HttpPost]
@@ -30,11 +33,8 @@ namespace Api.MessageSv.Controllers
         public async Task<ActionResult> GetMessages()
         {
             // The port number must match the port of the gRPC server.
-            using var channel = GrpcChannel.ForAddress("http://localhost:5171");
-            var client = new Greeter.GreeterClient(channel);
-            var reply = await client.SayHelloAsync(
-                              new HelloRequest { Name = "GreeterClient" });
-            return Ok(reply);
+            string token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
+            return Ok(await _authGrpcClient.ValidateJwtToken(token));
         }
     }
 }

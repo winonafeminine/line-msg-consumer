@@ -2,8 +2,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Api.AuthLib.Interfaces;
+using Api.AuthLib.Models;
 using Api.AuthLib.Stores;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 
 namespace Api.AuthLib.Services
 {
@@ -16,10 +18,11 @@ namespace Api.AuthLib.Services
 
             var tokenClaim = new Claim("", "");
 
-            if(issuer == JwtIssuers.Platform)
+            if (issuer == JwtIssuers.Platform)
             {
                 tokenClaim = new Claim("platform_id", refId);
-            }else if(issuer == JwtIssuers.user)
+            }
+            else if (issuer == JwtIssuers.user)
             {
                 tokenClaim = new Claim("user_id", refId);
             }
@@ -39,7 +42,16 @@ namespace Api.AuthLib.Services
             return tokenHandler.WriteToken(token);
         }
 
-        public ClaimsPrincipal  ValidateJwtToken(string token, string secretKey)
+        public JwtPayloadData GetJwtPayloadData(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+
+            string strPayload = jwtToken.Payload.SerializeToJson();
+            return JsonConvert.DeserializeObject<JwtPayloadData>(strPayload)!;
+        }
+
+        public ClaimsPrincipal ValidateJwtToken(string token, string secretKey)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(secretKey);

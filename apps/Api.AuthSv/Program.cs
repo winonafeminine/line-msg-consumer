@@ -76,6 +76,6 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapGrpcService<GreeterService>();
+app.MapGrpcService<AuthGrpcServerService>();
 
 app.Run();
