@@ -62,5 +62,3 @@ spec:
                 secretKeyRef:
                   name: mongo-secret
                   key: mongodbHostname
-            - name: Kestrel__Endpoints__gRPC__Url
-              value: http://lmc-api-auth-sv.{{ .Release.Namespace }}:7000

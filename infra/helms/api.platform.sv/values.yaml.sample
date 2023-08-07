@@ -7,7 +7,7 @@ deployment:
     rabbitMQConfig:
       properties:
         prefetchCount: 100
-    aspnetCoreEnv: 'Development'
+    aspnetCoreEnv: 'Production'
 
 service:
   name: lmc-api-platform-sv
