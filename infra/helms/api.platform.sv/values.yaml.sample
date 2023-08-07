@@ -14,5 +14,5 @@ service:
   ports:
     default: 5000
     grpc: 7000
-    nodePort: 30103
+    nodePort: 30104
   type: NodePort

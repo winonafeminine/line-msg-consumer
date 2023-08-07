@@ -6,50 +6,30 @@ build:
       context: .
       docker:
         dockerfile: ./apps/Api.MessageSv/Dockerfile
-      sync:
-        manual:
-          - dest: .
-            src: "apps/Api.MessageSv/**/*.cs"
     - image: 13angs/lmc.api.user.sv
       context: .
       docker:
         dockerfile: ./apps/Api.UserSv/Dockerfile
-      sync:
-        manual:
-          - dest: .
-            src: "apps/Api.UserSv/**/*.cs"
     - image: 13angs/lmc.api.chat.sv
       context: .
       docker:
         dockerfile: ./apps/Api.ChatSv/Dockerfile
-      sync:
-        manual:
-          - dest: .
-            src: "apps/Api.ChatSv/**/*.cs"
     - image: 13angs/lmc.api.auth.sv
       context: .
       docker:
         dockerfile: ./apps/Api.AuthSv/Dockerfile
-      sync:
-        manual:
-          - dest: .
-            src: "apps/Api.AuthSv/**/*.cs"
     - image: 13angs/lmc.api.platform.sv
       context: .
       docker:
         dockerfile: ./apps/Api.PlatformSv/Dockerfile
-      sync:
-        manual:
-          - dest: .
-            src: "apps/Api.PlatformSv/**/*.cs"
-    - image: 13angs/lmc.app.main.app
-      context: .
-      docker:
-        dockerfile: ./apps/app.main.app/Dockerfile
-      sync:
-        manual:
-          - dest: .
-            src: "apps/app.main.app/**/*.tsx"
+    # - image: 13angs/lmc.app.main.app
+    #   context: .
+    #   docker:
+    #     dockerfile: ./apps/app.main.app/Dockerfile
+    #   sync:
+    #     manual:
+    #       - dest: .
+    #         src: "apps/app.main.app/**/*.tsx"
   local:
     push: false # This flag will push the image to Docker Hub
 deploy:
@@ -65,5 +45,5 @@ deploy:
         chartPath: infra/helms/api.auth.sv
       - name: api.platform.sv
         chartPath: infra/helms/api.platform.sv
-      - name: app.main.app
-        chartPath: infra/helms/app.main.app
+      # - name: app.main.app
+      #   chartPath: infra/helms/app.main.app

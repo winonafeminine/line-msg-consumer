@@ -13,6 +13,7 @@ service:
   name: lmc-api-message-sv
   ports:
     default: 5000
+    nodePort: 30100
   type: ClusterIP
 
 secret:

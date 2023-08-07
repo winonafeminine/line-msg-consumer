@@ -19,7 +19,7 @@ service:
 secret:
   name: lmc-api-auth-secret
   data:
-    lineConfigLineLoginRedirectUri: ''
+    lineConfigLineLoginRedirectUri: 'https://2186-171-7-224-238.ngrok-free.app/auth/line/connect'
     lineConfigLineLoginSecretId: ''
     lineConfigLineLoginClientId: ''
   

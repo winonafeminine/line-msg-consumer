@@ -21,6 +21,7 @@ IConfiguration configuration = builder.Configuration;
 // Add services to the container.
 
 // configure controller to use Newtonsoft as a default serializer
+// add some comment here
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
         options.SerializerSettings.ReferenceLoopHandling = Newtonsoft
