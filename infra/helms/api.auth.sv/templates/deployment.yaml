@@ -32,8 +32,6 @@ spec:
                 secretKeyRef:
                   name: lmc-api-message-secret
                   key: lineConfigChannelSecretId
-            - name: ASPNETCORE_ENVIRONMENT
-              value: {{ .Values.deployment.env.aspnetCoreEnv }}
             - name: LineConfig__Channel__ClientId
               valueFrom:
                 secretKeyRef:
@@ -44,3 +42,23 @@ spec:
                 secretKeyRef:
                   name: lmc-api-message-secret
                   key: lineConfigChannelChannelAccessToken
+            - name: LineConfig__LineLogin__RedirectUri
+              valueFrom:
+                secretKeyRef:
+                  name: lmc-api-auth-secret
+                  key: lineConfigLineLoginRedirectUri
+            - name: LineConfig__LineLogin__ClientId
+              valueFrom:
+                secretKeyRef:
+                  name: lmc-api-auth-secret
+                  key: lineConfigLineLoginClientId
+            - name: LineConfig__LineLogin__SecretId
+              valueFrom:
+                secretKeyRef:
+                  name: lmc-api-auth-secret
+                  key: lineConfigLineLoginSecretId
+            - name: MongoConfig__HostName
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: mongodbHostname

@@ -22,21 +22,6 @@ spec:
           env:
             - name: ASPNETCORE_ENVIRONMENT
               value: {{ .Values.deployment.env.aspnetCoreEnv }}
-            - name: LineConfig__Channel__SecretId
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secret.name }}
-                  key: lineConfigChannelSecretId
-            - name: LineConfig__Channel__ClientId
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secret.name }}
-                  key: lineConfigChannelClientId
-            - name: LineConfig__Channel__ChannelAccessToken
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secret.name }}
-                  key: lineConfigChannelChannelAccessToken
             - name: RabbitMQConfig__HostName
               valueFrom:
                 secretKeyRef:
@@ -47,7 +32,3 @@ spec:
                 secretKeyRef:
                   name: mongo-secret
                   key: mongodbHostname
-            - name: TZ
-              value: 'Asia/Bangkok'
-            - name: GrpcConfig__Auth__Address
-              value: http://lmc-api-auth-sv.{{ .Release.Namespace }}:7000

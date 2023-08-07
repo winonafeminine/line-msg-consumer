@@ -15,3 +15,11 @@ service:
     default: 5000
     nodePort: 30103
   type: NodePort
+
+secret:
+  name: lmc-api-auth-secret
+  data:
+    lineConfigLineLoginRedirectUri: ''
+    lineConfigLineLoginSecretId: ''
+    lineConfigLineLoginClientId: ''
+  

@@ -34,6 +34,14 @@ build:
         manual:
           - dest: .
             src: "apps/Api.AuthSv/**/*.cs"
+    - image: 13angs/lmc.api.platform.sv
+      context: .
+      docker:
+        dockerfile: ./apps/Api.PlatformSv/Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: "apps/Api.PlatformSv/**/*.cs"
     - image: 13angs/lmc.app.main.app
       context: .
       docker:
@@ -55,5 +63,7 @@ deploy:
         chartPath: infra/helms/api.chat.sv
       - name: api.auth.sv
         chartPath: infra/helms/api.auth.sv
+      - name: api.platform.sv
+        chartPath: infra/helms/api.platform.sv
       - name: app.main.app
         chartPath: infra/helms/app.main.app
