@@ -37,8 +37,6 @@ spec:
                 secretKeyRef:
                   name: lmc-api-message-secret
                   key: lineConfigChannelSecretId
-            - name: ASPNETCORE_ENVIRONMENT
-              value: {{ .Values.deployment.env.aspnetCoreEnv }}
             - name: LineConfig__Channel__ClientId
               valueFrom:
                 secretKeyRef:

@@ -13,8 +13,8 @@ service:
   name: lmc-api-auth-sv
   ports:
     default: 5000
-    nodePort: 30103
-  type: NodePort
+    grpc: 7000
+  type: ClusterIP
 
 secret:
   name: lmc-api-auth-secret

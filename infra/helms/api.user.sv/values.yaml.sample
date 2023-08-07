@@ -13,5 +13,4 @@ service:
   name: lmc-api-user-sv
   ports:
     default: 5000
-    nodePort: 30101
-  type: NodePort
+  type: ClusterIP

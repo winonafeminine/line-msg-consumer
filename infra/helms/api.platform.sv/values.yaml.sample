@@ -13,6 +13,4 @@ service:
   name: lmc-api-platform-sv
   ports:
     default: 5000
-    grpc: 7000
-    nodePort: 30104
-  type: NodePort
+  type: ClusterIP

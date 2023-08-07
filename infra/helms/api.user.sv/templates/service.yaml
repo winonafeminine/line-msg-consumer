@@ -9,5 +9,4 @@ spec:
     - port: {{ .Values.service.ports.default }}
       name: default
       targetPort: {{ .Values.service.ports.default }}
-      nodePort: {{ .Values.service.ports.nodePort }}
   type: {{ .Values.service.type }}
