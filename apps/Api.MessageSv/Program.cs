@@ -10,6 +10,8 @@ using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Interfaces;
 using Api.ReferenceLib.Settings;
 using Api.ReferenceLib.Setttings;
+using Api.UserLib.Interfaces;
+using Api.UserLib.Services;
 using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
 using Simple.RabbitMQ;
@@ -54,7 +56,6 @@ builder.Services.AddScoped<IMessagePublisher>(x =>
         ExchangeType.Topic // exchange type
     ));
 builder.Services.AddHostedService<MessageDataCollector>();
-builder.Services.AddHostedService<MessageRpcServer>();
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
 builder.Services.Configure<LineChannelSetting>(configuration.GetSection("LineConfig:Channel"));
 builder.Services.Configure<GrpcConfigSetting>(configuration.GetSection("GrpcConfig"));

@@ -1,8 +1,8 @@
 using Api.AuthLib.Models;
+using Api.CommonLib.Interfaces;
 using Api.PlatformLib.Interfaces;
 using Api.PlatformLib.Models;
 using Api.ReferenceLib.Exceptions;
-using Api.ReferenceLib.Models;
 using Api.ReferenceLib.Stores;
 using Newtonsoft.Json;
 using Simple.RabbitMQ;
@@ -14,11 +14,13 @@ namespace Api.AuthSv.HostedServices
         private readonly IMessageSubscriber _subscriber;
         private readonly ILogger<AuthDataCollector> _logger;
         private readonly IPlatformRepository _platformRepo;
-        public AuthDataCollector(IMessageSubscriber subscriber, ILogger<AuthDataCollector> logger, IPlatformRepository platformRepo)
+        private readonly IAuthConsumer _authConsumer;
+        public AuthDataCollector(IMessageSubscriber subscriber, ILogger<AuthDataCollector> logger, IPlatformRepository platformRepo, IAuthConsumer authConsumer)
         {
             _subscriber = subscriber;
             _logger = logger;
             _platformRepo = platformRepo;
+            _authConsumer = authConsumer;
         }
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -55,6 +57,10 @@ namespace Api.AuthSv.HostedServices
                 };
 
                 await _platformRepo.AddPlatform(platformModel);
+            }else if(routingKey == RoutingKeys.Platform["verify"])
+            {
+                PlatformModel platformModel = JsonConvert.DeserializeObject<PlatformModel>(message)!;
+                await _authConsumer.VerifyPlatform(platformModel);
             }
             return true;
         }

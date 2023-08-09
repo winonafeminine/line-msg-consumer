@@ -43,19 +43,9 @@ namespace Api.UserLib.Models
         [BsonElement("picture_url")]
         public virtual string? PictureUrl { get; set; }
 
-        [JsonProperty("latest_message")]
-        [BsonElement("latest_message")]
-        public virtual UserLatestMessageModel? LatestMessage { get; set; }
+        [JsonProperty("platform_id")]
+        [BsonElement("platform_id")]
+        public virtual string? PlatformId { get; set; }
     }
 
-    public class UserLatestMessageModel
-    {
-        [JsonProperty("message_id")]
-        [BsonElement("message_id")]
-        public virtual string? MessageId { get; set; }
-
-        [JsonProperty("is_read")]
-        [BsonElement("is_read")]
-        public virtual bool IsRead { get; set; }
-    }
 }

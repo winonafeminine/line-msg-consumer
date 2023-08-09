@@ -2,6 +2,8 @@ using Api.PlatformLib.Interfaces;
 using Api.PlatformLib.Services;
 using Api.PlatformSv.HostedServices;
 using Api.ReferenceLib.Exceptions;
+using Api.ReferenceLib.Interfaces;
+using Api.ReferenceLib.Services;
 using Api.ReferenceLib.Setttings;
 using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
@@ -45,6 +47,7 @@ builder.Services.AddScoped<IMessagePublisher>(x =>
 builder.Services.AddSingleton<IPlatformRepository, PlatformRepository>();
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
 builder.Services.AddSingleton<IPlatformService, PlatformService>();
+builder.Services.AddSingleton<IScopePublisher, ScopePublisher>();
 
 var app = builder.Build();
 

@@ -1,6 +1,6 @@
-using Api.CommonLib.Interfaces;
 using Api.ReferenceLib.Models;
 using Api.ReferenceLib.Setttings;
+using Api.UserLib.Interfaces;
 using Api.UserLib.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -9,7 +9,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 
-namespace Api.CommonLib.Services
+namespace Api.UserLib.Services
 {
     public class UserChatRepository : IUserChatRepository
     {

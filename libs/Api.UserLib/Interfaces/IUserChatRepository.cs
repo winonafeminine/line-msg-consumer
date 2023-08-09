@@ -1,7 +1,7 @@
 using Api.ReferenceLib.Models;
 using Api.UserLib.Models;
 
-namespace Api.CommonLib.Interfaces
+namespace Api.UserLib.Interfaces
 {
     public interface IUserChatRepository
     {

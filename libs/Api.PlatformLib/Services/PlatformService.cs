@@ -2,10 +2,13 @@ using Api.PlatformLib.DTOs;
 using Api.PlatformLib.Interfaces;
 using Api.PlatformLib.Models;
 using Api.ReferenceLib.Exceptions;
+using Api.ReferenceLib.Interfaces;
 using Api.ReferenceLib.Models;
 using Api.ReferenceLib.Stores;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Simple.RabbitMQ;
 
 namespace Api.PlatformLib.Services
 {
@@ -13,10 +16,12 @@ namespace Api.PlatformLib.Services
     {
         private readonly ILogger<PlatformService> _logger;
         private readonly IPlatformRepository _platformRepo;
-        public PlatformService(ILogger<PlatformService> logger, IPlatformRepository platformRepo)
+        private readonly IScopePublisher _publisher;
+        public PlatformService(ILogger<PlatformService> logger, IPlatformRepository platformRepo, IScopePublisher publisher)
         {
             _logger = logger;
             _platformRepo = platformRepo;
+            _publisher = publisher;
         }
         public async Task<Response> UpdatePlatform(string action, string platformId, PlatformDto platformDto)
         {
@@ -46,6 +51,16 @@ namespace Api.PlatformLib.Services
                 platformModel.PlatformName = platformDto.PlatformName;
 
                 Response response = await _platformRepo.ReplacePlatform(platformModel);
+
+                // publish the replaced platform
+                string routingKey = RoutingKeys.Platform["verify"];
+                string strPlatform = JsonConvert.SerializeObject(platformModel);
+                string groupUserId = platformDto.GroupUserId!;
+                platformDto = JsonConvert.DeserializeObject<PlatformDto>(strPlatform)!;
+                platformDto.PlatformId=platformModel.PlatformId;
+                platformDto.GroupUserId=groupUserId;
+                strPlatform = JsonConvert.SerializeObject(platformDto);
+                _publisher.Publish(strPlatform, routingKey, null);
                 return response;
             }
 

@@ -17,5 +17,8 @@ namespace Api.ReferenceLib.Stores
         public static IDictionary<string, string> Auth = new Dictionary<string, string>{
             { "update", "lmc.auth.update" }
         };
+        public static IDictionary<string, string> Platform = new Dictionary<string, string>{
+            { "verify", "lmc.auth.verify" }
+        };
     }
 }

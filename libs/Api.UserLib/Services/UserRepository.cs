@@ -1,6 +1,7 @@
-using Api.CommonLib.Interfaces;
+using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Models;
 using Api.ReferenceLib.Setttings;
+using Api.UserLib.Interfaces;
 using Api.UserLib.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -9,7 +10,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 
-namespace Api.CommonLib.Services
+namespace Api.UserLib.Services
 {
     public class UserRepository : IUserRepository
     {
@@ -28,17 +29,17 @@ namespace Api.CommonLib.Services
 
         // use for rpc
         // run synchronously
-        public Response AddUser(UserModel user)
+        public async Task<Response> AddUser(UserModel user)
         {
             BsonDocument document = BsonDocument.Parse(
                 JsonConvert.SerializeObject(user)
             );
 
-            _userCols.InsertOne(document);
-            _logger.LogInformation("New User added!");
+            await _userCols.InsertOneAsync(document);
+            _logger.LogInformation("New user added!");
             return new Response
             {
-                Message = "New User added!",
+                Message = "New user added!",
                 Data = user,
                 StatusCode = StatusCodes.Status201Created
             };
@@ -62,26 +63,46 @@ namespace Api.CommonLib.Services
             };
         }
 
-        public Response FindUser(string userId)
+        public async Task<UserModel> FindUser(string userId)
         {
             // find the existing user
-            var existingUsers = _userCols.Find<BsonDocument>(x => x["group_user_id"] == userId)
-                .ToList();
+            var existingUser = await _userCols
+                .Find<BsonDocument>(x => x["group_user_id"] == userId)
+                .As<UserModel>()
+                .FirstOrDefaultAsync();
 
-            if (existingUsers.Any())
+            if (existingUser != null)
             {
-                // _logger.LogError("User existed!");
-                return new Response
-                {
-                    StatusCode = StatusCodes.Status409Conflict,
-                    Message = "User existed!"
-                };
+                // _logger.LogError("user existed!");
+                return existingUser;
             }
+            string resMessage = $"User with id {userId} not found";
+            _logger.LogWarning(resMessage);
+            throw new ErrorResponseException(
+                StatusCodes.Status404NotFound,
+                resMessage,
+                new List<Error>()
+            );
+        }
+
+        public async Task<Response> ReplaceUser(UserModel userModel)
+        {
+            string resMessage = string.Empty;
+            string strDoc = JsonConvert.SerializeObject(userModel);
+            BsonDocument document = BsonDocument.Parse(
+                strDoc
+            );
+
+            var filter = Builders<BsonDocument>.Filter.Eq(x => x["_id"], userModel.UserId);
+            var updateResult = await _userCols.ReplaceOneAsync(filter, document);
+            resMessage = $"Successfully replace the user";
+            _logger.LogInformation(resMessage);
 
             return new Response
             {
-                StatusCode = StatusCodes.Status404NotFound,
-                Message = "User not found"
+                StatusCode = StatusCodes.Status200OK,
+                Message = resMessage,
+                Data = userModel
             };
         }
     }

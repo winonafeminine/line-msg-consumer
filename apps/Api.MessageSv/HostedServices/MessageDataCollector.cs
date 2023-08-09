@@ -1,5 +1,5 @@
-using Api.CommonLib.Interfaces;
 using Api.ReferenceLib.Stores;
+using Api.UserLib.Interfaces;
 using Api.UserLib.Models;
 using Newtonsoft.Json;
 using Simple.RabbitMQ;
@@ -37,7 +37,7 @@ namespace Api.MessageSv.HostedServices
                 }catch{
                     _logger.LogInformation("Failed deserializing UserModel");
                 }
-                _userRepo.AddUser(userModel);
+                await _userRepo.AddUser(userModel);
             }
 
             return true;

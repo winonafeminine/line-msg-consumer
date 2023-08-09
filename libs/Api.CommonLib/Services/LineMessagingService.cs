@@ -4,10 +4,9 @@ using Api.CommonLib.Models;
 using Api.MessageLib.Interfaces;
 using Api.MessageLib.Models;
 using Api.ReferenceLib.Exceptions;
-using Api.ReferenceLib.Models;
 using Api.ReferenceLib.Setttings;
 using Api.ReferenceLib.Stores;
-using Api.UserLib.Models;
+using Api.UserLib.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -136,9 +135,5 @@ namespace Api.CommonLib.Services
             };
         }
 
-        public Response AddUser(UserModel user)
-        {
-            return _userRepo.AddUser(user);
-        }
     }
 }

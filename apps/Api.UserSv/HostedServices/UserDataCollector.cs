@@ -1,4 +1,4 @@
-using Api.ReferenceLib.Interfaces;
+using Api.CommonLib.Interfaces;
 using Api.ReferenceLib.Stores;
 using Simple.RabbitMQ;
 
@@ -8,13 +8,13 @@ namespace Api.UserSv.HostedServices
     {
         private readonly ILogger<UserDataCollector> _logger;
         private readonly IMessageSubscriber _subscriber;
-        private readonly IMessageConsumer _userMsgConsumer;
+        private readonly IUserConsumer _userConsumer;
 
-        public UserDataCollector(ILogger<UserDataCollector> logger, IMessageSubscriber subscriber, IMessageConsumer userMsgConsumer)
+        public UserDataCollector(ILogger<UserDataCollector> logger, IMessageSubscriber subscriber, IUserConsumer userConsumer)
         {
             _logger = logger;
             _subscriber = subscriber;
-            _userMsgConsumer = userMsgConsumer;
+            _userConsumer = userConsumer;
         }
         public async Task StartAsync(CancellationToken cancellationToken)
         {
@@ -29,7 +29,11 @@ namespace Api.UserSv.HostedServices
             IDictionary<string, string> msgRoutingKeys = RoutingKeys.Message;
             if(routingKey == msgRoutingKeys["create"])
             {
-                await _userMsgConsumer.ConsumeMessageCreate(message);
+                await _userConsumer.ConsumeMessageCreate(message);
+            }
+            if(routingKey == RoutingKeys.Platform["verify"])
+            {
+                await _userConsumer.ConsumePlatformVerify(message);
             }
             return true;
         }

@@ -8,6 +8,5 @@ namespace Api.CommonLib.Interfaces
     {
         public Task RetriveLineMessage(object content, string signature, string id);
         public LineChannelSetting GetChannel();
-        public Response AddUser(UserModel user);
     }
 }

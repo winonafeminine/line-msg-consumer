@@ -32,11 +32,11 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"ms-dotnettools.csharp",
 				"kreativ-software.csharpextensions",
 				"mongodb.mongodb-vscode",
 				"rohinivsenthil.rabbitrace",
-				"zxh404.vscode-proto3"
+				"zxh404.vscode-proto3",
+				"ms-dotnettools.csharp@1.26.0"
 			]
 		}
 	}

@@ -1,3 +1,4 @@
+using Api.CommonLib.Consumers;
 using Api.CommonLib.Interfaces;
 using Api.CommonLib.Services;
 using Api.CommonLib.Setttings;
@@ -5,6 +6,8 @@ using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Interfaces;
 using Api.ReferenceLib.Services;
 using Api.ReferenceLib.Setttings;
+using Api.UserLib.Interfaces;
+using Api.UserLib.Services;
 using Api.UserSv.HostedServices;
 using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
@@ -45,7 +48,7 @@ builder.Services.AddSingleton<IMessagePublisher>(x =>
         ExchangeType.Topic // exchange type
     ));
 builder.Services.AddHostedService<UserDataCollector>();
-builder.Services.AddSingleton<IMessageConsumer, UserMessageConsumerService>();
+builder.Services.AddSingleton<IUserConsumer, UserConsumer>();
 builder.Services.AddSingleton<ILineGroupInfo, LineGroupInfoService>();
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));

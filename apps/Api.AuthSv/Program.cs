@@ -3,6 +3,8 @@ using Api.AuthLib.Services;
 using Api.AuthLib.Settings;
 using Api.AuthSv.Grpcs;
 using Api.AuthSv.HostedServices;
+using Api.CommonLib.Consumers;
+using Api.CommonLib.Interfaces;
 using Api.CommonLib.Services;
 using Api.CommonLib.Setttings;
 using Api.PlatformLib.Interfaces;
@@ -59,6 +61,7 @@ builder.Services.AddSingleton<IScopePublisher, ScopePublisher>();
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
 builder.Services.AddSingleton<IPlatformRepository, PlatformRepository>();
 builder.Services.AddHostedService<AuthDataCollector>();
+builder.Services.AddSingleton<IAuthConsumer, AuthConsumer>();
 
 var app = builder.Build();
 
