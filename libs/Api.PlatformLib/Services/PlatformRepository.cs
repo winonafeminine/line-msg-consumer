@@ -45,7 +45,12 @@ namespace Api.PlatformLib.Services
         {
             // find the existing user
             var existingPlatform = await _platformCols
-                .Find<BsonDocument>(x => x["_id"] == platformId)
+                .Aggregate()
+                .Match(x => x["_id"] == platformId)
+                .Project(new BsonDocument{
+                    { "platform_id", 0 },
+                    { "group_user_id", 0 },
+                })
                 .As<PlatformModel>()
                 .FirstOrDefaultAsync();
 

@@ -85,7 +85,7 @@
             "request": "launch",
             "preLaunchTask": "Api.AuthSv.Build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/dist/apps/Api.AuthSv/net6.0/ApiAuthSv.dll",
+            "program": "${workspaceFolder}/apps/Api.AuthSv/bin/Debug/net6.0/ApiAuthSv.dll",
             "args": [],
             "cwd": "${workspaceFolder}/apps/Api.AuthSv",
             "stopAtEntry": false,

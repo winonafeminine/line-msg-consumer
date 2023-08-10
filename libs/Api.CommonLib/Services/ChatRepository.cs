@@ -60,8 +60,31 @@ namespace Api.CommonLib.Services
                     new List<Error>()
                 );
             }
-            
+
             return existingChat;
+        }
+
+        public IEnumerable<T> FindChats<T>(List<BsonDocument> pipeline)
+        {
+            IEnumerable<T> chatModels = new List<T>();
+
+            try
+            {
+                chatModels = _chatCols
+                    .Aggregate<T>(pipeline.ToArray())
+                    .ToEnumerable();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new ErrorResponseException(
+                    StatusCodes.Status400BadRequest,
+                    ex.Message,
+                    new List<Error>()
+                );
+            }
+
+            return chatModels;
         }
     }
 }

@@ -1,10 +1,15 @@
+using Api.AuthLib.Grpcs;
+using Api.AuthLib.Interfaces;
 using Api.ChatLib.Consumers;
+using Api.ChatLib.Interfaces;
+using Api.ChatLib.Services;
 using Api.ChatSv.HostedServices;
 using Api.CommonLib.Interfaces;
 using Api.CommonLib.Services;
 using Api.CommonLib.Setttings;
 using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Interfaces;
+using Api.ReferenceLib.Settings;
 using Api.ReferenceLib.Setttings;
 using Api.UserLib.Interfaces;
 using Api.UserLib.Services;
@@ -44,9 +49,12 @@ builder.Services.AddHostedService<ChatDataCollector>();
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
 builder.Services.Configure<LineChannelSetting>(configuration.GetSection("LineConfig:Channel"));
+builder.Services.Configure<GrpcConfigSetting>(configuration.GetSection("GrpcConfig"));
 builder.Services.AddSingleton<ILineGroupInfo, LineGroupInfoService>();
 builder.Services.AddSingleton<IChatRepository, ChatRepository>();
 builder.Services.AddSingleton<IUserChatRepository, UserChatRepository>();
+builder.Services.AddSingleton<IChatService, ChatService>();
+builder.Services.AddSingleton<IAuthGrpcClientService, AuthGrpcClientService>();
 
 var app = builder.Build();
 
