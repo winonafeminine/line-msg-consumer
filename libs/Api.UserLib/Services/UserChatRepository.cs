@@ -1,3 +1,4 @@
+using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Models;
 using Api.ReferenceLib.Setttings;
 using Api.UserLib.Interfaces;
@@ -40,6 +41,29 @@ namespace Api.UserLib.Services
                 Data = userChatModel,
                 StatusCode = StatusCodes.Status201Created
             };
+        }
+
+        public async Task<UserChatModel> FindUserChatByGroupId(string groupId)
+        {
+            UserChatModel userChatModel = new UserChatModel();
+
+            userChatModel = await _userChatCols
+                .Find(x=>x["group_id"] == groupId)
+                .As<UserChatModel>()
+                .FirstOrDefaultAsync();
+            
+            string resMsg = string.Empty;
+            if(userChatModel == null)
+            {
+                resMsg=$"Chat with group id {groupId} not found";
+                throw new ErrorResponseException(
+                    StatusCodes.Status404NotFound,
+                    resMsg,
+                    new List<Error>()
+                );
+            }
+
+            return userChatModel;
         }
     }
 }

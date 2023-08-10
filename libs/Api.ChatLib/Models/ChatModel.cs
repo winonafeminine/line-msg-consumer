@@ -22,6 +22,10 @@ namespace Api.CommonLib.Models
         [JsonProperty("latest_message")]
         [BsonElement("latest_message")]
         public virtual ChatLatestMessageModel? LatestMessage { get; set; }
+
+        [JsonProperty("platform_id")]
+        [BsonElement("platform_id")]
+        public virtual string? PlatformId { get; set; }
     }
 
     public class ChatGroupModel

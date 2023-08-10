@@ -23,25 +23,29 @@ namespace Api.AuthLib.Grpcs
         }
         public async Task<JwtPayloadData> ValidateJwtToken(string token)
         {
-            using var channel = GrpcChannel.ForAddress(_grpcConfig.Value.Auth!.Address!);
-            var client = new AuthGrpc.AuthGrpcClient(channel);
+            using (var channel = GrpcChannel.ForAddress(_grpcConfig.Value.Auth!.Address!))
+            {
+                var client = new AuthGrpc.AuthGrpcClient(channel);
+                AuthGrpcReply reply = new AuthGrpcReply();
 
-            AuthGrpcReply reply = new AuthGrpcReply();
+                try
+                {
+                    reply = await client.ValidateJwtTokenAsync(
+                                    new GrpcValidateJwtTokenRequest { Token = token });
+                }
+                catch (RpcException ex)
+                {
+                    int statusCode = StatusCodes.Status401Unauthorized;
 
-            try{
-                reply = await client.ValidateJwtTokenAsync(
-                                new GrpcValidateJwtTokenRequest { Token = token });
-            }catch(RpcException ex){
-                int statusCode = StatusCodes.Status401Unauthorized;
-
-                _logger.LogError(ex.Status.Detail);
-                throw new ErrorResponseException(
-                    statusCode,
-                    ex.Status.Detail,
-                    new List<Error>()
-                );
+                    _logger.LogError(ex.Status.Detail);
+                    throw new ErrorResponseException(
+                        statusCode,
+                        ex.Status.Detail,
+                        new List<Error>()
+                    );
+                }
+                return JsonConvert.DeserializeObject<JwtPayloadData>(reply.Data)!;
             }
-            return JsonConvert.DeserializeObject<JwtPayloadData>(reply.Data)!;
         }
     }
 }

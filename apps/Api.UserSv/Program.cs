@@ -2,9 +2,12 @@ using Api.CommonLib.Consumers;
 using Api.CommonLib.Interfaces;
 using Api.CommonLib.Services;
 using Api.CommonLib.Setttings;
+using Api.MessageLib.Grpcs;
+using Api.MessageLib.Interfaces;
 using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Interfaces;
 using Api.ReferenceLib.Services;
+using Api.ReferenceLib.Settings;
 using Api.ReferenceLib.Setttings;
 using Api.UserLib.Interfaces;
 using Api.UserLib.Services;
@@ -21,11 +24,10 @@ IConfiguration configuration = builder.Configuration;
 // configure controller to use Newtonsoft as a default serializer
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
-        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft
-            .Json.ReferenceLoopHandling.Ignore)
-                .AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver
-                    = new DefaultContractResolver()
-);
+    {
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -53,9 +55,11 @@ builder.Services.AddSingleton<ILineGroupInfo, LineGroupInfoService>();
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
 builder.Services.Configure<LineChannelSetting>(configuration.GetSection("LineConfig:Channel"));
+builder.Services.Configure<GrpcConfigSetting>(configuration.GetSection("GrpcConfig"));
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IUserChatRepository, UserChatRepository>();
 builder.Services.AddSingleton<IScopePublisher, ScopePublisher>();
+builder.Services.AddSingleton<IMessageGrpcClientService, MessageGrpcClientService>();
 
 
 var app = builder.Build();

@@ -1,3 +1,4 @@
+using Api.CommonLib.Interfaces;
 using Api.ReferenceLib.Interfaces;
 using Api.ReferenceLib.Stores;
 using Api.UserLib.Interfaces;
@@ -11,10 +12,10 @@ namespace Api.ChatSv.HostedServices
     {
         private readonly ILogger<ChatDataCollector> _logger;
         private readonly IMessageSubscriber _subscriber;
-        private readonly IMessageConsumer _chatMsgConsumer;
+        private readonly IChatConsumer _chatMsgConsumer;
         private readonly IUserChatRepository _userChatRepo;
 
-        public ChatDataCollector(ILogger<ChatDataCollector> logger, IMessageSubscriber subscriber, IMessageConsumer chatMsgConsumer, IUserChatRepository userChatRepo)
+        public ChatDataCollector(ILogger<ChatDataCollector> logger, IMessageSubscriber subscriber, IChatConsumer chatMsgConsumer, IUserChatRepository userChatRepo)
         {
             _logger = logger;
             _subscriber = subscriber;
@@ -42,6 +43,10 @@ namespace Api.ChatSv.HostedServices
                 // await _chatMsgConsumer.ConsumeMessageCreate(message);
                 UserChatModel userChatModel = JsonConvert.DeserializeObject<UserChatModel>(message)!;
                 await _userChatRepo.AddUserChat(userChatModel);
+            }
+            else if (routingKey == RoutingKeys.UserChat["verify"])
+            {
+                await _chatMsgConsumer.ConsumeUserChatVerify(message);
             }
             return true;
         }

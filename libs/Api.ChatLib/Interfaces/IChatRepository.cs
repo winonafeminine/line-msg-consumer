@@ -5,7 +5,7 @@ namespace Api.ReferenceLib.Interfaces
 {
     public interface IChatRepository
     {
-        public Response AddChat(ChatModel chat);
-        public Response FindChat(string groupId);
+        public Task<Response> AddChat(ChatModel chat);
+        public Task<ChatModel> FindChat(string groupId);
     }
 }

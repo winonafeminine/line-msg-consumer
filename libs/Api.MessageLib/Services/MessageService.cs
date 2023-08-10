@@ -1,12 +1,11 @@
 using System.Text.RegularExpressions;
-using Api.CommonLib.Interfaces;
-using Api.CommonLib.Models;
 using Api.MessageLib.Interfaces;
 using Api.MessageLib.Models;
+using Api.MessageLib.Stores;
 using Api.ReferenceLib.Exceptions;
+using Api.ReferenceLib.Interfaces;
 using Api.ReferenceLib.Setttings;
 using Api.ReferenceLib.Stores;
-using Api.UserLib.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -16,30 +15,25 @@ using MongoDB.Driver;
 using Newtonsoft.Json;
 using Simple.RabbitMQ;
 
-namespace Api.CommonLib.Services
+namespace Api.MessageLib.Services
 {
-    public class LineMessagingService : ILineMessaging
+    public class MessageService : IMessageService
     {
-        private readonly ILogger<LineMessagingService> _logger;
+        private readonly ILogger<MessageService> _logger;
         private readonly ILineMessageValidation _lineValidation;
-        private readonly IMessagePublisher _publisher;
         private readonly IHostEnvironment _env;
-        private readonly IMongoCollection<BsonDocument> _messageCols;
         private readonly IOptions<LineChannelSetting> _channelSetting;
-        private readonly IUserRepository _userRepo;
-        public LineMessagingService(ILogger<LineMessagingService> logger, ILineMessageValidation lineValidation,
-            IMessagePublisher publisher, IHostEnvironment env, IOptions<MongoConfigSetting> mongoConfig, IOptions<LineChannelSetting> channelSetting, IUserRepository userRepo)
+        private readonly ISpecialKeywordHandler _skHandler;
+        private readonly IScopePublisher _publisher;
+        public MessageService(ILogger<MessageService> logger, ILineMessageValidation lineValidation,
+            IHostEnvironment env, IOptions<MongoConfigSetting> mongoConfig, IOptions<LineChannelSetting> channelSetting, ISpecialKeywordHandler skHandler, IScopePublisher publisher)
         {
             _logger = logger;
             _lineValidation = lineValidation;
-            _publisher = publisher;
             _env = env;
-
-            IMongoClient mongoClient = new MongoClient(mongoConfig.Value.HostName);
-            IMongoDatabase mongodb = mongoClient.GetDatabase(mongoConfig.Value.DatabaseName);
-            _messageCols = mongodb.GetCollection<BsonDocument>(MongoConfigSetting.Collections["Message"]);
             _channelSetting = channelSetting;
-            _userRepo = userRepo;
+            _skHandler = skHandler;
+            _publisher = publisher;
         }
 
         private string GetValFromJson(string strContent, string keyName, string pattern)
@@ -78,6 +72,8 @@ namespace Api.CommonLib.Services
             string pattern = @"""groupId"":\s*""([^""]+)""";
             string groupId = GetValFromJson(strContent, "groupId", pattern);
 
+
+
             // get the event type
             pattern = @"""type"":\s*""([^""]+)""";
             string eventType = GetValFromJson(strContent, "type", pattern);
@@ -93,7 +89,6 @@ namespace Api.CommonLib.Services
                 groupUserId = GetValFromJson(strContent, "userId", pattern);
             }
 
-
             MessageModel messageModel = new MessageModel
             {
                 ClientId = id,
@@ -103,25 +98,30 @@ namespace Api.CommonLib.Services
                 MessageObject = content
             };
 
+            string messageModelStr = JsonConvert.SerializeObject(messageModel);
+
+            // handle the special keywords
+            // if true publish to the specific route key
+            // catch the error
+            try
+            {
+                _skHandler.HandleGroupVerify(messageModelStr);
+            }
+            catch
+            {
+                return;
+            }
+            
             BsonDocument document = BsonDocument.Parse(
                 JsonConvert.SerializeObject(messageModel)
             );
 
-            await _messageCols.InsertOneAsync(document);
+            // await _messageCols.InsertOneAsync(document);
 
-            try
-            {
-                string messageModelStr = JsonConvert.SerializeObject(messageModel);
-                IDictionary<string, string> msgRoutingKeys = RoutingKeys.Message;
-                string routingKey = msgRoutingKeys["create"];
-                _publisher.Publish(messageModelStr, routingKey, null);
-                // _logger.LogInformation($"Message pulished\nRouting key: {routingKey}");
-            }
-            finally
-            {
-                _logger.LogInformation($"Message publisher disposed");
-                _publisher.Dispose();
-            }
+            IDictionary<string, string> msgRoutingKeys = RoutingKeys.Message;
+            string routingKey = msgRoutingKeys["create"];
+            _publisher.Publish(messageModelStr, routingKey, null);
+            
             return;
         }
 

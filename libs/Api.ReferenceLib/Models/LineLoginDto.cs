@@ -1,3 +1,4 @@
+using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
 namespace Api.ReferenceLib.DTOs
@@ -18,21 +19,27 @@ namespace Api.ReferenceLib.DTOs
     public class LineLoginIssueTokenResponseDto
     {
         [JsonProperty("access_token")]
+        [BsonElement("access_token")]
         public string? AccessToken { get; set; }
 
         [JsonProperty("expires_in")]
+        [BsonElement("expires_in")]
         public long ExpiresIn { get; set; }
 
         [JsonProperty("id_token")]
+        [BsonElement("id_token")]
         public string? IdToken { get; set; }
 
         [JsonProperty("refresh_token")]
+        [BsonElement("refresh_token")]
         public string? RefreshToken { get; set; }
 
         [JsonProperty("scope")]
+        [BsonElement("scope")]
         public string? Scope { get; set; }
 
         [JsonProperty("token_type")]
+        [BsonElement("token_type")]
         public string? TokenType { get; set; }
     }
 

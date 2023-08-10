@@ -11,7 +11,7 @@ namespace Api.AuthLib.Services
 {
     public class JwtTokenService : IJwtToken
     {
-        public string GenerateJwtToken(string secretKey, string issuer, string refId)
+        public string GenerateJwtToken(string secretKey, string issuer, string refId, DateTime? expires)
         {
             var key = Encoding.ASCII.GetBytes(secretKey);
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -35,7 +35,7 @@ namespace Api.AuthLib.Services
                     tokenClaim
                 }),
                 Issuer = issuer,
-                Expires = DateTime.UtcNow.AddHours(1), // Token expiration time
+                Expires = expires, // Token expiration time
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);

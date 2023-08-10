@@ -1,13 +1,14 @@
 using Api.AuthLib.Grpcs;
 using Api.AuthLib.Interfaces;
-using Api.CommonLib.Interfaces;
 using Api.CommonLib.Services;
 using Api.CommonLib.Setttings;
 using Api.MessageLib.Interfaces;
 using Api.MessageLib.Services;
+using Api.MessageSv.Grpcs;
 using Api.MessageSv.HostedServices;
 using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Interfaces;
+using Api.ReferenceLib.Services;
 using Api.ReferenceLib.Settings;
 using Api.ReferenceLib.Setttings;
 using Api.UserLib.Interfaces;
@@ -26,15 +27,15 @@ IConfiguration configuration = builder.Configuration;
 // add some comment here
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
-        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft
-            .Json.ReferenceLoopHandling.Ignore)
-                .AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver
-                    = new DefaultContractResolver()
-);
+    {
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+    });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<ILineMessaging, LineMessagingService>();
+builder.Services.AddSingleton<IMessageService, MessageService>();
 builder.Services.AddSingleton<ILineMessageValidation, LineMessageValidation>();
 builder.Services.AddSingleton<IBasicConnection>(new BasicConnection(configuration["RabbitMQConfig:HostName"], true));
 // Register message subscriber
@@ -63,6 +64,10 @@ builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoCo
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IChatRepository, ChatRepository>();
 builder.Services.AddSingleton<IAuthGrpcClientService, AuthGrpcClientService>();
+builder.Services.AddSingleton<IScopePublisher, ScopePublisher>();
+builder.Services.AddSingleton<ISpecialKeywordHandler, SpecialKeywordHandler>();
+builder.Services.AddSingleton<IMessageRepository, MessageRepository>();
+builder.Services.AddGrpc();
 
 var app = builder.Build();
 
@@ -71,7 +76,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}else{
+}
+else
+{
     app.UseResponseExceptionHandler();
 }
 
@@ -80,6 +87,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGrpcService<MessageGrpcServerService>();
 
 
 app.Run();

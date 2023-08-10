@@ -1,3 +1,4 @@
+using Api.ReferenceLib.DTOs;
 using Newtonsoft.Json;
 
 namespace Api.AuthLib.Models
@@ -22,6 +23,15 @@ namespace Api.AuthLib.Models
         [JsonProperty("group_user_id", NullValueHandling=NullValueHandling.Ignore)]
         public virtual string? GroupUserId { get; set; }
 
+        [JsonProperty("display_name", NullValueHandling=NullValueHandling.Ignore)]
+        public virtual string? DisplayName { get; set; }
+
+        [JsonProperty("picture_url", NullValueHandling=NullValueHandling.Ignore)]
+        public virtual string? PictureUrl { get; set; }
+
+        [JsonProperty("status_message", NullValueHandling=NullValueHandling.Ignore)]
+        public virtual string? StatusMessage { get; set; }
+
         [JsonProperty("code", NullValueHandling=NullValueHandling.Ignore)]
         public virtual string? Code { get; set; }
 
@@ -30,5 +40,11 @@ namespace Api.AuthLib.Models
 
         [JsonProperty("platform_id", NullValueHandling=NullValueHandling.Ignore)]
         public virtual string? PlatformId { get; set; }
+
+        [JsonProperty("token", NullValueHandling=NullValueHandling.Ignore)]
+        public virtual LineLoginIssueTokenResponseDto? Token { get; set; }
+
+        [JsonProperty("user_profile", NullValueHandling=NullValueHandling.Ignore)]
+        public virtual LineLoginUserProfileResponseDto? UserProfile { get; set; }
     }
 }

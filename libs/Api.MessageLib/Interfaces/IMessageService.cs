@@ -1,10 +1,8 @@
-using Api.ReferenceLib.Models;
 using Api.ReferenceLib.Setttings;
-using Api.UserLib.Models;
 
-namespace Api.CommonLib.Interfaces
+namespace Api.MessageLib.Interfaces
 {
-    public interface ILineMessaging
+    public interface IMessageService
     {
         public Task RetriveLineMessage(object content, string signature, string id);
         public LineChannelSetting GetChannel();

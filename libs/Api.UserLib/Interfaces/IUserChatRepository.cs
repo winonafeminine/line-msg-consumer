@@ -6,5 +6,6 @@ namespace Api.UserLib.Interfaces
     public interface IUserChatRepository
     {
         public Task<Response> AddUserChat(UserChatModel userChatModel);
+        public Task<UserChatModel> FindUserChatByGroupId(string groupId);
     }
 }

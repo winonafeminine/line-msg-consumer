@@ -1,7 +1,8 @@
 using Api.AuthLib.Interfaces;
-using Api.AuthLib.Protos;
-using Api.CommonLib.Interfaces;
-using Grpc.Net.Client;
+using Api.MessageLib.Interfaces;
+using Api.MessageLib.Models;
+using Api.MessageLib.Parameters;
+using Api.MessageLib.Routes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.MessageSv.Controllers
@@ -10,12 +11,12 @@ namespace Api.MessageSv.Controllers
     [Route("/message/v1")]
     public class MessagesController : ControllerBase
     {
-        private readonly ILineMessaging _lineMessagin;
+        private readonly IMessageService _messageSv;
         private readonly IAuthGrpcClientService _authGrpcClient;
-        public MessagesController(ILineMessaging lineMessagin, IAuthGrpcClientService authGrpcClient)
+        public MessagesController(IAuthGrpcClientService authGrpcClient, IMessageService messageSv)
         {
-            _lineMessagin = lineMessagin;
             _authGrpcClient = authGrpcClient;
+            _messageSv = messageSv;
         }
 
         [HttpPost]
@@ -24,17 +25,20 @@ namespace Api.MessageSv.Controllers
         {
             await Task.Yield();
             string signature = HttpContext.Request.Headers["X-Line-Signature"].ToString();
-            await _lineMessagin.RetriveLineMessage(content, signature, id);
+            await _messageSv.RetriveLineMessage(content, signature, id);
             return Ok();
         }
 
         [HttpGet]
-        [Route("messages")]
-        public async Task<ActionResult> GetMessages()
+        [Route("group/{group_id}/messages")]
+        public async Task<ActionResult<IEnumerable<MessageModel>>> GetPlatformGroupMessages([FromRoute] MessageRoute route, [FromQuery] MessageParam param)
         {
             // The port number must match the port of the gRPC server.
             string token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
-            return Ok(await _authGrpcClient.ValidateJwtToken(token));
+            var authReponse = await _authGrpcClient.ValidateJwtToken(token);
+            param.GroupId=route.GroupId;
+            param.PlatformId=authReponse.PlatformId;
+            return Ok(param);
         }
     }
 }

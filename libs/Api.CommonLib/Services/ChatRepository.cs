@@ -1,4 +1,5 @@
 using Api.CommonLib.Models;
+using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Interfaces;
 using Api.ReferenceLib.Models;
 using Api.ReferenceLib.Setttings;
@@ -26,14 +27,14 @@ namespace Api.CommonLib.Services
             IMongoDatabase mongodb = mongoClient.GetDatabase(_mongoSetting.Value.DatabaseName);
             _chatCols = mongodb.GetCollection<BsonDocument>(MongoConfigSetting.Collections["Chat"]);
         }
-        public Response AddChat(ChatModel chat)
+        public async Task<Response> AddChat(ChatModel chat)
         {
             string strChat = JsonConvert.SerializeObject(chat);
             BsonDocument document = BsonDocument.Parse(
                 strChat
             );
 
-            _chatCols.InsertOne(document);
+            await _chatCols.InsertOneAsync(document);
             _logger.LogInformation("New Chat added!");
             return new Response
             {
@@ -42,27 +43,25 @@ namespace Api.CommonLib.Services
                 StatusCode = StatusCodes.Status201Created
             };
         }
-        public Response FindChat(string groupId)
+        public async Task<ChatModel> FindChat(string groupId)
         {
             // find the existing user
-            var existingChats = _chatCols.Find<BsonDocument>(x => x["group"]["group_id"] == groupId)
-                .ToList();
+            var existingChat = await _chatCols
+                .Find(x => x["group"]["group_id"] == groupId)
+                .As<ChatModel>()
+                .FirstOrDefaultAsync();
 
-            if (existingChats.Any())
+            if (existingChat == null)
             {
                 // _logger.LogError("Chat existed!");
-                return new Response
-                {
-                    StatusCode = StatusCodes.Status409Conflict,
-                    Message = "Group existed!"
-                };
+                throw new ErrorResponseException(
+                    StatusCodes.Status404NotFound,
+                    $"Chat with group id {groupId} not found",
+                    new List<Error>()
+                );
             }
             
-            return new Response
-            {
-                Message = "Group not found",
-                StatusCode = StatusCodes.Status404NotFound
-            };
+            return existingChat;
         }
     }
 }

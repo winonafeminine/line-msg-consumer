@@ -1,5 +1,6 @@
-using Api.ChatLib.Services;
+using Api.ChatLib.Consumers;
 using Api.ChatSv.HostedServices;
+using Api.CommonLib.Interfaces;
 using Api.CommonLib.Services;
 using Api.CommonLib.Setttings;
 using Api.ReferenceLib.Exceptions;
@@ -19,11 +20,10 @@ IConfiguration configuration = builder.Configuration;
 // configure controller to use Newtonsoft as a default serializer
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
-        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft
-            .Json.ReferenceLoopHandling.Ignore)
-                .AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver
-                    = new DefaultContractResolver()
-);
+    {
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -39,7 +39,7 @@ builder.Services.AddSingleton<IMessageSubscriber>(x =>
         autoAck: bool.Parse(configuration["RabbitMQConfig:Properties:AutoAck"]),
         prefetchCount: ushort.Parse(configuration["RabbitMQConfig:Properties:PrefetchCount"])
     ));
-builder.Services.AddSingleton<IMessageConsumer, ChatMessageConsumerService>();
+builder.Services.AddSingleton<IChatConsumer, ChatConsumer>();
 builder.Services.AddHostedService<ChatDataCollector>();
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));

@@ -8,5 +8,6 @@ namespace Api.AuthLib.Interfaces
         public Response CreateLineAuthState(AuthDto auth);
         public Task<Response> UpdateLineAuthState(string state, AuthDto auth);
         public Response GetLineAuthStates();
+        public Response RemoveStateByPlatformId(string platformId);
     }
 }

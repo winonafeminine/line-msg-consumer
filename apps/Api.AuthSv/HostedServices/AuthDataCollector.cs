@@ -32,35 +32,11 @@ namespace Api.AuthSv.HostedServices
         {
             if(routingKey == RoutingKeys.Auth["update"])
             {
-                // _logger.LogInformation(message);
-                LineAuthStateModel authModel = JsonConvert
-                    .DeserializeObject<LineAuthStateModel>(message)!;
-
-                PlatformModel platformModel = new PlatformModel();
-                try{
-                    platformModel = await _platformRepo.Find(authModel.PlatformId!);
-
-                    if(platformModel != null)
-                    {
-                        _logger.LogError("Platform exist!");
-                        return true;
-                    }
-                }catch (ErrorResponseException ex){
-                    _logger.LogInformation(ex.Description);
-                    platformModel = new PlatformModel();
-                }
-
-                platformModel = new PlatformModel{
-                    PlatformId=authModel.PlatformId,
-                    AccessToken=authModel.AccessToken,
-                    SecretKey=authModel.SecretKey
-                };
-
-                await _platformRepo.AddPlatform(platformModel);
-            }else if(routingKey == RoutingKeys.Platform["verify"])
+                await _authConsumer.ConsumeAuthUpdate(message);
+            }
+            else if(routingKey == RoutingKeys.Platform["verify"])
             {
-                PlatformModel platformModel = JsonConvert.DeserializeObject<PlatformModel>(message)!;
-                await _authConsumer.VerifyPlatform(platformModel);
+                await _authConsumer.ConsumePlatformVerify(message);
             }
             return true;
         }

@@ -31,9 +31,17 @@ namespace Api.UserSv.HostedServices
             {
                 await _userConsumer.ConsumeMessageCreate(message);
             }
-            if(routingKey == RoutingKeys.Platform["verify"])
+            else if(routingKey == RoutingKeys.Platform["verify"])
             {
                 await _userConsumer.ConsumePlatformVerify(message);
+            }
+            else if(routingKey == RoutingKeys.Auth["update"])
+            {
+                await _userConsumer.ConsumeAuthUpdate(message);
+            }
+            else if(routingKey == RoutingKeys.Message["verify"])
+            {
+                await _userConsumer.ConsumeMessageVerify(message);
             }
             return true;
         }

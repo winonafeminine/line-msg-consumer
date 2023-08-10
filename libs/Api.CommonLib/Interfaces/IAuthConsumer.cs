@@ -1,9 +1,8 @@
-using Api.PlatformLib.Models;
-
 namespace Api.CommonLib.Interfaces
 {
     public interface IAuthConsumer
     {
-        public Task VerifyPlatform(PlatformModel platformModel);
+        public Task ConsumeAuthUpdate(string message);
+        public Task ConsumePlatformVerify(string message);
     }
 }

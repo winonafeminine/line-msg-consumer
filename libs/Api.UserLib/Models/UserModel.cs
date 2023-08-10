@@ -1,3 +1,4 @@
+using Api.ReferenceLib.DTOs;
 using Api.ReferenceLib.Models;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -43,9 +44,28 @@ namespace Api.UserLib.Models
         [BsonElement("picture_url")]
         public virtual string? PictureUrl { get; set; }
 
+        [JsonProperty("status_message")]
+        [BsonElement("status_message")]
+        public virtual string? StatusMessage { get; set; }
+
+        [JsonProperty("token")]
+        [BsonElement("token")]
+        public virtual LineLoginIssueTokenResponseDto? Token { get; set; }
+
+        [JsonProperty("platform")]
+        [BsonElement("platform")]
+        public virtual UserPlatformModel? Platform { get; set; }
+    }
+
+    public class UserPlatformModel{
+
         [JsonProperty("platform_id")]
         [BsonElement("platform_id")]
-        public virtual string? PlatformId { get; set; }
+        public string? PlatformId { get; set; }
+
+        [JsonProperty("is_verified")]
+        [BsonElement("is_verified")]
+        public bool IsVerified { get; set; }
     }
 
 }

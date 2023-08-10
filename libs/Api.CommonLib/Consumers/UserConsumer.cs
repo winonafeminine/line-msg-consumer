@@ -1,14 +1,14 @@
+using Api.AuthLib.Interfaces;
+using Api.AuthLib.Models;
 using Api.CommonLib.Interfaces;
+using Api.MessageLib.Interfaces;
 using Api.MessageLib.Models;
 using Api.PlatformLib.DTOs;
-using Api.PlatformLib.Models;
 using Api.ReferenceLib.Interfaces;
-using Api.ReferenceLib.Models;
 using Api.ReferenceLib.Setttings;
 using Api.ReferenceLib.Stores;
 using Api.UserLib.Interfaces;
 using Api.UserLib.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -26,13 +26,15 @@ namespace Api.CommonLib.Consumers
         private readonly IOptions<LineChannelSetting> _channelSetting;
         private readonly IScopePublisher _publisher;
         private readonly IUserChatRepository _userChatRepo;
+        private readonly IMessageGrpcClientService _msgGrpc;
         public UserConsumer(ILogger<UserConsumer> logger,
             IOptions<MongoConfigSetting> mongoConfig,
             ILineGroupInfo lineUserInfo,
             IUserRepository userRepo,
             IOptions<LineChannelSetting> channelSetting,
             IScopePublisher publisher,
-            IUserChatRepository userChatRepo)
+            IUserChatRepository userChatRepo,
+            IMessageGrpcClientService msgGrpc)
         {
             _logger = logger;
             IMongoClient mongoClient = new MongoClient(mongoConfig.Value.HostName);
@@ -43,7 +45,45 @@ namespace Api.CommonLib.Consumers
             _channelSetting = channelSetting;
             _publisher = publisher;
             _userChatRepo = userChatRepo;
+            _msgGrpc = msgGrpc;
         }
+
+        public async Task ConsumeAuthUpdate(string message)
+        {
+            LineAuthStateModel authModel = JsonConvert
+                .DeserializeObject<LineAuthStateModel>(message)!;
+
+            UserModel userModel = new UserModel();
+            try
+            {
+                userModel = await _userRepo
+                    .FindUser(authModel.GroupUserId!);
+            }
+            catch
+            {
+                userModel = new UserModel
+                {
+                    Token = authModel.Token,
+                    GroupUserId = authModel.GroupUserId,
+                    DisplayName = authModel.DisplayName,
+                    PictureUrl = authModel.PictureUrl,
+                    StatusMessage = authModel.StatusMessage,
+                    Platform = new UserPlatformModel
+                    {
+                        PlatformId = authModel.PlatformId
+                    }
+                };
+            }
+
+            await _userRepo.AddUser(userModel);
+
+            // publish the user
+            string pubMessage = JsonConvert.SerializeObject(userModel);
+            string routingKey = RoutingKeys.User["create"];
+            _publisher.Publish(pubMessage, routingKey, null);
+            return;
+        }
+
         public async Task ConsumeMessageCreate(string message)
         {
             // await Task.Yield();
@@ -66,6 +106,8 @@ namespace Api.CommonLib.Consumers
                 if (existingUser != null)
                 {
                     _logger.LogInformation("Do nothing");
+                    // need to replace the user chat
+                    // publish the user chat
                     return;
                 }
             }
@@ -73,6 +115,8 @@ namespace Api.CommonLib.Consumers
             {
                 var userInfo = await _lineUserInfo.GetGroupMemberProfile(msgModel.GroupId!, userModel.GroupUserId!, _channelSetting.Value.ChannelAccessToken!);
 
+                // get the chat using grpc
+                // assign the platform_id to both user and user_chat
                 userModel.DisplayName = userInfo.DisplayName;
                 userModel.PictureUrl = userInfo.PictureUrl;
                 await _userRepo.AddUser(userModel);
@@ -99,8 +143,68 @@ namespace Api.CommonLib.Consumers
             return;
         }
 
+        public async Task ConsumeMessageVerify(string message)
+        {
+            MessageModel messageModel = JsonConvert
+                .DeserializeObject<MessageModel>(message)!;
+            UserModel existingUser = new UserModel();
+            UserChatModel userChat = new UserChatModel();
+            string resMsg = "";
+
+            try
+            {
+                existingUser = await _userRepo.FindUser(messageModel.GroupUserId!);
+            }
+            catch
+            {
+                return;
+            }
+
+            try
+            {
+                userChat = await _userChatRepo.FindUserChatByGroupId(messageModel.GroupId!);
+            }
+            catch
+            {
+                if (!existingUser.Platform!.IsVerified)
+                {
+                    resMsg = "Need to verify the platform first!";
+                    _logger.LogError(resMsg);
+                    return;
+                }
+
+                userChat = new UserChatModel
+                {
+                    GroupId = messageModel.GroupId,
+                    PlatformId = existingUser.Platform!.PlatformId,
+                };
+
+                await _userChatRepo.AddUserChat(userChat);
+
+                // publish the user chat
+                string strUserChat = JsonConvert.SerializeObject(userChat);
+                string routingKey = RoutingKeys.UserChat["verify"];
+                _publisher.Publish(strUserChat, routingKey, null);
+
+                try{
+                    // add the message
+                    messageModel.PlatformId=existingUser.Platform.PlatformId;
+                    await _msgGrpc.AddMessage(messageModel);
+                }catch (Exception ex){
+                    _logger.LogError(ex.Message);
+                }
+
+                return;
+            }
+            
+            resMsg="User chat exist!";
+            _logger.LogWarning(resMsg);
+            return;
+        }
+
         public async Task ConsumePlatformVerify(string message)
         {
+            _logger.LogInformation(message);
             PlatformDto platformDto = JsonConvert
                 .DeserializeObject<PlatformDto>(message)!;
 
@@ -112,12 +216,16 @@ namespace Api.CommonLib.Consumers
 
                 userModel = await _userRepo.FindUser(platformDto.GroupUserId!);
                 userModel.ModifiedDate = modifiedDate;
-                userModel.PlatformId = platformDto.PlatformId;
+                userModel.Platform = new UserPlatformModel
+                {
+                    PlatformId = platformDto.PlatformId,
+                    IsVerified = true
+                };
                 await _userRepo.ReplaceUser(userModel);
             }
-            catch
+            catch (Exception ex)
             {
-                _logger.LogError("Failed update the user platform_id");
+                _logger.LogError(ex.Message);
                 return;
             }
 

@@ -45,6 +45,10 @@ namespace Api.MessageLib.Models
         [JsonProperty("message_object")]
         [BsonElement("message_object")]
         public virtual object? MessageObject { get; set; }
+
+        [JsonProperty("platform_id")]
+        [BsonElement("platform_id")]
+        public virtual string? PlatformId { get; set; }
     }
 
     public class MessageFromModel

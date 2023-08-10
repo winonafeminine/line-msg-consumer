@@ -3,7 +3,8 @@ namespace Api.ReferenceLib.Stores
     public class RoutingKeys
     {
         public static IDictionary<string, string> Message = new Dictionary<string, string>{
-            { "create", "lmc.message.create" }
+            { "create", "lmc.message.create" },
+            { "verify", "lmc.message.verify" }
         };
         public static IDictionary<string, string> User = new Dictionary<string, string>{
             { "create", "lmc.user.create" }
@@ -12,7 +13,8 @@ namespace Api.ReferenceLib.Stores
             { "create", "lmc.chat.create" }
         };
         public static IDictionary<string, string> UserChat = new Dictionary<string, string>{
-            { "create", "lmc.user_chat.create" }
+            { "create", "lmc.user_chat.create" },
+            { "verify", "lmc.user_chat.verify" },
         };
         public static IDictionary<string, string> Auth = new Dictionary<string, string>{
             { "update", "lmc.auth.update" }

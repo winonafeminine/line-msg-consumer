@@ -102,7 +102,7 @@ namespace Api.AuthLib.Services
 
             // generate the platform access token
             string secretKey = SecretKeyGenerator.GenerateSecretKey();
-            string accessToken = _jwtToken.GenerateJwtToken(secretKey, JwtIssuers.Platform, platformId);
+            string accessToken = _jwtToken.GenerateJwtToken(secretKey, JwtIssuers.Platform, platformId, DateTime.UtcNow.AddMonths(6));
 
             if (!_hostEnv.IsDevelopment())
             {
@@ -115,7 +115,12 @@ namespace Api.AuthLib.Services
             // save the data in memory
             lineAuthState.Code = auth.Code;
             lineAuthState.LineAccessToken = tokenResponse.AccessToken;
+            lineAuthState.Token = tokenResponse;
+            lineAuthState.UserProfile = userProfile;
             lineAuthState.GroupUserId = userProfile.UserId;
+            lineAuthState.DisplayName = userProfile.DisplayName;
+            lineAuthState.PictureUrl = userProfile.PictureUrl;
+            lineAuthState.StatusMessage = userProfile.StatusMessage;
             lineAuthState.SecretKey = secretKey;
             lineAuthState.AccessToken = accessToken;
             lineAuthState.PlatformId = platformId;
@@ -124,7 +129,7 @@ namespace Api.AuthLib.Services
             string strLineAuthState = JsonConvert.SerializeObject(lineAuthState);
             string routingKey = RoutingKeys.Auth["update"];
             _publisher.Publish(strLineAuthState, routingKey, null);
-            
+
             return new Response
             {
                 StatusCode = StatusCodes.Status200OK,
@@ -136,6 +141,32 @@ namespace Api.AuthLib.Services
                     PlatformId = platformId,
                     AppRedirectUri = lineAuthState.AppRedirectUri
                 }
+            };
+        }
+
+        public Response RemoveStateByPlatformId(string platformId)
+        {
+            LineAuthStateModel authModel = _authState.FirstOrDefault(x => x.PlatformId == platformId)!;
+
+            string resMsg = string.Empty;
+            if (authModel == null)
+            {
+                resMsg = "State not found";
+                _logger.LogError(resMsg);
+                throw new ErrorResponseException(
+                    StatusCodes.Status404NotFound,
+                    resMsg,
+                    new List<Error>()
+                );
+            }
+
+            _authState.Remove(authModel);
+            resMsg = "State removed!";
+            _logger.LogInformation(resMsg);
+            return new Response
+            {
+                Message = resMsg,
+                StatusCode = StatusCodes.Status200OK,
             };
         }
     }

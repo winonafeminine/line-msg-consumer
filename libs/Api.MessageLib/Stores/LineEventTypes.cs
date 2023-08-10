@@ -1,4 +1,4 @@
-namespace Api.CommonLib.Models
+namespace Api.MessageLib.Models
 {
     public class LineEventTypes
     {
