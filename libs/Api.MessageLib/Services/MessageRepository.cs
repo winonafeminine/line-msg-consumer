@@ -52,10 +52,10 @@ namespace Api.MessageLib.Services
             return HandleFindMessage(messageModel, groupId, "group");
         }
 
-        public IEnumerable<MessageModel> FindMessages(List<BsonDocument> pipeline)
+        public IEnumerable<T> FindMessages<T>(List<BsonDocument> pipeline)
         {
             return _messageCols
-                .Aggregate<MessageModel>(pipeline.ToArray())
+                .Aggregate<T>(pipeline.ToArray())
                 .ToEnumerable();
         }
 

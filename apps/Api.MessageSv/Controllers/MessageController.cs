@@ -36,9 +36,10 @@ namespace Api.MessageSv.Controllers
             // The port number must match the port of the gRPC server.
             string token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             var authReponse = await _authGrpcClient.ValidateJwtToken(token);
-            param.GroupId=route.GroupId;
             param.PlatformId=authReponse.PlatformId;
-            return Ok(param);
+
+
+            return Ok(_messageSv.GetMessages(route, param));
         }
     }
 }

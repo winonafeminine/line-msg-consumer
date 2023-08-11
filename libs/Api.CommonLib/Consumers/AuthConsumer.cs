@@ -58,7 +58,9 @@ namespace Api.CommonLib.Consumers
         public async Task ConsumePlatformVerify(string message)
         {
             PlatformDto platformDto = JsonConvert.DeserializeObject<PlatformDto>(message)!;
-            await _platformRepo.ReplacePlatform(platformDto);
+            PlatformModel platformModel = JsonConvert.DeserializeObject<PlatformModel>(message)!;
+            platformModel.PlatformId=platformDto.PlatformId;
+            await _platformRepo.ReplacePlatform(platformModel);
             _authRepo.RemoveStateByPlatformId(platformDto.PlatformId!);
         }
     }

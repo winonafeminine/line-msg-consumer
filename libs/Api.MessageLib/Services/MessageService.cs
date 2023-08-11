@@ -1,7 +1,9 @@
 using System.Text.RegularExpressions;
+using Api.MessageLib.DTOs;
 using Api.MessageLib.Interfaces;
 using Api.MessageLib.Models;
-using Api.MessageLib.Stores;
+using Api.MessageLib.Parameters;
+using Api.MessageLib.Routes;
 using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Interfaces;
 using Api.ReferenceLib.Setttings;
@@ -11,9 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
-using MongoDB.Driver;
 using Newtonsoft.Json;
-using Simple.RabbitMQ;
 
 namespace Api.MessageLib.Services
 {
@@ -25,8 +25,9 @@ namespace Api.MessageLib.Services
         private readonly IOptions<LineChannelSetting> _channelSetting;
         private readonly ISpecialKeywordHandler _skHandler;
         private readonly IScopePublisher _publisher;
+        private readonly IMessageRepository _msgRepo;
         public MessageService(ILogger<MessageService> logger, ILineMessageValidation lineValidation,
-            IHostEnvironment env, IOptions<MongoConfigSetting> mongoConfig, IOptions<LineChannelSetting> channelSetting, ISpecialKeywordHandler skHandler, IScopePublisher publisher)
+            IHostEnvironment env, IOptions<MongoConfigSetting> mongoConfig, IOptions<LineChannelSetting> channelSetting, ISpecialKeywordHandler skHandler, IScopePublisher publisher, IMessageRepository msgRepo)
         {
             _logger = logger;
             _lineValidation = lineValidation;
@@ -34,6 +35,7 @@ namespace Api.MessageLib.Services
             _channelSetting = channelSetting;
             _skHandler = skHandler;
             _publisher = publisher;
+            _msgRepo = msgRepo;
         }
 
         private string GetValFromJson(string strContent, string keyName, string pattern)
@@ -111,7 +113,7 @@ namespace Api.MessageLib.Services
             {
                 return;
             }
-            
+
             BsonDocument document = BsonDocument.Parse(
                 JsonConvert.SerializeObject(messageModel)
             );
@@ -121,19 +123,95 @@ namespace Api.MessageLib.Services
             IDictionary<string, string> msgRoutingKeys = RoutingKeys.Message;
             string routingKey = msgRoutingKeys["create"];
             _publisher.Publish(messageModelStr, routingKey, null);
-            
+
             return;
         }
 
-        public LineChannelSetting GetChannel()
+        public IEnumerable<MessageDto> GetMessages(MessageRoute route, MessageParam param)
         {
-            return new LineChannelSetting
+            var mo_type_format = new BsonArray
             {
-                SecretId = _channelSetting.Value.SecretId,
-                ClientId = _channelSetting.Value.ClientId,
-                ChannelAccessToken = _channelSetting.Value.ChannelAccessToken,
+                new BsonDocument("$eq", new BsonArray
+                {
+                    new BsonDocument("$first", "$message_object.events.message.type"),
+                    "sticker"
+                }),
+                new BsonArray
+                {
+                    new BsonDocument
+                    {
+                        { "type", "sticker" },
+                        { "id", new BsonDocument("$first", "$message_object.events.message.id") },
+                        { "stickerId", new BsonDocument("$first", "$message_object.events.message.stickerId") },
+                        { "packageId", new BsonDocument("$first", "$message_object.events.message.packageId") },
+                        { "stickerResourceType", new BsonDocument("$first", "$message_object.events.message.stickerResourceType") }
+                    }
+                },
+                "$message_object.events.message"
             };
-        }
 
+            var match_stage = new BsonDocument
+            {
+                { "platform_id", param.PlatformId },
+                { "group_id", route.GroupId },
+                { "message_object.events.message.type", new BsonDocument("$in", BsonArray.Create(param.GetMessageTypes()) ) }
+            };
+
+            if (!string.IsNullOrEmpty(param.Text))
+            {
+                match_stage["message_object.events.message.type"] = "text";
+                match_stage["message_object.events.message.text"] = new BsonDocument("$regex", new BsonRegularExpression(param.Text, "i"));
+            }
+            if (!string.IsNullOrEmpty(param.StartDate))
+            {
+                match_stage["created_date"] = new BsonDocument("$regex", new BsonRegularExpression(param.StartDate, "i"));
+            }
+
+            var pipeline = new List<BsonDocument>
+            {
+                new BsonDocument("$sort", new BsonDocument(param.GetSortField(), param.GetSortValue())),
+                new BsonDocument("$match", match_stage),
+                new BsonDocument("$limit", param.Limit),
+                new BsonDocument("$lookup",
+                new BsonDocument
+                {
+                    { "from", "lmc_users" },
+                    { "localField", "group_user_id" },
+                    { "foreignField", "group_user_id" },
+                    { "as", "users" }
+                }),
+                new BsonDocument("$addFields",
+                    new BsonDocument
+                    {
+                        { "group_user_id", new BsonDocument("$first", "$users.group_user_id") },
+                        { "display_name", new BsonDocument("$first", "$users.display_name") }
+                    }
+                ),
+                new BsonDocument("$project",
+                    new BsonDocument
+                    {
+                        { "_id", 0 },
+                        { "message_id", "$_id" },
+                        { "group_id", 1 },
+                        {
+                            "user",
+                            new BsonDocument
+                            {
+                                { "group_user_id", "$group_user_id" },
+                                { "display_name", "$display_name" }
+                            }
+                        },
+                        { "created_date", 1 },
+                        { "modified_date", 1 },
+                        {
+                            "message_object",
+                            new BsonDocument("$cond", mo_type_format)
+                        }
+                    }
+                )
+            };
+
+            return _msgRepo.FindMessages<MessageDto>(pipeline);
+        }
     }
 }

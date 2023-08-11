@@ -19,9 +19,9 @@ namespace Api.MessageLib.Parameters
         [JsonProperty("text")]
         public virtual string? Text { get; set; }
 
-        public List<string> GetMessageTypes()
+        public string[] GetMessageTypes()
         {
-            return Types!.Split(",").ToList();
+            return Types!.Split(",");
         }
     }
 }
