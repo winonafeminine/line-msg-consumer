@@ -1,9 +1,12 @@
-using Api.AuthLib.Interfaces;
 using Api.AuthLib.Models;
+using Api.ChatLib.Interfaces;
 using Api.CommonLib.Interfaces;
+using Api.CommonLib.Models;
 using Api.MessageLib.Interfaces;
 using Api.MessageLib.Models;
 using Api.PlatformLib.DTOs;
+using Api.ReferenceLib.DTOs;
+using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Interfaces;
 using Api.ReferenceLib.Setttings;
 using Api.ReferenceLib.Stores;
@@ -27,6 +30,7 @@ namespace Api.CommonLib.Consumers
         private readonly IScopePublisher _publisher;
         private readonly IUserChatRepository _userChatRepo;
         private readonly IMessageGrpcClientService _msgGrpc;
+        private readonly IChatGrpcClientService _chatGrpc;
         public UserConsumer(ILogger<UserConsumer> logger,
             IOptions<MongoConfigSetting> mongoConfig,
             ILineGroupInfo lineUserInfo,
@@ -34,7 +38,8 @@ namespace Api.CommonLib.Consumers
             IOptions<LineChannelSetting> channelSetting,
             IScopePublisher publisher,
             IUserChatRepository userChatRepo,
-            IMessageGrpcClientService msgGrpc)
+            IMessageGrpcClientService msgGrpc,
+            IChatGrpcClientService chatGrpc)
         {
             _logger = logger;
             IMongoClient mongoClient = new MongoClient(mongoConfig.Value.HostName);
@@ -46,6 +51,7 @@ namespace Api.CommonLib.Consumers
             _publisher = publisher;
             _userChatRepo = userChatRepo;
             _msgGrpc = msgGrpc;
+            _chatGrpc = chatGrpc;
         }
 
         public async Task ConsumeAuthUpdate(string message)
@@ -92,10 +98,20 @@ namespace Api.CommonLib.Consumers
             MessageModel msgModel = JsonConvert
                 .DeserializeObject<MessageModel>(message)!;
 
+            ChatModel chatModel = new ChatModel();
+            try{
+                chatModel = await _chatGrpc.GetChat(msgModel.GroupId!);
+            }catch (ErrorResponseException ex){
+                _logger.LogError(ex.Description);
+            }
+
             UserModel userModel = new UserModel
             {
                 ClientId = msgModel.ClientId,
                 GroupUserId = msgModel.GroupUserId,
+                Platform = new UserPlatformModel{
+                    PlatformId=chatModel.PlatformId
+                }
             };
 
             // check if user exist
@@ -103,29 +119,33 @@ namespace Api.CommonLib.Consumers
             try
             {
                 existingUser = await _userRepo.FindUser(userModel.GroupUserId!);
-                if (existingUser != null)
+            }
+            catch (ErrorResponseException ex)
+            {
+                _logger.LogInformation($"{ex.Description}\nAdding new user...");
+
+                var userInfo = new GetGroupMemberProfileDto();
+                try{
+                    userInfo = await _lineUserInfo.GetGroupMemberProfile(msgModel.GroupId!, userModel.GroupUserId!, _channelSetting.Value.ChannelAccessToken!);
+                }catch(Exception lineEx)
                 {
-                    _logger.LogInformation("Do nothing");
-                    // need to replace the user chat
-                    // publish the user chat
+                    _logger.LogError(lineEx.Message);
                     return;
                 }
-            }
-            finally
-            {
-                var userInfo = await _lineUserInfo.GetGroupMemberProfile(msgModel.GroupId!, userModel.GroupUserId!, _channelSetting.Value.ChannelAccessToken!);
 
                 // get the chat using grpc
                 // assign the platform_id to both user and user_chat
                 userModel.DisplayName = userInfo.DisplayName;
                 userModel.PictureUrl = userInfo.PictureUrl;
+
                 await _userRepo.AddUser(userModel);
 
                 // add the user chat
                 UserChatModel userChatModel = new UserChatModel
                 {
                     GroupId = msgModel.GroupId,
-                    GroupUserId = msgModel.GroupUserId
+                    GroupUserId = msgModel.GroupUserId,
+                    PlatformId = chatModel.PlatformId
                 };
 
                 await _userChatRepo.AddUserChat(userChatModel);

@@ -61,6 +61,7 @@ namespace Api.MessageLib.Services
         public async Task RetriveLineMessage(object content, string signature, string id)
         {
             // await Task.Yield();
+            // _logger.LogInformation(JsonConvert.SerializeObject(content));
 
             // only calculate the signature in production mode
             if (!_env.IsDevelopment())
@@ -70,25 +71,35 @@ namespace Api.MessageLib.Services
 
             string strContent = JsonConvert.SerializeObject(content);
 
-            // get the group id value using regex
-            string pattern = @"""groupId"":\s*""([^""]+)""";
-            string groupId = GetValFromJson(strContent, "groupId", pattern);
-
-
-
-            // get the event type
-            pattern = @"""type"":\s*""([^""]+)""";
-            string eventType = GetValFromJson(strContent, "type", pattern);
-
+            string groupId = string.Empty;
             string groupUserId = string.Empty;
-            string messageType = string.Empty;
 
-            // check if the event type=message
-            if (eventType == LineEventTypes.Message)
+            try
             {
-                // get the line userId
-                pattern = @"""userId"":\s*""([^""]+)""";
-                groupUserId = GetValFromJson(strContent, "userId", pattern);
+                // get the group id value using regex
+                string pattern = @"""groupId"":\s*""([^""]+)""";
+                groupId = GetValFromJson(strContent, "groupId", pattern);
+
+                // get the event type
+                pattern = @"""type"":\s*""([^""]+)""";
+                string eventType = GetValFromJson(strContent, "type", pattern);
+
+                groupUserId = string.Empty;
+                string messageType = string.Empty;
+
+                // check if the event type=message
+                if (eventType == LineEventTypes.Message || eventType == LineEventTypes.MemberJoined)
+                {
+                    // get the line userId
+                    pattern = @"""userId"":\s*""([^""]+)""";
+                    groupUserId = GetValFromJson(strContent, "userId", pattern);
+                }
+            }
+            // can not throw ask it will prevent verify in line console
+            catch (ErrorResponseException ex)
+            {
+                _logger.LogWarning(ex.Description);
+                return;
             }
 
             MessageModel messageModel = new MessageModel
@@ -101,29 +112,35 @@ namespace Api.MessageLib.Services
             };
 
             string messageModelStr = JsonConvert.SerializeObject(messageModel);
+            MessageModel existingMessage = new MessageModel();
 
             // handle the special keywords
             // if true publish to the specific route key
-            // catch the error
+            // then catch the error
             try
             {
                 _skHandler.HandleGroupVerify(messageModelStr);
+                existingMessage = await _msgRepo.FindMessageByGroupId(messageModel.GroupId);
             }
-            catch
+            catch (ErrorResponseException ex)
             {
+                // means the validating the group
+                _logger.LogWarning(ex.Description);
                 return;
             }
+
+            messageModel.PlatformId = existingMessage.PlatformId;
 
             BsonDocument document = BsonDocument.Parse(
                 JsonConvert.SerializeObject(messageModel)
             );
 
             // await _messageCols.InsertOneAsync(document);
+            await _msgRepo.AddMessage(messageModel);
 
             IDictionary<string, string> msgRoutingKeys = RoutingKeys.Message;
             string routingKey = msgRoutingKeys["create"];
             _publisher.Publish(messageModelStr, routingKey, null);
-
             return;
         }
 

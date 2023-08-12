@@ -1,3 +1,5 @@
+using Api.ChatLib.Grpcs;
+using Api.ChatLib.Interfaces;
 using Api.CommonLib.Consumers;
 using Api.CommonLib.Interfaces;
 using Api.CommonLib.Services;
@@ -60,6 +62,7 @@ builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IUserChatRepository, UserChatRepository>();
 builder.Services.AddSingleton<IScopePublisher, ScopePublisher>();
 builder.Services.AddSingleton<IMessageGrpcClientService, MessageGrpcClientService>();
+builder.Services.AddSingleton<IChatGrpcClientService, ChatGrpcClientService>();
 
 
 var app = builder.Build();

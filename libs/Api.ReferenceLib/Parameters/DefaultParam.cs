@@ -23,7 +23,7 @@ namespace Api.ReferenceLib.Parameters
 
         [FromQuery(Name = "sort_by")]
         [JsonProperty("sort_by")]
-        public virtual string? SortBy { get; set; }
+        public virtual string? SortBy { get; set; } = "created_date-desc";
         public Tuple<string, string> GetSortData()
         {
             var sorts = SortBy!.Split("-");

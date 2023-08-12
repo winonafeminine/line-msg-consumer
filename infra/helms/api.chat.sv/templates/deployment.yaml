@@ -47,3 +47,5 @@ spec:
                 secretKeyRef:
                   name: lmc-api-message-secret
                   key: lineConfigChannelChannelAccessToken
+            - name: GrpcConfig__Auth__Address
+              value: http://lmc-api-auth-sv.{{ .Release.Namespace }}:7000

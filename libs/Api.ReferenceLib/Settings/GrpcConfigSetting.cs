@@ -4,6 +4,7 @@ namespace Api.ReferenceLib.Settings
     {
         public AuthGrpcConfigSetting? Auth { get; set; }
         public MessageGrpcConfigSetting? Message { get; set; }
+        public ChatGrpcConfigSetting? Chat { get; set; }
     }
 
     public class CommonGrpcConfigSetting
@@ -13,4 +14,5 @@ namespace Api.ReferenceLib.Settings
 
     public class AuthGrpcConfigSetting : CommonGrpcConfigSetting{}
     public class MessageGrpcConfigSetting : CommonGrpcConfigSetting{}
+    public class ChatGrpcConfigSetting : CommonGrpcConfigSetting{}
 }

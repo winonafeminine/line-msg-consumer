@@ -38,8 +38,8 @@ namespace Api.MessageSv.Controllers
             var authReponse = await _authGrpcClient.ValidateJwtToken(token);
             param.PlatformId=authReponse.PlatformId;
 
-
-            return Ok(_messageSv.GetMessages(route, param));
+            var messages = _messageSv.GetMessages(route, param);
+            return Ok(messages);
         }
     }
 }

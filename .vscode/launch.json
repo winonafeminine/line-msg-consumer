@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "Api.MessageSv.Build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/dist/apps/Api.MessageSv/net6.0/ApiMessageSv.dll",
+            "program": "${workspaceFolder}/apps/Api.MessageSv/bin/Debug/net6.0/ApiMessageSv.dll",
             "args": [],
             "cwd": "${workspaceFolder}/apps/Api.MessageSv",
             "stopAtEntry": false,
@@ -35,7 +35,7 @@
             "request": "launch",
             "preLaunchTask": "Api.UserSv.Build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/dist/apps/Api.UserSv/net6.0/ApiUserSv.dll",
+            "program": "${workspaceFolder}/apps/Api.UserSv/bin/Debug/net6.0/ApiUserSv.dll",
             "args": [],
             "cwd": "${workspaceFolder}/apps/Api.UserSv",
             "stopAtEntry": false,

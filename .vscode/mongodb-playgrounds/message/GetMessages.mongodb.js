@@ -46,7 +46,7 @@ const mo_type_format = [
 
 var match_stage = {
     group_id: request.group_id,
-    group_user_id: request.group_user_id,
+    // group_user_id: request.group_user_id,
     "message_object.events.message.type": {
         $in: request.message_types
     },

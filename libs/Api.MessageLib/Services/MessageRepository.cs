@@ -45,7 +45,7 @@ namespace Api.MessageLib.Services
         public async Task<MessageModel> FindMessageByGroupId(string groupId)
         {
             MessageModel messageModel = await _messageCols
-                .Find(x => x["_id"] == groupId)
+                .Find(x => x["group_id"] == groupId)
                 .As<MessageModel>()
                 .FirstOrDefaultAsync();
 

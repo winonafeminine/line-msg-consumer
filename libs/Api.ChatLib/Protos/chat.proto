@@ -1,0 +1,24 @@
+syntax = "proto3";
+import "google/protobuf/wrappers.proto";
+
+option csharp_namespace = "Api.ChatLib.Protos";
+
+package chat;
+
+// The greeting service definition.
+service ChatGrpc {
+  // Sends a greeting
+  rpc GetChat (ChatGrpcRequest) returns (ChatGrpcReply);
+}
+
+// The request message containing the user's name.
+message ChatGrpcRequest {
+    string GroupId = 1;
+}
+
+// The response message containing the greetings.
+message ChatGrpcReply {
+    int32 StatusCode = 1;
+    google.protobuf.StringValue Data = 2;
+    google.protobuf.StringValue Message = 3;
+}

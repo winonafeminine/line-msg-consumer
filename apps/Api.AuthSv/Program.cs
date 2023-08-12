@@ -51,6 +51,7 @@ builder.Services.AddScoped<IMessagePublisher>(x =>
         ExchangeType.Topic // exchange type
     ));
 builder.Services.Configure<AuthLineConfigSetting>(configuration.GetSection("LineConfig:LineLogin"));
+builder.Services.Configure<LineChannelSetting>(configuration.GetSection("LineConfig:Channel"));
 builder.Services.AddSingleton<IAuthRepository, AuthRepository>();
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
 builder.Services.AddSingleton<ILineGroupInfo, LineGroupInfoService>();

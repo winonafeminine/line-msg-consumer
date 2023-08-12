@@ -13,4 +13,5 @@ service:
   name: lmc-api-chat-sv
   ports:
     default: 5000
+    grpc: 7000
   type: ClusterIP

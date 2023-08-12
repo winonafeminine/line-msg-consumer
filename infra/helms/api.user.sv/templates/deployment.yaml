@@ -49,3 +49,5 @@ spec:
                   key: mongodbHostname
             - name: GrpcConfig__Message__Address
               value: http://lmc-api-message-sv.{{ .Release.Namespace }}:7000
+            - name: GrpcConfig__Chat__Address
+              value: http://lmc-api-chat-sv.{{ .Release.Namespace }}:7000

@@ -3,6 +3,7 @@ using Api.AuthLib.Interfaces;
 using Api.ChatLib.Consumers;
 using Api.ChatLib.Interfaces;
 using Api.ChatLib.Services;
+using Api.ChatSv.Grpcs;
 using Api.ChatSv.HostedServices;
 using Api.CommonLib.Interfaces;
 using Api.CommonLib.Services;
@@ -55,6 +56,7 @@ builder.Services.AddSingleton<IChatRepository, ChatRepository>();
 builder.Services.AddSingleton<IUserChatRepository, UserChatRepository>();
 builder.Services.AddSingleton<IChatService, ChatService>();
 builder.Services.AddSingleton<IAuthGrpcClientService, AuthGrpcClientService>();
+builder.Services.AddGrpc();
 
 var app = builder.Build();
 
@@ -72,5 +74,6 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGrpcService<ChatGrpcServerService>();
 
 app.Run();

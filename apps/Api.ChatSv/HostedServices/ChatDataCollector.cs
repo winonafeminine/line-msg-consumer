@@ -1,5 +1,4 @@
 using Api.CommonLib.Interfaces;
-using Api.ReferenceLib.Interfaces;
 using Api.ReferenceLib.Stores;
 using Api.UserLib.Interfaces;
 using Api.UserLib.Models;
@@ -31,13 +30,7 @@ namespace Api.ChatSv.HostedServices
         public async Task<bool> ProcessMessage(string message, IDictionary<string, object> headers, string routingKey)
         {
             // await Task.Yield();
-            IDictionary<string, string> msgRoutingKeys = RoutingKeys.Message;
-            if (routingKey == msgRoutingKeys["create"])
-            {
-                // _logger.LogInformation($"Routing key: {routingKey}\nMessage: {message}");
-                await _chatMsgConsumer.ConsumeMessageCreate(message);
-            }
-            else if (routingKey == RoutingKeys.UserChat["create"])
+            if (routingKey == RoutingKeys.UserChat["create"])
             {
                 // _logger.LogInformation($"Routing key: {routingKey}\nMessage: {message}");
                 // await _chatMsgConsumer.ConsumeMessageCreate(message);

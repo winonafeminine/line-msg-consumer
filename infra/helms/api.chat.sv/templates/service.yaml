@@ -9,4 +9,7 @@ spec:
     - port: {{ .Values.service.ports.default }}
       name: default
       targetPort: {{ .Values.service.ports.default }}
+    - port: {{ .Values.service.ports.grpc }}
+      name: grpc
+      targetPort: {{ .Values.service.ports.grpc }}
   type: {{ .Values.service.type }}
