@@ -1,3 +1,4 @@
+using Api.AuthLib.Interfaces;
 using Api.PlatformLib.DTOs;
 using Api.PlatformLib.Interfaces;
 using Api.ReferenceLib.Models;
@@ -10,16 +11,20 @@ namespace Api.PlatformSv.Controllers
     public class PlatformController : ControllerBase
     {
         private readonly IPlatformService _platformSv;
-        public PlatformController(IPlatformRepository platformRepo, IPlatformService platformSv)
+        private readonly IAuthGrpcClientService _authGrpc;
+        public PlatformController(IPlatformRepository platformRepo, IPlatformService platformSv, IAuthGrpcClientService authGrpc)
         {
             _platformSv = platformSv;
+            _authGrpc = authGrpc;
         }
 
         [HttpPut]
-        [Route("verify/{platformId}")]
-        public async Task<ActionResult<Response>> UpdatePlatform([FromRoute] string action, [FromRoute] string platformId, [FromBody] PlatformDto platformDto)
+        [Route("verify")]
+        public async Task<ActionResult<Response>> UpdatePlatform([FromRoute] string action, [FromBody] PlatformDto platformDto)
         {
-            return Ok(await _platformSv.UpdatePlatform("verify", platformId, platformDto));
+            string? token = Request.Headers.Authorization.FirstOrDefault()?.Split(" ").Last()!;
+            var authResponse = await _authGrpc.ValidateJwtToken(token);
+            return Ok(await _platformSv.UpdatePlatform("verify", authResponse.PlatformId!, platformDto));
         }
     }
 }

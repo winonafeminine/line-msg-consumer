@@ -1,8 +1,8 @@
 using Api.AuthLib.Interfaces;
 using Api.MessageLib.Interfaces;
-using Api.MessageLib.Models;
 using Api.MessageLib.Parameters;
 using Api.MessageLib.Routes;
+using Api.ReferenceLib.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.MessageSv.Controllers
@@ -31,7 +31,7 @@ namespace Api.MessageSv.Controllers
 
         [HttpGet]
         [Route("group/{group_id}/messages")]
-        public async Task<ActionResult<IEnumerable<MessageModel>>> GetPlatformGroupMessages([FromRoute] MessageRoute route, [FromQuery] MessageParam param)
+        public async Task<ActionResult<Response>> GetPlatformGroupMessages([FromRoute] MessageRoute route, [FromQuery] MessageParam param)
         {
             // The port number must match the port of the gRPC server.
             string token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
@@ -39,7 +39,10 @@ namespace Api.MessageSv.Controllers
             param.PlatformId=authReponse.PlatformId;
 
             var messages = _messageSv.GetMessages(route, param);
-            return Ok(messages);
+            return Ok(new Response{
+                Data=messages,
+                StatusCode=StatusCodes.Status200OK
+            });
         }
     }
 }

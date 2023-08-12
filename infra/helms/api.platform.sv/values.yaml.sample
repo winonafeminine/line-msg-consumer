@@ -14,3 +14,7 @@ service:
   ports:
     default: 5000
   type: ClusterIP
+
+ingress:
+  rules:
+    - host: 'line-message-consumer.org'

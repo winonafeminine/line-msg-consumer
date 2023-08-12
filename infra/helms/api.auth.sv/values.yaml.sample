@@ -7,7 +7,7 @@ deployment:
     rabbitMQConfig:
       properties:
         prefetchCount: 100
-    aspnetCoreEnv: 'Development'
+    aspnetCoreEnv: 'Production'
 
 service:
   name: lmc-api-auth-sv
@@ -19,7 +19,10 @@ service:
 secret:
   name: lmc-api-auth-secret
   data:
-    lineConfigLineLoginRedirectUri: 'https://2186-171-7-224-238.ngrok-free.app/auth/line/connect'
+    lineConfigLineLoginRedirectUri: 'https://5808-171-7-247-105.ngrok-free.app/connect'
     lineConfigLineLoginSecretId: ''
     lineConfigLineLoginClientId: ''
-  
+
+ingress:
+  rules:
+    - host: 'line-message-consumer.org'

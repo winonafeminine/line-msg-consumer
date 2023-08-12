@@ -49,5 +49,17 @@
             ],
             "problemMatcher": "$msCompile"
         },
+        {
+            "label": "Api.PlatformSv.Build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/apps/Api.PlatformSv/ApiPlatformSv.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
     ]
 }

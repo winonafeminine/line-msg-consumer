@@ -2,6 +2,7 @@ using Api.AuthLib.Interfaces;
 using Api.ChatLib.DTOs;
 using Api.ChatLib.Interfaces;
 using Api.ChatLib.Parameters;
+using Api.ReferenceLib.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.ChatSv.Controllers
@@ -20,12 +21,15 @@ namespace Api.ChatSv.Controllers
 
         [HttpGet]
         [Route("groups")]
-        public async Task<ActionResult<IEnumerable<ChatDto>>> GetChats([FromQuery] ChatParam param)
+        public async Task<ActionResult<Response>> GetChats([FromQuery] ChatParam param)
         {
             string token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;;
             var authRes = await _authGrpc.ValidateJwtToken(token);
             param.PlatformId=authRes.PlatformId;
-            return Ok(_chatSv.GetChats(param));
+            return Ok(new Response{
+                Data=_chatSv.GetChats(param),
+                StatusCode=StatusCodes.Status200OK
+            });
         }
     }
 }

@@ -33,7 +33,28 @@ namespace Api.ChatLib.Consumers
         {
             UserChatModel userChatModel = JsonConvert
                 .DeserializeObject<UserChatModel>(message)!;
+            
+            ChatModel chat = new ChatModel{
+                Group = new ChatGroupModel{
+                    GroupId=userChatModel.GroupId,
+                },
+                PlatformId = userChatModel.PlatformId
+            };
 
+            GetGroupSummaryDto groupInfo = new GetGroupSummaryDto();
+            try{
+
+                groupInfo = await _lineGroupProfile.GetGroupSummary(userChatModel.GroupId!, _channelSetting.Value.ChannelAccessToken!);
+            }catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return;
+            }
+
+            chat.Group!.GroupName=groupInfo.GroupName;
+            chat.Group!.PictureUrl=groupInfo.PictureUrl;
+
+            await _chatRepo.AddChat(chat);
             await _userChatRepo.AddUserChat(userChatModel);
         }
     }

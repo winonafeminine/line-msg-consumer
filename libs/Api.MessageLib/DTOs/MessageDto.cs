@@ -51,5 +51,9 @@ namespace Api.MessageLib.DTOs
         [JsonProperty("display_name")]
         [BsonElement("display_name")]
         public virtual string? DisplayName { get; set; }
+
+        [JsonProperty("picture_url")]
+        [BsonElement("picture_url")]
+        public virtual string? PictureUrl { get; set; }
     }
 }

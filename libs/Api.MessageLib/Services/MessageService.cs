@@ -201,7 +201,8 @@ namespace Api.MessageLib.Services
                     new BsonDocument
                     {
                         { "group_user_id", new BsonDocument("$first", "$users.group_user_id") },
-                        { "display_name", new BsonDocument("$first", "$users.display_name") }
+                        { "display_name", new BsonDocument("$first", "$users.display_name") },
+                        { "picture_url", new BsonDocument("$first", "$users.picture_url") },
                     }
                 ),
                 new BsonDocument("$project",
@@ -215,7 +216,8 @@ namespace Api.MessageLib.Services
                             new BsonDocument
                             {
                                 { "group_user_id", "$group_user_id" },
-                                { "display_name", "$display_name" }
+                                { "display_name", "$display_name" },
+                                { "picture_url", "$picture_url" },
                             }
                         },
                         { "created_date", 1 },
