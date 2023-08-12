@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployment.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Values.deployment.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.deployment.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.deployment.name }}
+    spec:
+      containers:
+        - name: {{ .Values.deployment.name }}-con
+          image: {{ .Values.deployment.image.repo }}:{{ .Values.deployment.image.tag }}
+          ports:
+            - containerPort: {{ .Values.service.ports.default }} 
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: {{ .Values.deployment.env.aspnetCoreEnv }}
+            - name: TZ
+              value: 'Asia/Bangkok'
+            - name: LineConfig__Channel__SecretId
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: lineConfigChannelSecretId
+            - name: LineConfig__Channel__ClientId
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: lineConfigChannelClientId
+            - name: LineConfig__Channel__ChannelAccessToken
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: lineConfigChannelChannelAccessToken
+            - name: RabbitMQConfig__HostName
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: hostName
+            - name: MongoConfig__HostName
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: mongodbHostname
+            - name: GrpcConfig__Auth__Address
+              value: http://lmc-api-auth-sv.{{ .Release.Namespace }}:7000

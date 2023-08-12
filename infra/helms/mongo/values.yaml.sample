@@ -1,0 +1,19 @@
+secret:
+  name: mongo-secret
+  data: 
+    rootUser: 'root'
+    rootPass: 'password'
+    mongodbHostname: ''
+
+service:
+  name: mongo-sv
+  ports:
+    default: 27017
+    nodePort: 30002
+  type: NodePort
+
+deployment:
+  name: mongo-depl
+  image:
+    repo: mongo
+    tag: latest

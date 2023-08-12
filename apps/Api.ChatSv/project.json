@@ -1,0 +1,60 @@
+{
+    "name": "Api.ChatSv",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "projectType": "application",
+    "sourceRoot": "apps/Api.ChatSv",
+    "targets": {
+        "build": {
+            "executor": "@nx-dotnet/core:build",
+            "outputs": [
+                "{workspaceRoot}/dist/apps/Api.ChatSv",
+                "{workspaceRoot}/dist/intermediates/apps/Api.ChatSv"
+            ],
+            "options": {
+                "configuration": "Debug",
+                "noDependencies": true
+            },
+            "configurations": {
+                "production": {
+                    "configuration": "Release"
+                }
+            }
+        },
+        "serve": {
+            "executor": "@nx-dotnet/core:serve",
+            "options": {
+                "configuration": "Debug"
+            },
+            "configurations": {
+                "production": {
+                    "configuration": "Release"
+                }
+            }
+        },
+        "publish": {
+            "executor": "@nx-dotnet/core:publish",
+            "outputs": [
+              "{workspaceRoot}/dist/apps/Api.ChatSv"
+            ],
+            "options": {
+              "configuration": "Release",
+              "noDependencies": false,
+              "selfContained": false,
+              "noBuild": false,
+              "noRestore": false
+            }
+          },
+        "lint": {
+            "executor": "@nx-dotnet/core:format"
+        },
+        "swagger": {
+            "executor": "@nx-dotnet/core:update-swagger",
+            "outputs": ["options.output"],
+            "options": {
+                "output": "libs/generated/api.chat-sv-swagger/swagger.json"
+            },
+            "dependsOn": ["build"]
+        }
+    },
+    "tags": []
+}

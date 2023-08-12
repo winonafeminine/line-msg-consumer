@@ -1,0 +1,24 @@
+syntax = "proto3";
+import "google/protobuf/wrappers.proto";
+
+option csharp_namespace = "Api.AuthLib.Protos";
+
+package auth;
+
+// The greeting service definition.
+service AuthGrpc {
+  // Sends a greeting
+  rpc ValidateJwtToken (GrpcValidateJwtTokenRequest) returns (AuthGrpcReply);
+}
+
+// The request message containing the user's name.
+message GrpcValidateJwtTokenRequest {
+    google.protobuf.StringValue Token = 1;
+}
+
+// The response message containing the greetings.
+message AuthGrpcReply {
+    google.protobuf.Int32Value StatusCode = 1;
+    google.protobuf.StringValue Data = 2;
+    google.protobuf.StringValue Message = 3;
+}

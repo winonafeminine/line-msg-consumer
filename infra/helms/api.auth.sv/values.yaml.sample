@@ -1,0 +1,28 @@
+deployment:
+  name: lmc-api-auth-depl
+  image:
+    repo: 13angs/lmc.api.auth.sv
+    tag: latest
+  env:
+    rabbitMQConfig:
+      properties:
+        prefetchCount: 100
+    aspnetCoreEnv: 'Production'
+
+service:
+  name: lmc-api-auth-sv
+  ports:
+    default: 5000
+    grpc: 7000
+  type: ClusterIP
+
+secret:
+  name: lmc-api-auth-secret
+  data:
+    lineConfigLineLoginRedirectUri: 'https://5808-171-7-247-105.ngrok-free.app/connect'
+    lineConfigLineLoginSecretId: ''
+    lineConfigLineLoginClientId: ''
+
+ingress:
+  rules:
+    - host: 'line-message-consumer.org'

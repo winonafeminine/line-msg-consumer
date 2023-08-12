@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: lmc-api-platform-ingress
+  annotations:
+    # kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-reges: 'true'
+spec:
+  rules:
+  - host: {{ index .Values.ingress.rules 0 "host" }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/platform"
+        backend:
+          service:
+            name: lmc-api-platform-sv
+            port:
+              number: 5000

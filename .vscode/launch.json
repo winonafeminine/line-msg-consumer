@@ -1,0 +1,130 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // Use IntelliSense to find out which attributes exist for C# debugging
+            // Use hover for the description of the existing attributes
+            // For further information visit https://github.com/dotnet/vscode-csharp/blob/main/debugger-launchjson.md
+            "name": "Api.MessageSv",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Api.MessageSv.Build",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/apps/Api.MessageSv/bin/Debug/net6.0/ApiMessageSv.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/apps/Api.MessageSv",
+            "stopAtEntry": false,
+            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
+            // "serverReadyAction": {
+            //     "action": "openExternally",
+            //     "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            // },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            // Use IntelliSense to find out which attributes exist for C# debugging
+            // Use hover for the description of the existing attributes
+            // For further information visit https://github.com/dotnet/vscode-csharp/blob/main/debugger-launchjson.md
+            "name": "Api.UserSv",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Api.UserSv.Build",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/apps/Api.UserSv/bin/Debug/net6.0/ApiUserSv.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/apps/Api.UserSv",
+            "stopAtEntry": false,
+            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
+            // "serverReadyAction": {
+            //     "action": "openExternally",
+            //     "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            // },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            // Use IntelliSense to find out which attributes exist for C# debugging
+            // Use hover for the description of the existing attributes
+            // For further information visit https://github.com/dotnet/vscode-csharp/blob/main/debugger-launchjson.md
+            "name": "Api.ChatSv",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Api.ChatSv.Build",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/apps/Api.ChatSv/bin/Debug/net6.0/ApiChatSv.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/apps/Api.ChatSv",
+            "stopAtEntry": false,
+            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
+            // "serverReadyAction": {
+            //     "action": "openExternally",
+            //     "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            // },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            // Use IntelliSense to find out which attributes exist for C# debugging
+            // Use hover for the description of the existing attributes
+            // For further information visit https://github.com/dotnet/vscode-csharp/blob/main/debugger-launchjson.md
+            "name": "Api.AuthSv",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Api.AuthSv.Build",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/apps/Api.AuthSv/bin/Debug/net6.0/ApiAuthSv.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/apps/Api.AuthSv",
+            "stopAtEntry": false,
+            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
+            // "serverReadyAction": {
+            //     "action": "openExternally",
+            //     "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            // },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            // Use IntelliSense to find out which attributes exist for C# debugging
+            // Use hover for the description of the existing attributes
+            // For further information visit https://github.com/dotnet/vscode-csharp/blob/main/debugger-launchjson.md
+            "name": "Api.PlatformSv",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Api.PlatformSv.Build",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/apps/Api.PlatformSv/bin/Debug/net6.0/ApiPlatformSv.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/apps/Api.PlatformSv",
+            "stopAtEntry": false,
+            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
+            // "serverReadyAction": {
+            //     "action": "openExternally",
+            //     "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            // },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+    ]
+}

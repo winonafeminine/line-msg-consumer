@@ -1,0 +1,20 @@
+deployment:
+  name: lmc-api-platform-depl
+  image:
+    repo: 13angs/lmc.api.platform.sv
+    tag: latest
+  env:
+    rabbitMQConfig:
+      properties:
+        prefetchCount: 100
+    aspnetCoreEnv: 'Production'
+
+service:
+  name: lmc-api-platform-sv
+  ports:
+    default: 5000
+  type: ClusterIP
+
+ingress:
+  rules:
+    - host: 'line-message-consumer.org'

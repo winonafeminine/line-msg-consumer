@@ -1,0 +1,21 @@
+deployment:
+  name: lmc-api-chat-depl
+  image:
+    repo: 13angs/lmc.api.chat.sv
+    tag: latest
+  env:
+    rabbitMQConfig:
+      properties:
+        prefetchCount: 100
+    aspnetCoreEnv: 'Production'
+
+service:
+  name: lmc-api-chat-sv
+  ports:
+    default: 5000
+    grpc: 7000
+  type: ClusterIP
+
+ingress:
+  rules:
+    - host: 'line-message-consumer.org'

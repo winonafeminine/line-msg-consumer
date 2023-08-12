@@ -1,0 +1,28 @@
+deployment:
+  name: lmc-api-message-depl
+  image:
+    repo: 13angs/lmc.api.message.sv
+    tag: latest
+  env:
+    rabbitMQConfig:
+      properties:
+        prefetchCount: 100
+    aspnetCoreEnv: 'Production'
+
+service:
+  name: lmc-api-message-sv
+  ports:
+    default: 5000
+    grpc: 7000
+  type: ClusterIP
+
+secret:
+  name: lmc-api-message-secret
+  data:
+    lineConfigChannelSecretId: ''
+    lineConfigChannelClientId: ''
+    lineConfigChannelChannelAccessToken: ''
+
+ingress:
+  rules:
+    - host: 'line-message-consumer.org'
