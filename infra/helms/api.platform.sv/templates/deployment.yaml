@@ -32,3 +32,5 @@ spec:
                 secretKeyRef:
                   name: mongo-secret
                   key: mongodbHostname
+            - name: GrpcConfig__Auth__Address
+              value: http://lmc-api-auth-sv.{{ .Release.Namespace }}:7000
