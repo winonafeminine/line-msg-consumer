@@ -23,6 +23,16 @@ var configuration = builder.Configuration;
 // Add services to the container.
 
 // configure controller to use Newtonsoft as a default serializer
+builder.Services.AddCors(options =>
+{
+  options.AddPolicy(name: "auth", build =>
+  {
+    build.WithOrigins(configuration["AllowedHosts"])
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+
+  });
+});
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
@@ -74,6 +84,7 @@ if (app.Environment.IsDevelopment())
     app.UseResponseExceptionHandler();
 }
 
+app.UseCors("auth");
 // app.UseHttpsRedirection();
 
 app.UseAuthorization();
