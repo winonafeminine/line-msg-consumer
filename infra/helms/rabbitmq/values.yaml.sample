@@ -1,7 +1,13 @@
 secret:
   name: rabbitmq-secret
   data:
-    hostName: ''
+    defaultUser: 'root'
+    defaultPass: 
+      - 'password'
+      - 'password'
+    hostName: 
+      - 'amqp://root:password@rabbitmq-sv.default:5672'
+      - 'amqp://root:password@rabbitmq-sv.dev:5672'
 
 service:
   name: rabbitmq-sv

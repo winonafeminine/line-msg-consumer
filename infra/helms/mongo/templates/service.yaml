@@ -9,5 +9,12 @@ spec:
     - port: {{ .Values.service.ports.default }} 
       name: default
       targetPort: {{ .Values.service.ports.default }}
+      {{- if eq .Release.Namespace "default" }}
       nodePort: {{ .Values.service.ports.nodePort }}
-  type: {{ .Values.service.type }}
+      {{- end }}
+  
+  {{- if eq .Release.Namespace "dev" }}
+  type: ClusterIP
+  {{- else }}
+  type: NodePort
+  {{- end }}
