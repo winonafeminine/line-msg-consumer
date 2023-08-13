@@ -36,7 +36,8 @@
 				"mongodb.mongodb-vscode",
 				"rohinivsenthil.rabbitrace",
 				"zxh404.vscode-proto3",
-				"ms-dotnettools.csharp@1.26.0"
+				"ms-dotnettools.csharp@1.26.0",
+				"ms-kubernetes-tools.vscode-kubernetes-tools"
 			]
 		}
 	}

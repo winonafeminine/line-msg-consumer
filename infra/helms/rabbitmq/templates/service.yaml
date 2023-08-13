@@ -9,9 +9,14 @@ spec:
     - port: {{ .Values.service.ports.amqp }} 
       name: amqp
       targetPort: {{ .Values.service.ports.amqp }} 
+      {{- if eq .Release.Namespace "default" }}
       nodePort: {{ .Values.service.ports.nodePort }} 
+      {{- end }}
     - port: {{ .Values.service.ports.management }}
       name: management
       targetPort: {{ .Values.service.ports.management }}
-
-  type: {{ .Values.service.type }}
+  {{- if eq .Release.Namespace "dev" }}
+  type: ClusterIP
+  {{- else }}
+  type: NodePort
+  {{- end }}
