@@ -9,16 +9,20 @@ metadata:
     {{- end }}
     # nginx.ingress.kubernetes.io/use-reges: 'true'
 spec:
+  {{- if ne .Release.Namespace "default" }}
   tls:
   - hosts:
     {{- if eq .Release.Namespace "dev" }}
     - {{ index .Values.ingress.rules 1 "host" }}
-    {{- else }}
-    - {{ index .Values.ingress.rules 0 "host" }}
     {{- end }}
-    secretName: lmc-api-platform-tls
+    secretName: lmc-api-auth-tls
+  {{- end }}
   rules:
+  {{- if eq .Release.Namespace "dev" }}
+  - host: {{ index .Values.ingress.rules 1 "host" }}
+  {{- else }}
   - host: {{ index .Values.ingress.rules 0 "host" }}
+  {{- end }}
     http:
       paths:
       - pathType: Prefix
