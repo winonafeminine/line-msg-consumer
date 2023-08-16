@@ -22,6 +22,10 @@ build:
       context: .
       docker:
         dockerfile: ./apps/Api.PlatformSv/Dockerfile
+    - image: 13angs/lmc.app
+      context: .
+      docker:
+        dockerfile: ./apps/app/Dockerfile
   local:
     push: false # This flag will push the image to Docker Hub
 deploy:
@@ -37,3 +41,5 @@ deploy:
         chartPath: infra/helms/api.auth.sv
       - name: api.platform.sv
         chartPath: infra/helms/api.platform.sv
+      - name: app
+        chartPath: infra/helms/app

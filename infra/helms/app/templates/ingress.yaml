@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: lmc-app-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    {{- if eq .Release.Namespace "dev" }}
+    cert-manager.io/cluster-issuer: letsencrypt-issuer
+    {{- end }}
+    # nginx.ingress.kubernetes.io/use-reges: 'true'
+spec:
+  {{- if ne .Release.Namespace "default" }}
+  tls:
+  - hosts:
+    {{- if eq .Release.Namespace "dev" }}
+    - {{ index .Values.ingress.rules 1 "host" }}
+    {{- end }}
+    secretName: lmc-app-tls
+  {{- end }}
+  rules:
+  {{- if eq .Release.Namespace "dev" }}
+  - host: {{ index .Values.ingress.rules 1 "host" }}
+  {{- else }}
+  - host: {{ index .Values.ingress.rules 0 "host" }}
+  {{- end }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: lmc-app-sv
+            port:
+              number: 3000
