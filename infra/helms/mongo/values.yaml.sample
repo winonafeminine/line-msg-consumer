@@ -15,7 +15,7 @@ service:
     default: 27017
     nodePort: 30002
 
-  deployment:
+deployment:
   name: mongo-depl
   image:
     repo: mongo
