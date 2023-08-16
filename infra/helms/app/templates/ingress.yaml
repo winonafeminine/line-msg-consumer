@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: lmc-api-auth-ingress
+  name: lmc-app-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
     {{- if eq .Release.Namespace "dev" }}
@@ -15,7 +15,7 @@ spec:
     {{- if eq .Release.Namespace "dev" }}
     - {{ index .Values.ingress.rules 1 "host" }}
     {{- end }}
-    secretName: lmc-api-auth-tls
+    secretName: lmc-app-tls
   {{- end }}
   rules:
   {{- if eq .Release.Namespace "dev" }}
@@ -26,9 +26,9 @@ spec:
     http:
       paths:
       - pathType: Prefix
-        path: "/api/auth"
+        path: "/"
         backend:
           service:
-            name: lmc-api-auth-sv
+            name: lmc-app-sv
             port:
-              number: 5000
+              number: 3000

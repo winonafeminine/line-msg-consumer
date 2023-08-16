@@ -26,7 +26,7 @@ spec:
     http:
       paths:
       - pathType: Prefix
-        path: "/message"
+        path: "/api/message"
         backend:
           service:
             name: lmc-api-message-sv

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.ChatSv.Controllers
 {
     [ApiController]
-    [Route("chat/v1")]
+    [Route("api/chat/v1")]
     public class ChatController : ControllerBase
     {
         private readonly IChatService _chatSv;

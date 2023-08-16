@@ -1,0 +1,16 @@
+deployment:
+  name: lmc-app-depl
+  image:
+    repo: 13angs/lmc.app
+    tag: latest
+      
+service:
+  name: lmc-app-sv
+  ports:
+    default: 3000
+    nodePort: 30200
+
+ingress:
+  rules:
+    - host: 'line-message-consumer.org'
+    - host: 'dev.lmc.nextblackswan.com'
