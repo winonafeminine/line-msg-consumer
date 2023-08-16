@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.AuthSv.Controllers
 {
     [ApiController]
-    [Route("auth/v1")]
+    [Route("api/auth/v1")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthRepository _authRepo;

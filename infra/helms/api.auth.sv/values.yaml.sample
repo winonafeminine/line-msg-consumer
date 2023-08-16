@@ -19,7 +19,7 @@ service:
 secret:
   name: lmc-api-auth-secret
   data:
-    lineConfigLineLoginRedirectUri: 'https://5808-171-7-247-105.ngrok-free.app/connect'
+    lineConfigLineLoginRedirectUri: 'https://dev.lmc.nextblackswan.com/platform/verify'
     lineConfigLineLoginSecretId: ''
     lineConfigLineLoginClientId: ''
 

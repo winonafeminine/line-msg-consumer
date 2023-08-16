@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.PlatformSv.Controllers
 {
-    [Route("platform/v1")]
+    [Route("api/platform/v1")]
     [ApiController]
     public class PlatformController : ControllerBase
     {
