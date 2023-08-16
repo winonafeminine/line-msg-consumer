@@ -12,11 +12,13 @@ using Api.ReferenceLib.Setttings;
 using Api.ReferenceLib.Stores;
 using Api.UserLib.Interfaces;
 using Api.UserLib.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
+using Simple.RabbitMQ;
 
 namespace Api.CommonLib.Consumers
 {
@@ -31,6 +33,7 @@ namespace Api.CommonLib.Consumers
         private readonly IUserChatRepository _userChatRepo;
         private readonly IMessageGrpcClientService _msgGrpc;
         private readonly IChatGrpcClientService _chatGrpc;
+        private readonly IServiceProvider _serviceProvider;
         public UserConsumer(ILogger<UserConsumer> logger,
             IOptions<MongoConfigSetting> mongoConfig,
             ILineGroupInfo lineUserInfo,
@@ -39,7 +42,8 @@ namespace Api.CommonLib.Consumers
             IScopePublisher publisher,
             IUserChatRepository userChatRepo,
             IMessageGrpcClientService msgGrpc,
-            IChatGrpcClientService chatGrpc)
+            IChatGrpcClientService chatGrpc,
+            IServiceProvider serviceProvider)
         {
             _logger = logger;
             IMongoClient mongoClient = new MongoClient(mongoConfig.Value.HostName);
@@ -52,6 +56,7 @@ namespace Api.CommonLib.Consumers
             _userChatRepo = userChatRepo;
             _msgGrpc = msgGrpc;
             _chatGrpc = chatGrpc;
+            _serviceProvider = serviceProvider;
         }
 
         public async Task ConsumeAuthUpdate(string message)
@@ -99,9 +104,12 @@ namespace Api.CommonLib.Consumers
                 .DeserializeObject<MessageModel>(message)!;
 
             ChatModel chatModel = new ChatModel();
-            try{
+            try
+            {
                 chatModel = await _chatGrpc.GetChat(msgModel.GroupId!);
-            }catch (ErrorResponseException ex){
+            }
+            catch (ErrorResponseException ex)
+            {
                 _logger.LogError(ex.Description);
             }
 
@@ -109,8 +117,9 @@ namespace Api.CommonLib.Consumers
             {
                 ClientId = msgModel.ClientId,
                 GroupUserId = msgModel.GroupUserId,
-                Platform = new UserPlatformModel{
-                    PlatformId=chatModel.PlatformId
+                Platform = new UserPlatformModel
+                {
+                    PlatformId = chatModel.PlatformId
                 }
             };
 
@@ -125,9 +134,11 @@ namespace Api.CommonLib.Consumers
                 _logger.LogInformation($"{ex.Description}\nAdding new user...");
 
                 var userInfo = new GetGroupMemberProfileDto();
-                try{
+                try
+                {
                     userInfo = await _lineUserInfo.GetGroupMemberProfile(msgModel.GroupId!, userModel.GroupUserId!, _channelSetting.Value.ChannelAccessToken!);
-                }catch(Exception lineEx)
+                }
+                catch (Exception lineEx)
                 {
                     _logger.LogError(lineEx.Message);
                     return;
@@ -150,15 +161,28 @@ namespace Api.CommonLib.Consumers
 
                 await _userChatRepo.AddUserChat(userChatModel);
 
-                // publish the user
-                string pubMessage = JsonConvert.SerializeObject(userModel);
-                string routingKey = RoutingKeys.User["create"];
-                _publisher.Publish(pubMessage, routingKey, null);
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var publisher = scope.ServiceProvider.GetRequiredService<IMessagePublisher>();
 
-                // publish the user
-                pubMessage = JsonConvert.SerializeObject(userChatModel);
-                routingKey = RoutingKeys.UserChat["create"];
-                _publisher.Publish(pubMessage, routingKey, null);
+                    try
+                    {
+                        // publish the user
+                        string pubMessage = JsonConvert.SerializeObject(userModel);
+                        string routingKey = RoutingKeys.User["create"];
+                        publisher.Publish(pubMessage, routingKey, null);
+                        // _publisher.Publish(pubMessage, routingKey, null);
+
+                        // publish the user
+                        pubMessage = JsonConvert.SerializeObject(userChatModel);
+                        routingKey = RoutingKeys.UserChat["create"];
+                        publisher.Publish(pubMessage, routingKey, null);
+                        // _publisher.Publish(pubMessage, routingKey, null);
+                    }
+                    finally{
+                        publisher.Dispose();
+                    }
+                }
             }
             return;
         }
@@ -206,18 +230,21 @@ namespace Api.CommonLib.Consumers
                 string routingKey = RoutingKeys.UserChat["verify"];
                 _publisher.Publish(strUserChat, routingKey, null);
 
-                try{
+                try
+                {
                     // add the message
-                    messageModel.PlatformId=existingUser.Platform.PlatformId;
+                    messageModel.PlatformId = existingUser.Platform.PlatformId;
                     await _msgGrpc.AddMessage(messageModel);
-                }catch (Exception ex){
+                }
+                catch (Exception ex)
+                {
                     _logger.LogError(ex.Message);
                 }
 
                 return;
             }
-            
-            resMsg="User chat exist!";
+
+            resMsg = "User chat exist!";
             _logger.LogWarning(resMsg);
             return;
         }

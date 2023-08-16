@@ -16,7 +16,15 @@ namespace Api.ReferenceLib.Services
             using (var scope = _serviceProvider.CreateScope())
             {
                 var publisher = scope.ServiceProvider.GetRequiredService<IMessagePublisher>();
-                publisher.Publish(message, routingKey, headers);
+
+                try
+                {
+                    publisher.Publish(message, routingKey, headers);
+                }
+                finally
+                {
+                    publisher.Dispose();
+                }
             }
         }
     }
