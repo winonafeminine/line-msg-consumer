@@ -13,7 +13,7 @@ spec:
       nodePort: {{ .Values.service.ports.nodePort }}
       {{- end }}
   
-  {{- if eq .Release.Namespace "dev" }}
+  {{- if eq .Release.Namespace "lmc-dev" }}
   type: ClusterIP
   {{- else }}
   type: NodePort

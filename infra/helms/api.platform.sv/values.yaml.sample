@@ -18,4 +18,4 @@ service:
 ingress:
   rules:
     - host: 'line-message-consumer.org'
-    - host: 'api.dev.lmc.nextblackswan.com'
+    - host: 'dev.lmc.nextblackswan.com'

@@ -14,16 +14,20 @@ spec:
       labels:
         app: {{ .Values.deployment.name }}
     spec:
+      {{- if eq .Release.Namespace "default" }}
       volumes:
         - name: mongo-claim0
           persistentVolumeClaim:
             claimName: mongo-claim0
+      {{- end }}
       containers:
         - name: {{ .Values.deployment.name }}-con
           image: {{ .Values.deployment.image.repo }}:{{ .Values.deployment.image.tag }}
+          {{- if eq .Release.Namespace "default" }}
           volumeMounts:
             - mountPath: /data/db
               name: mongo-claim0
+          {{- end }}
           ports:
             - containerPort: {{ .Values.service.ports.default }} 
           env:

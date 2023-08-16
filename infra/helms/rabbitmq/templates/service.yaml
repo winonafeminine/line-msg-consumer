@@ -15,7 +15,7 @@ spec:
     - port: {{ .Values.service.ports.management }}
       name: management
       targetPort: {{ .Values.service.ports.management }}
-  {{- if eq .Release.Namespace "dev" }}
+  {{- if eq .Release.Namespace "lmc-dev" }}
   type: ClusterIP
   {{- else }}
   type: NodePort
