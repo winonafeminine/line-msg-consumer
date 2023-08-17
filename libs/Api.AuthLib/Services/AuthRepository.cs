@@ -104,13 +104,13 @@ namespace Api.AuthLib.Services
             string secretKey = SecretKeyGenerator.GenerateSecretKey();
             string accessToken = _jwtToken.GenerateJwtToken(secretKey, JwtIssuers.Platform, platformId, DateTime.UtcNow.AddMonths(6));
 
-            if (!_hostEnv.IsDevelopment())
-            {
-                // issue line login access token
-                tokenResponse = await _lineGroup.IssueLineLoginAccessToken(auth.Code!);
-                // get line user profile
-                userProfile = await _lineGroup.GetLineLoginUserProfile(tokenResponse.AccessToken!);
-            }
+            // if (!_hostEnv.IsDevelopment())
+            // {
+            // }
+            // issue line login access token
+            tokenResponse = await _lineGroup.IssueLineLoginAccessToken(auth.Code!);
+            // get line user profile
+            userProfile = await _lineGroup.GetLineLoginUserProfile(tokenResponse.AccessToken!);
 
             // save the data in memory
             lineAuthState.Code = auth.Code;

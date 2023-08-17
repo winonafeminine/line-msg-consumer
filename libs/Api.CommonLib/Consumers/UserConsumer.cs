@@ -111,6 +111,7 @@ namespace Api.CommonLib.Consumers
             catch (ErrorResponseException ex)
             {
                 _logger.LogError(ex.Description);
+                return;
             }
 
             UserModel userModel = new UserModel
@@ -125,14 +126,18 @@ namespace Api.CommonLib.Consumers
 
             // check if user exist
             UserModel existingUser = new UserModel();
+
+            bool isUserExist = false;
             try
             {
                 existingUser = await _userRepo.FindUser(userModel.GroupUserId!);
+                isUserExist = true;
             }
+            // if user not exist add it.
             catch (ErrorResponseException ex)
             {
-                _logger.LogInformation($"{ex.Description}\nAdding new user...");
-
+                _logger.LogWarning($"{ex.Description}\nAdding new user...");
+                isUserExist = false;
                 var userInfo = new GetGroupMemberProfileDto();
                 try
                 {
@@ -150,38 +155,59 @@ namespace Api.CommonLib.Consumers
                 userModel.PictureUrl = userInfo.PictureUrl;
 
                 await _userRepo.AddUser(userModel);
+            }
 
-                // add the user chat
-                UserChatModel userChatModel = new UserChatModel
-                {
-                    GroupId = msgModel.GroupId,
-                    GroupUserId = msgModel.GroupUserId,
-                    PlatformId = chatModel.PlatformId
-                };
+            // add the user chat
+            UserChatModel userChatModel = new UserChatModel
+            {
+                GroupId = msgModel.GroupId,
+                GroupUserId = msgModel.GroupUserId,
+                PlatformId = chatModel.PlatformId
+            };
 
+            bool isUserChatExist = false;
+
+            try
+            {
+                isUserChatExist = true;
+                userChatModel = await _userChatRepo.FindUserChat(chatModel.Group!.GroupId!, msgModel.GroupUserId!);
+                return;
+            }
+            catch (ErrorResponseException ex)
+            {
+                _logger.LogWarning($"{ex.Description}\nAdding new user chat...");
                 await _userChatRepo.AddUserChat(userChatModel);
+                isUserChatExist = false;
+            }
 
-                using (var scope = _serviceProvider.CreateScope())
+
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var publisher = scope.ServiceProvider.GetRequiredService<IMessagePublisher>();
+
+                try
                 {
-                    var publisher = scope.ServiceProvider.GetRequiredService<IMessagePublisher>();
+                    string pubMessage = JsonConvert.SerializeObject(userModel);
+                    string routingKey = RoutingKeys.User["create"];
 
-                    try
+                    if (!isUserExist)
                     {
                         // publish the user
-                        string pubMessage = JsonConvert.SerializeObject(userModel);
-                        string routingKey = RoutingKeys.User["create"];
                         publisher.Publish(pubMessage, routingKey, null);
                         // _publisher.Publish(pubMessage, routingKey, null);
-
+                    }
+                    if (!isUserChatExist)
+                    {
                         // publish the user
                         pubMessage = JsonConvert.SerializeObject(userChatModel);
                         routingKey = RoutingKeys.UserChat["create"];
                         publisher.Publish(pubMessage, routingKey, null);
                         // _publisher.Publish(pubMessage, routingKey, null);
                     }
-                    finally{
-                        publisher.Dispose();
-                    }
+                }
+                finally
+                {
+                    publisher.Dispose();
                 }
             }
             return;
@@ -201,6 +227,8 @@ namespace Api.CommonLib.Consumers
             }
             catch
             {
+                resMsg = "No admin user exit.";
+                _logger.LogError(resMsg);
                 return;
             }
 
@@ -225,10 +253,6 @@ namespace Api.CommonLib.Consumers
 
                 await _userChatRepo.AddUserChat(userChat);
 
-                // publish the user chat
-                string strUserChat = JsonConvert.SerializeObject(userChat);
-                string routingKey = RoutingKeys.UserChat["verify"];
-                _publisher.Publish(strUserChat, routingKey, null);
 
                 try
                 {
@@ -241,6 +265,10 @@ namespace Api.CommonLib.Consumers
                     _logger.LogError(ex.Message);
                 }
 
+                // publish the user chat
+                string strUserChat = JsonConvert.SerializeObject(userChat);
+                string routingKey = RoutingKeys.UserChat["verify"];
+                _publisher.Publish(strUserChat, routingKey, null);
                 return;
             }
 
