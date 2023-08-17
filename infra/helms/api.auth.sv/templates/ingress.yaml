@@ -4,7 +4,7 @@ metadata:
   name: lmc-api-auth-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
-    {{- if eq .Release.Namespace "dev" }}
+    {{- if eq .Release.Namespace "lmc-dev" }}
     cert-manager.io/cluster-issuer: letsencrypt-issuer
     {{- end }}
     # nginx.ingress.kubernetes.io/use-reges: 'true'
@@ -12,13 +12,13 @@ spec:
   {{- if ne .Release.Namespace "default" }}
   tls:
   - hosts:
-    {{- if eq .Release.Namespace "dev" }}
+    {{- if eq .Release.Namespace "lmc-dev" }}
     - {{ index .Values.ingress.rules 1 "host" }}
     {{- end }}
     secretName: lmc-api-auth-tls
   {{- end }}
   rules:
-  {{- if eq .Release.Namespace "dev" }}
+  {{- if eq .Release.Namespace "lmc-dev" }}
   - host: {{ index .Values.ingress.rules 1 "host" }}
   {{- else }}
   - host: {{ index .Values.ingress.rules 0 "host" }}

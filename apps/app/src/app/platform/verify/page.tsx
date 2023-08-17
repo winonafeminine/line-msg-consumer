@@ -20,7 +20,7 @@ export default function Verify() {
   const handleConfirm = async() => {
     // handle confirmation logic here
     const state = searchParams.get('state');
-    const code = searchParams.get('state');
+    const code = searchParams.get('code');
     var data = mockData;
     try{
       var apiUrl = process.env.NEXT_PUBLIC_API_URL;

@@ -39,3 +39,4 @@ testem.log
 Thumbs.db
 **values.yaml
 **kubeconfig.yaml
+**v*.*.*
