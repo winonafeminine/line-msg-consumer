@@ -16,8 +16,8 @@ namespace Api.PlatformLib.Services
     {
         private readonly ILogger<PlatformService> _logger;
         private readonly IPlatformRepository _platformRepo;
-        private readonly IScopePublisher _publisher;
-        public PlatformService(ILogger<PlatformService> logger, IPlatformRepository platformRepo, IScopePublisher publisher)
+        private readonly IMessagePublisher _publisher;
+        public PlatformService(ILogger<PlatformService> logger, IPlatformRepository platformRepo, IMessagePublisher publisher)
         {
             _logger = logger;
             _platformRepo = platformRepo;
@@ -57,10 +57,21 @@ namespace Api.PlatformLib.Services
                 string strPlatform = JsonConvert.SerializeObject(platformModel);
                 string groupUserId = platformDto.GroupUserId!;
                 platformDto = JsonConvert.DeserializeObject<PlatformDto>(strPlatform)!;
-                platformDto.PlatformId=platformModel.PlatformId;
-                platformDto.GroupUserId=groupUserId;
+                platformDto.PlatformId = platformModel.PlatformId;
+                platformDto.GroupUserId = groupUserId;
                 strPlatform = JsonConvert.SerializeObject(platformDto);
-                _publisher.Publish(strPlatform, routingKey, null);
+                try
+                {
+                    _publisher.Publish(strPlatform, routingKey, null);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message);
+                }
+                finally
+                {
+                    _publisher.Dispose();
+                }
                 return response;
             }
 

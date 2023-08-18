@@ -62,17 +62,16 @@ builder.Services.AddSingleton<IMessagePublisher>(x =>
         ExchangeType.Topic // exchange type
     ));
 builder.Services.AddHostedService<UserDataCollector>();
-builder.Services.AddSingleton<IUserConsumer, UserConsumer>();
-builder.Services.AddSingleton<ILineGroupInfo, LineGroupInfoService>();
+builder.Services.AddScoped<IUserConsumer, UserConsumer>();
+builder.Services.AddScoped<ILineGroupInfo, LineGroupInfoService>();
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
 builder.Services.Configure<LineChannelSetting>(configuration.GetSection("LineConfig:Channel"));
 builder.Services.Configure<GrpcConfigSetting>(configuration.GetSection("GrpcConfig"));
-builder.Services.AddSingleton<IUserRepository, UserRepository>();
-builder.Services.AddSingleton<IUserChatRepository, UserChatRepository>();
-builder.Services.AddSingleton<IScopePublisher, ScopePublisher>();
-builder.Services.AddSingleton<IMessageGrpcClientService, MessageGrpcClientService>();
-builder.Services.AddSingleton<IChatGrpcClientService, ChatGrpcClientService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserChatRepository, UserChatRepository>();
+builder.Services.AddScoped<IMessageGrpcClientService, MessageGrpcClientService>();
+builder.Services.AddScoped<IChatGrpcClientService, ChatGrpcClientService>();
 
 
 var app = builder.Build();

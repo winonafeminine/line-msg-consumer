@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using Newtonsoft.Json;
+using Simple.RabbitMQ;
 
 namespace Api.AuthLib.Services
 {
@@ -25,8 +26,8 @@ namespace Api.AuthLib.Services
         private readonly ILineGroupInfo _lineGroup;
         private readonly IJwtToken _jwtToken;
         private readonly IHostEnvironment _hostEnv;
-        private readonly IScopePublisher _publisher;
-        public AuthRepository(ILogger<AuthRepository> logger, IOptions<AuthLineConfigSetting> lineConfigSetting, ILineGroupInfo lineGroup, IJwtToken jwtToken, IHostEnvironment hostEnv, IScopePublisher publisher)
+        private readonly IMessagePublisher _publisher;
+        public AuthRepository(ILogger<AuthRepository> logger, IOptions<AuthLineConfigSetting> lineConfigSetting, ILineGroupInfo lineGroup, IJwtToken jwtToken, IHostEnvironment hostEnv, IMessagePublisher publisher)
         {
             _authState = new List<LineAuthStateModel>();
             _logger = logger;
@@ -126,9 +127,20 @@ namespace Api.AuthLib.Services
             lineAuthState.PlatformId = platformId;
 
             // publish the LineAuthStateModel
-            string strLineAuthState = JsonConvert.SerializeObject(lineAuthState);
-            string routingKey = RoutingKeys.Auth["update"];
-            _publisher.Publish(strLineAuthState, routingKey, null);
+            try
+            {
+                string strLineAuthState = JsonConvert.SerializeObject(lineAuthState);
+                string routingKey = RoutingKeys.Auth["update"];
+                _publisher.Publish(strLineAuthState, routingKey, null);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+            finally
+            {
+                _publisher.Dispose();
+            }
 
             return new Response
             {

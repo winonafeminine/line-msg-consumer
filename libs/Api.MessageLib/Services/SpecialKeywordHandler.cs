@@ -12,8 +12,8 @@ namespace Api.MessageLib.Services
     public class SpecialKeywordHandler : ISpecialKeywordHandler
     {
         private readonly ILogger<SpecialKeywordHandler> _logger;
-        private readonly IScopePublisher _publisher;
-        public SpecialKeywordHandler(ILogger<SpecialKeywordHandler> logger, IScopePublisher publisher)
+        private readonly IMessagePublisher _publisher;
+        public SpecialKeywordHandler(ILogger<SpecialKeywordHandler> logger, IMessagePublisher publisher)
         {
             _logger = logger;
             _publisher = publisher;
@@ -30,7 +30,18 @@ namespace Api.MessageLib.Services
             _logger.LogInformation(msgRes);
             string routingKey = RoutingKeys.Message["verify"];
 
-            _publisher.Publish(message, routingKey, null);
+            try
+            {
+                _publisher.Publish(message, routingKey, null);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+            finally
+            {
+                _publisher.Dispose();
+            }
 
             throw new ErrorResponseException(
                 StatusCodes.Status200OK,

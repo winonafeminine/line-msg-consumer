@@ -62,16 +62,15 @@ builder.Services.AddScoped<IMessagePublisher>(x =>
     ));
 builder.Services.Configure<AuthLineConfigSetting>(configuration.GetSection("LineConfig:LineLogin"));
 builder.Services.Configure<LineChannelSetting>(configuration.GetSection("LineConfig:Channel"));
-builder.Services.AddSingleton<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
-builder.Services.AddSingleton<ILineGroupInfo, LineGroupInfoService>();
+builder.Services.AddScoped<ILineGroupInfo, LineGroupInfoService>();
 builder.Services.AddGrpc();
-builder.Services.AddSingleton<IJwtToken, JwtTokenService>();
-builder.Services.AddSingleton<IScopePublisher, ScopePublisher>();
+builder.Services.AddScoped<IJwtToken, JwtTokenService>();
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
-builder.Services.AddSingleton<IPlatformRepository, PlatformRepository>();
+builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
 builder.Services.AddHostedService<AuthDataCollector>();
-builder.Services.AddSingleton<IAuthConsumer, AuthConsumer>();
+builder.Services.AddScoped<IAuthConsumer, AuthConsumer>();
 
 var app = builder.Build();
 
