@@ -14,8 +14,8 @@ namespace Api.CommonLib.Consumers
     {
         private readonly ILogger<AuthConsumer> _logger;
         private readonly IPlatformRepository _platformRepo;
-        private readonly IAuthRepository _authRepo;
-        public AuthConsumer(IPlatformRepository platformRepo, ILogger<AuthConsumer> logger, IAuthRepository authRepo)
+        private readonly IAuthService _authRepo;
+        public AuthConsumer(IPlatformRepository platformRepo, ILogger<AuthConsumer> logger, IAuthService authRepo)
         {
             _platformRepo = platformRepo;
             _logger = logger;
@@ -61,7 +61,7 @@ namespace Api.CommonLib.Consumers
             PlatformModel platformModel = JsonConvert.DeserializeObject<PlatformModel>(message)!;
             platformModel.PlatformId=platformDto.PlatformId;
             await _platformRepo.ReplacePlatform(platformModel);
-            _authRepo.RemoveStateByPlatformId(platformDto.PlatformId!);
+            await _authRepo.RemoveStateByPlatformId(platformDto.PlatformId!);
         }
     }
 }

@@ -27,7 +27,7 @@ build:
       docker:
         dockerfile: ./apps/app/Dockerfile
   local:
-    push: false # This flag will push the image to Docker Hub
+    push: true # This flag will push the image to Docker Hub
 deploy:
   helm:
     releases:

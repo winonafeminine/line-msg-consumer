@@ -10,6 +10,7 @@ namespace Api.ReferenceLib.Setttings
             { "Chat", "lmc_chats" },
             { "UserChat", "lmc_user_chats" },
             { "Platform", "lmc_platforms" },
+            { "Auth", "lmc_auths" },
         };
     }
 }

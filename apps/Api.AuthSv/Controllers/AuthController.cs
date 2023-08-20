@@ -9,17 +9,17 @@ namespace Api.AuthSv.Controllers
     [Route("api/auth/v1")]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthRepository _authRepo;
-        public AuthController(IAuthRepository authRepo)
+        private readonly IAuthService _authRepo;
+        public AuthController(IAuthService authRepo)
         {
             _authRepo = authRepo;
         }
 
         [HttpPost]
         [Route("line/state")]
-        public ActionResult<Response> CreateLineAuthState(AuthDto authDto)
+        public async Task<ActionResult<Response>> CreateLineAuthState(AuthDto authDto)
         {
-            return StatusCode(StatusCodes.Status201Created, _authRepo.CreateLineAuthState(authDto));
+            return StatusCode(StatusCodes.Status201Created, await _authRepo.CreateLineAuthState(authDto));
         }
 
         [HttpGet]

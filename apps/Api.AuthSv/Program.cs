@@ -62,7 +62,7 @@ builder.Services.AddScoped<IMessagePublisher>(x =>
     ));
 builder.Services.Configure<AuthLineConfigSetting>(configuration.GetSection("LineConfig:LineLogin"));
 builder.Services.Configure<LineChannelSetting>(configuration.GetSection("LineConfig:Channel"));
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
 builder.Services.AddScoped<ILineGroupInfo, LineGroupInfoService>();
 builder.Services.AddGrpc();
@@ -71,6 +71,7 @@ builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoCo
 builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
 builder.Services.AddHostedService<AuthDataCollector>();
 builder.Services.AddScoped<IAuthConsumer, AuthConsumer>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
 var app = builder.Build();
 
