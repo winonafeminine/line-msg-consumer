@@ -87,5 +87,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapGrpcService<ChatGrpcServerService>();
+app.MapGrpcService<UserChatGrpcServerService>();
 
 app.Run();

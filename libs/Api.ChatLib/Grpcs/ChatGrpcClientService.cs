@@ -2,6 +2,7 @@ using Api.ChatLib.Interfaces;
 using Api.ChatLib.Protos;
 using Api.CommonLib.Models;
 using Api.ReferenceLib.Exceptions;
+using Api.ReferenceLib.Models;
 using Api.ReferenceLib.Settings;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -21,6 +22,36 @@ namespace Api.ChatLib.Grpcs
             _grpcConfig = grpcConfig;
             _logger = logger;
         }
+
+        public async Task<Response> AddChat(ChatModel chat)
+        {
+            string address = _grpcConfig.Value.Chat!.Address!;
+            using var channel = GrpcChannel.ForAddress(address);
+            _logger.LogInformation(address);
+            var client = new ChatGrpc.ChatGrpcClient(channel);
+            ChatGrpcReply reply = new ChatGrpcReply();
+
+            try
+            {
+                reply = await client.AddChatAsync(
+                                new AddChatGrpcRequest { Data = JsonConvert.SerializeObject(chat) });
+            }
+            catch (RpcException ex)
+            {
+                int statusCode = StatusCodes.Status400BadRequest;
+
+                _logger.LogError(ex.Status.Detail);
+                throw new ErrorResponseException(
+                    statusCode,
+                    ex.Status.Detail,
+                    new List<Error>()
+                );
+            }
+            return new Response{
+                StatusCode = StatusCodes.Status201Created
+            };
+        }
+
         public async Task<ChatModel> GetChat(string groupId)
         {
             string address = _grpcConfig.Value.Chat!.Address!;

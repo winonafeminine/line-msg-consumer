@@ -8,7 +8,6 @@ using Api.MessageSv.Grpcs;
 using Api.MessageSv.HostedServices;
 using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Interfaces;
-using Api.ReferenceLib.Services;
 using Api.ReferenceLib.Settings;
 using Api.ReferenceLib.Setttings;
 using Api.UserLib.Interfaces;
@@ -98,6 +97,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapGrpcService<MessageGrpcServerService>();
+app.MapGrpcService<UserGrpcServerService>();
 
 
 app.Run();

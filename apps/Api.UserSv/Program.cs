@@ -11,6 +11,7 @@ using Api.ReferenceLib.Interfaces;
 using Api.ReferenceLib.Services;
 using Api.ReferenceLib.Settings;
 using Api.ReferenceLib.Setttings;
+using Api.UserLib.Grpcs;
 using Api.UserLib.Interfaces;
 using Api.UserLib.Services;
 using Api.UserSv.HostedServices;
@@ -72,6 +73,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserChatRepository, UserChatRepository>();
 builder.Services.AddScoped<IMessageGrpcClientService, MessageGrpcClientService>();
 builder.Services.AddScoped<IChatGrpcClientService, ChatGrpcClientService>();
+builder.Services.AddScoped<IUserGrpcClientService, UserGrpcClientService>();
+builder.Services.AddScoped<IUserChatGrpcClientService, UserChatGrpcClientService>();
 
 
 var app = builder.Build();

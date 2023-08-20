@@ -9,11 +9,16 @@ package chat;
 service ChatGrpc {
   // Sends a greeting
   rpc GetChat (ChatGrpcRequest) returns (ChatGrpcReply);
+  rpc AddChat (AddChatGrpcRequest) returns (ChatGrpcReply);
 }
 
 // The request message containing the user's name.
 message ChatGrpcRequest {
     string GroupId = 1;
+}
+
+message AddChatGrpcRequest {
+    string Data = 1;
 }
 
 // The response message containing the greetings.

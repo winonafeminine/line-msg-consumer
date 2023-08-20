@@ -12,7 +12,6 @@ using Api.ReferenceLib.Setttings;
 using Api.ReferenceLib.Stores;
 using Api.UserLib.Interfaces;
 using Api.UserLib.Models;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -33,6 +32,8 @@ namespace Api.CommonLib.Consumers
         private readonly IMessageGrpcClientService _msgGrpc;
         private readonly IChatGrpcClientService _chatGrpc;
         private readonly IMessagePublisher _publisher;
+        private readonly IUserGrpcClientService _userGrpc;
+        private readonly IUserChatGrpcClientService _userChatGrpc;
         public UserConsumer(ILogger<UserConsumer> logger,
             IOptions<MongoConfigSetting> mongoConfig,
             ILineGroupInfo lineUserInfo,
@@ -42,7 +43,9 @@ namespace Api.CommonLib.Consumers
             IMessageGrpcClientService msgGrpc,
             IChatGrpcClientService chatGrpc,
             IServiceProvider serviceProvider,
-            IMessagePublisher publisher)
+            IMessagePublisher publisher,
+            IUserGrpcClientService userGrpc,
+            IUserChatGrpcClientService userChatGrpc)
         {
             _logger = logger;
             IMongoClient mongoClient = new MongoClient(mongoConfig.Value.HostName);
@@ -55,6 +58,8 @@ namespace Api.CommonLib.Consumers
             _msgGrpc = msgGrpc;
             _chatGrpc = chatGrpc;
             _publisher = publisher;
+            _userGrpc = userGrpc;
+            _userChatGrpc = userChatGrpc;
         }
 
         public async Task ConsumeAuthUpdate(string message)
@@ -87,20 +92,28 @@ namespace Api.CommonLib.Consumers
             await _userRepo.AddUser(userModel);
 
             // publish the user
-            string pubMessage = JsonConvert.SerializeObject(userModel);
-            string routingKey = RoutingKeys.User["create"];
+            // string pubMessage = JsonConvert.SerializeObject(userModel);
+            // string routingKey = RoutingKeys.User["create"];
 
+            // try
+            // {
+            //     _publisher.Publish(pubMessage, routingKey, null);
+            // }
+            // catch (Exception ex)
+            // {
+            //     _logger.LogError(ex.Message);
+            // }
+            // finally
+            // {
+            //     _publisher.Dispose();
+            // }
             try
             {
-                _publisher.Publish(pubMessage, routingKey, null);
+                await _userGrpc.AddUser(userModel);
             }
-            catch (Exception ex)
+            catch (ErrorResponseException ex)
             {
-                _logger.LogError(ex.Message);
-            }
-            finally
-            {
-                _publisher.Dispose();
+                _logger.LogError(ex.Description);
             }
             return;
         }
@@ -192,30 +205,28 @@ namespace Api.CommonLib.Consumers
 
             try
             {
-                string pubMessage = JsonConvert.SerializeObject(userModel);
-                string routingKey = RoutingKeys.User["create"];
+                // string pubMessage = JsonConvert.SerializeObject(userModel);
+                // string routingKey = RoutingKeys.User["create"];
 
                 if (!isUserExist)
                 {
                     // publish the user
-                    _publisher.Publish(pubMessage, routingKey, null);
+                    await _userGrpc.AddUser(userModel); // in message
                 }
                 if (!isUserChatExist)
                 {
                     // publish the user
-                    pubMessage = JsonConvert.SerializeObject(userChatModel);
-                    routingKey = RoutingKeys.UserChat["create"];
-                    _publisher.Publish(pubMessage, routingKey, null);
+                    // pubMessage = JsonConvert.SerializeObject(userChatModel);
+                    // routingKey = RoutingKeys.UserChat["create"];
+                    // _publisher.Publish(pubMessage, routingKey, null);
+                    await _userChatGrpc.AddUserChat(userChatModel);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
             }
-            finally
-            {
-                _publisher.Dispose();
-            }
+            
             return;
         }
 
@@ -272,19 +283,34 @@ namespace Api.CommonLib.Consumers
                 }
 
                 // publish the user chat
-                string strUserChat = JsonConvert.SerializeObject(userChat);
-                string routingKey = RoutingKeys.UserChat["verify"];
+                // string strUserChat = JsonConvert.SerializeObject(userChat);
+                // string routingKey = RoutingKeys.UserChat["verify"];
+                // try
+                // {
+                //     _publisher.Publish(strUserChat, routingKey, null);
+                // }
+                // catch (Exception ex)
+                // {
+                //     _logger.LogError(ex.Message);
+                // }
+                // finally
+                // {
+                //     _publisher.Dispose();
+                // }
                 try
                 {
-                    _publisher.Publish(strUserChat, routingKey, null);
+                    ChatModel chat = new ChatModel{
+                        PlatformId=existingUser.Platform.PlatformId,
+                        Group=new ChatGroupModel{
+                            GroupId=messageModel.GroupId
+                        }
+                    };
+                    await _chatGrpc.AddChat(chat);
+                    await _userChatGrpc.AddUserChat(userChat);
                 }
-                catch (Exception ex)
+                catch (ErrorResponseException ex)
                 {
-                    _logger.LogError(ex.Message);
-                }
-                finally
-                {
-                    _publisher.Dispose();
+                    _logger.LogError(ex.Description);
                 }
                 return;
             }
