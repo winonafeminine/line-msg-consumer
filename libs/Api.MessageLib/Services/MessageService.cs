@@ -131,9 +131,10 @@ namespace Api.MessageLib.Services
             }
 
             messageModel.PlatformId = existingMessage.PlatformId;
+            messageModelStr = JsonConvert.SerializeObject(messageModel);
 
             BsonDocument document = BsonDocument.Parse(
-                JsonConvert.SerializeObject(messageModel)
+                messageModelStr
             );
 
             // await _messageCols.InsertOneAsync(document);
@@ -173,7 +174,8 @@ namespace Api.MessageLib.Services
                         { "id", new BsonDocument("$first", "$message_object.events.message.id") },
                         { "stickerId", new BsonDocument("$first", "$message_object.events.message.stickerId") },
                         { "packageId", new BsonDocument("$first", "$message_object.events.message.packageId") },
-                        { "stickerResourceType", new BsonDocument("$first", "$message_object.events.message.stickerResourceType") }
+                        { "stickerResourceType", new BsonDocument("$first", "$message_object.events.message.stickerResourceType") },
+                        { "static_url", new BsonDocument("$first", "$message_object.events.message.static_url") }
                     }
                 },
                 "$message_object.events.message"

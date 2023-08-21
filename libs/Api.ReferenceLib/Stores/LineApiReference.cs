@@ -17,6 +17,8 @@ namespace Api.ReferenceLib.Stores
         public static string Token = "token";
         public static string Verify = "verify";
         public static string Profile = "profile";
+        public static string Message = "message";
+        public static string Content = "content";
         public static string GetGroupMemberProfile(string groupId, string userId)
         {
             return Path.Combine(ApiUrl, ApiVersion, Bot, Group, groupId, Member, userId);
@@ -46,6 +48,16 @@ namespace Api.ReferenceLib.Stores
         public static string GetLineLoginUserProfileUrl()
         {
             return Path.Combine(ApiUrl, ApiVersion, Profile);
+        }
+        public static string GetContent(string messageId)
+        {
+            // $"https://api-data.line.me/v2/bot/message/{messageId}/content"
+            return Path.Combine(DataApiUrl, ApiVersion, Bot, Message, messageId, Content);
+        }
+        public static string GetStickerUrl(string stickerId)
+        {
+            // https://stickershop.line-scdn.net/stickershop/v1/sticker/52002736/android/sticker.png
+            return $"https://stickershop.line-scdn.net/stickershop/v1/sticker/{stickerId}/android/sticker.png";
         }
     }
 }

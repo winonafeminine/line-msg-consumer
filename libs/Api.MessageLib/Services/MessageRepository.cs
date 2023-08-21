@@ -73,5 +73,21 @@ namespace Api.MessageLib.Services
                 Message=resMsg
             };
         }
+
+        public async Task<Response> ReplaceMessage(BsonDocument document)
+        {
+            // BsonDocument document = BsonDocument.Parse(
+            //     JsonConvert.SerializeObject(model)
+            // );
+
+            await _messageCols.ReplaceOneAsync(x=>x["_id"] == document["_id"], document);
+            string resMessage = "Successfully replace message";
+            _logger.LogInformation(resMessage);
+
+            return new Response{
+                StatusCode=StatusCodes.Status200OK,
+                Message=resMessage
+            };
+        }
     }
 }

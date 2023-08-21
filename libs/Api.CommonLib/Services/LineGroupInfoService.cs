@@ -1,8 +1,10 @@
 using Api.AuthLib.Settings;
+using Api.MessageLib.Stores;
 using Api.ReferenceLib.DTOs;
 using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Interfaces;
 using Api.ReferenceLib.Stores;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -14,11 +16,43 @@ namespace Api.CommonLib.Services
     {
         private readonly ILogger<LineGroupInfoService> _logger;
         private readonly IOptions<AuthLineConfigSetting> _lineLoginSetting;
-        public LineGroupInfoService(ILogger<LineGroupInfoService> logger, IOptions<AuthLineConfigSetting> lineLoginSetting)
+        private readonly IWebHostEnvironment _webHostEnv;
+        public LineGroupInfoService(ILogger<LineGroupInfoService> logger, IOptions<AuthLineConfigSetting> lineLoginSetting, IWebHostEnvironment webHostEnv)
         {
             _logger = logger;
             _lineLoginSetting = lineLoginSetting;
+            _webHostEnv = webHostEnv;
         }
+
+        public async Task<StaticfileDto> GetContent(string messageId, string accessToken)
+        {
+            using (var _httpClient = new HttpClient())
+            {
+                string url = LineApiReference.GetContent(messageId);
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                request.Headers.Add("Authorization", $"Bearer {accessToken}");
+
+                var response = await _httpClient.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+                string contentType = response.Content.Headers.ContentType!.ToString();
+                string[] mediaTypes = contentType.Split("/");
+
+                string rootPath = _webHostEnv.ContentRootPath;
+                string fileName = $"{messageId}.{mediaTypes.Last()}";
+                string fullPath = Path.Combine(rootPath, Staticfile.Path, fileName);
+                using (var contentStream = await response.Content.ReadAsStreamAsync())
+                using (var fileStream = File.Create(fullPath))
+                {
+                    await contentStream.CopyToAsync(fileStream);
+                }
+                return new StaticfileDto{
+                    Key = fileName,
+                    FilePath = fullPath,
+                    ContentType = contentType
+                };
+            }
+        }
+
         public async Task<GetGroupMemberProfileDto> GetGroupMemberProfile(string groupId, string userId, string channelAccessToken)
         {
             string fullUrl = LineApiReference.GetGroupMemberProfile(groupId, userId);
@@ -95,7 +129,7 @@ namespace Api.CommonLib.Services
                         new List<Error>()
                     );
                 }
-                resMessage="Successfully getting Line Login user profile";
+                resMessage = "Successfully getting Line Login user profile";
                 _logger.LogInformation(resMessage);
                 return JsonConvert.DeserializeObject<LineLoginUserProfileResponseDto>(strResponse)!;
             }

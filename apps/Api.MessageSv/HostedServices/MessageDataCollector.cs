@@ -1,3 +1,4 @@
+using Api.CommonLib.Interfaces;
 using Api.ReferenceLib.Stores;
 using Api.UserLib.Interfaces;
 using Api.UserLib.Models;
@@ -29,6 +30,8 @@ namespace Api.MessageSv.HostedServices
             using (var scope = _serviceProvider.CreateAsyncScope())
             {
                 IUserRepository _userRepo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+                IMessageConsumer _msgConsumer = scope.ServiceProvider.GetRequiredService<IMessageConsumer>();
+
                 if (routingKey == RoutingKeys.User["create"])
                 {
                     // _logger.LogInformation($"Routing key: {routingKey}\nMessage: {message}");
@@ -42,6 +45,11 @@ namespace Api.MessageSv.HostedServices
                         _logger.LogInformation("Failed deserializing UserModel");
                     }
                     await _userRepo.AddUser(userModel);
+                }
+                else if (routingKey == RoutingKeys.Message["create"])
+                {
+                    // _logger.LogInformation($"Routing key: {routingKey}\nMessage: {message}");
+                    await _msgConsumer.ConsumeMessageCreate(message);
                 }
             }
 

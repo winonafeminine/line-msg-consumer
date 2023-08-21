@@ -40,3 +40,4 @@ Thumbs.db
 **values.yaml
 **kubeconfig.yaml
 **v*.*.*
+skaffold.yaml
