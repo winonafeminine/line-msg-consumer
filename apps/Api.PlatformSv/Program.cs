@@ -59,9 +59,8 @@ builder.Services.AddScoped<IMessagePublisher>(x =>
 builder.Services.AddSingleton<IPlatformRepository, PlatformRepository>();
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
 builder.Services.Configure<GrpcConfigSetting>(configuration.GetSection("GrpcConfig"));
-builder.Services.AddSingleton<IPlatformService, PlatformService>();
-builder.Services.AddSingleton<IScopePublisher, ScopePublisher>();
-builder.Services.AddSingleton<IAuthGrpcClientService, AuthGrpcClientService>();
+builder.Services.AddScoped<IPlatformService, PlatformService>();
+builder.Services.AddScoped<IAuthGrpcClientService, AuthGrpcClientService>();
 
 var app = builder.Build();
 

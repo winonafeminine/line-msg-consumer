@@ -10,34 +10,39 @@ namespace Api.MessageSv.HostedServices
     {
         private readonly ILogger<MessageDataCollector> _logger;
         private readonly IMessageSubscriber _subscriber;
-        private readonly IUserRepository _userRepo;
-        public MessageDataCollector(ILogger<MessageDataCollector> logger, IMessageSubscriber subscriber, IUserRepository userRepo)
+        private readonly IServiceProvider _serviceProvider;
+        public MessageDataCollector(ILogger<MessageDataCollector> logger, IMessageSubscriber subscriber, IServiceProvider serviceProvider)
         {
             _logger = logger;
             _subscriber = subscriber;
-            _userRepo = userRepo;
+            _serviceProvider = serviceProvider;
         }
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            await Task.Yield();
             _subscriber.SubscribeAsync(ProcessMessage);
+            return Task.CompletedTask;
         }
 
         public async Task<bool> ProcessMessage(string message, IDictionary<string, object> headers, string routingKey)
         {
-            await Task.Yield();
-
             // consume the user message when user is created
-            if(routingKey == RoutingKeys.User["create"])
+            using (var scope = _serviceProvider.CreateAsyncScope())
             {
-                // _logger.LogInformation($"Routing key: {routingKey}\nMessage: {message}");
-                UserModel userModel = new UserModel();
-                try{
-                    userModel = JsonConvert.DeserializeObject<UserModel>(message)!;
-                }catch{
-                    _logger.LogInformation("Failed deserializing UserModel");
+                IUserRepository _userRepo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+                if (routingKey == RoutingKeys.User["create"])
+                {
+                    // _logger.LogInformation($"Routing key: {routingKey}\nMessage: {message}");
+                    UserModel userModel = new UserModel();
+                    try
+                    {
+                        userModel = JsonConvert.DeserializeObject<UserModel>(message)!;
+                    }
+                    catch
+                    {
+                        _logger.LogInformation("Failed deserializing UserModel");
+                    }
+                    await _userRepo.AddUser(userModel);
                 }
-                await _userRepo.AddUser(userModel);
             }
 
             return true;

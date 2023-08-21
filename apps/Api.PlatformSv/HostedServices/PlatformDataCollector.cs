@@ -13,12 +13,12 @@ namespace Api.PlatformSv.HostedServices
     {
         private readonly IMessageSubscriber _subscriber;
         private readonly ILogger<PlatformDataCollector> _logger;
-        private readonly IPlatformRepository _platformRepo;
-        public PlatformDataCollector(IMessageSubscriber subscriber, ILogger<PlatformDataCollector> logger, IPlatformRepository platformRepo)
+        private readonly IServiceProvider _serviceProvider;
+        public PlatformDataCollector(IMessageSubscriber subscriber, ILogger<PlatformDataCollector> logger, IServiceProvider serviceProvider)
         {
             _subscriber = subscriber;
             _logger = logger;
-            _platformRepo = platformRepo;
+            _serviceProvider = serviceProvider;
         }
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -28,33 +28,41 @@ namespace Api.PlatformSv.HostedServices
 
         public async Task<bool> ProcessMessage(string message, IDictionary<string, object> headers, string routingKey)
         {
-            if(routingKey == RoutingKeys.Auth["update"])
+            using (var scope = _serviceProvider.CreateAsyncScope())
             {
-                // _logger.LogInformation(message);
-                LineAuthStateModel authModel = JsonConvert
-                    .DeserializeObject<LineAuthStateModel>(message)!;
+                if (routingKey == RoutingKeys.Auth["update"])
+                {
+                    IPlatformRepository _platformRepo = scope.ServiceProvider.GetRequiredService<IPlatformRepository>();
+                    // _logger.LogInformation(message);
+                    LineAuthStateModel authModel = JsonConvert
+                        .DeserializeObject<LineAuthStateModel>(message)!;
 
-                PlatformModel platformModel = new PlatformModel();
-                try{
-                    platformModel = await _platformRepo.Find(authModel.PlatformId!);
-
-                    if(platformModel != null)
+                    PlatformModel platformModel = new PlatformModel();
+                    try
                     {
-                        _logger.LogError("Platform exist!");
-                        return true;
+                        platformModel = await _platformRepo.Find(authModel.PlatformId!);
+
+                        if (platformModel != null)
+                        {
+                            _logger.LogError("Platform exist!");
+                            return true;
+                        }
                     }
-                }catch (ErrorResponseException ex){
-                    _logger.LogInformation(ex.Description);
-                    platformModel = new PlatformModel();
+                    catch (ErrorResponseException ex)
+                    {
+                        _logger.LogInformation(ex.Description);
+                        platformModel = new PlatformModel();
+                    }
+
+                    platformModel = new PlatformModel
+                    {
+                        PlatformId = authModel.PlatformId,
+                        AccessToken = authModel.AccessToken,
+                        SecretKey = authModel.SecretKey
+                    };
+
+                    await _platformRepo.AddPlatform(platformModel);
                 }
-
-                platformModel = new PlatformModel{
-                    PlatformId=authModel.PlatformId,
-                    AccessToken=authModel.AccessToken,
-                    SecretKey=authModel.SecretKey
-                };
-
-                await _platformRepo.AddPlatform(platformModel);
             }
             return true;
         }

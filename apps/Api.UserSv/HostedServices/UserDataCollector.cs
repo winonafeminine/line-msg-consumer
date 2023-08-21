@@ -8,40 +8,42 @@ namespace Api.UserSv.HostedServices
     {
         private readonly ILogger<UserDataCollector> _logger;
         private readonly IMessageSubscriber _subscriber;
-        private readonly IUserConsumer _userConsumer;
-
-        public UserDataCollector(ILogger<UserDataCollector> logger, IMessageSubscriber subscriber, IUserConsumer userConsumer)
+        private readonly IServiceProvider _serviceProvider;
+        public UserDataCollector(ILogger<UserDataCollector> logger, IMessageSubscriber subscriber, IServiceProvider serviceProvider)
         {
             _logger = logger;
             _subscriber = subscriber;
-            _userConsumer = userConsumer;
+            _serviceProvider = serviceProvider;
         }
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            await Task.Yield();
             _subscriber.SubscribeAsync(ProcessMessage);
+            return Task.CompletedTask;
         }
 
         public async Task<bool> ProcessMessage(string message, IDictionary<string, object> headers, string routingKey)
         {
-            // await Task.Yield();
-            // _logger.LogInformation($"Routing key: {routingKey}\nMessage: {message}");
-            IDictionary<string, string> msgRoutingKeys = RoutingKeys.Message;
-            if(routingKey == msgRoutingKeys["create"])
+            using (var scope = _serviceProvider.CreateAsyncScope())
             {
-                await _userConsumer.ConsumeMessageCreate(message);
-            }
-            else if(routingKey == RoutingKeys.Platform["verify"])
-            {
-                await _userConsumer.ConsumePlatformVerify(message);
-            }
-            else if(routingKey == RoutingKeys.Auth["update"])
-            {
-                await _userConsumer.ConsumeAuthUpdate(message);
-            }
-            else if(routingKey == RoutingKeys.Message["verify"])
-            {
-                await _userConsumer.ConsumeMessageVerify(message);
+                IUserConsumer _userConsumer = scope.ServiceProvider.GetRequiredService<IUserConsumer>();
+                // _logger.LogInformation($"Routing key: {routingKey}\nMessage: {message}");
+                IDictionary<string, string> msgRoutingKeys = RoutingKeys.Message;
+                if (routingKey == msgRoutingKeys["create"])
+                {
+                    await _userConsumer.ConsumeMessageCreate(message);
+                }
+                else if (routingKey == RoutingKeys.Platform["verify"])
+                {
+                    await _userConsumer.ConsumePlatformVerify(message);
+                }
+                else if (routingKey == RoutingKeys.Auth["update"])
+                {
+                    await _userConsumer.ConsumeAuthUpdate(message);
+                }
+                else if (routingKey == RoutingKeys.Message["verify"])
+                {
+                    await _userConsumer.ConsumeMessageVerify(message);
+                }
             }
             return true;
         }

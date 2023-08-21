@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using Newtonsoft.Json;
+using Simple.RabbitMQ;
 
 namespace Api.MessageLib.Services
 {
@@ -24,18 +25,18 @@ namespace Api.MessageLib.Services
         private readonly IHostEnvironment _env;
         private readonly IOptions<LineChannelSetting> _channelSetting;
         private readonly ISpecialKeywordHandler _skHandler;
-        private readonly IScopePublisher _publisher;
         private readonly IMessageRepository _msgRepo;
+        private readonly IMessagePublisher _publisher;
         public MessageService(ILogger<MessageService> logger, ILineMessageValidation lineValidation,
-            IHostEnvironment env, IOptions<MongoConfigSetting> mongoConfig, IOptions<LineChannelSetting> channelSetting, ISpecialKeywordHandler skHandler, IScopePublisher publisher, IMessageRepository msgRepo)
+            IHostEnvironment env, IOptions<MongoConfigSetting> mongoConfig, IOptions<LineChannelSetting> channelSetting, ISpecialKeywordHandler skHandler, IMessageRepository msgRepo, IMessagePublisher publisher)
         {
             _logger = logger;
             _lineValidation = lineValidation;
             _env = env;
             _channelSetting = channelSetting;
             _skHandler = skHandler;
-            _publisher = publisher;
             _msgRepo = msgRepo;
+            _publisher = publisher;
         }
 
         private string GetValFromJson(string strContent, string keyName, string pattern)
@@ -140,7 +141,18 @@ namespace Api.MessageLib.Services
 
             IDictionary<string, string> msgRoutingKeys = RoutingKeys.Message;
             string routingKey = msgRoutingKeys["create"];
-            _publisher.Publish(messageModelStr, routingKey, null);
+            try
+            {
+                _publisher.Publish(messageModelStr, routingKey, null);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+            finally
+            {
+                _publisher.Dispose();
+            }
             return;
         }
 

@@ -55,17 +55,17 @@ builder.Services.AddSingleton<IMessageSubscriber>(x =>
         autoAck: bool.Parse(configuration["RabbitMQConfig:Properties:AutoAck"]),
         prefetchCount: ushort.Parse(configuration["RabbitMQConfig:Properties:PrefetchCount"])
     ));
-builder.Services.AddSingleton<IChatConsumer, ChatConsumer>();
+builder.Services.AddScoped<IChatConsumer, ChatConsumer>();
 builder.Services.AddHostedService<ChatDataCollector>();
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
 builder.Services.Configure<LineChannelSetting>(configuration.GetSection("LineConfig:Channel"));
 builder.Services.Configure<GrpcConfigSetting>(configuration.GetSection("GrpcConfig"));
-builder.Services.AddSingleton<ILineGroupInfo, LineGroupInfoService>();
-builder.Services.AddSingleton<IChatRepository, ChatRepository>();
-builder.Services.AddSingleton<IUserChatRepository, UserChatRepository>();
-builder.Services.AddSingleton<IChatService, ChatService>();
-builder.Services.AddSingleton<IAuthGrpcClientService, AuthGrpcClientService>();
+builder.Services.AddScoped<ILineGroupInfo, LineGroupInfoService>();
+builder.Services.AddScoped<IChatRepository, ChatRepository>();
+builder.Services.AddScoped<IUserChatRepository, UserChatRepository>();
+builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IAuthGrpcClientService, AuthGrpcClientService>();
 builder.Services.AddGrpc();
 
 var app = builder.Build();
@@ -87,5 +87,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapGrpcService<ChatGrpcServerService>();
+app.MapGrpcService<UserChatGrpcServerService>();
 
 app.Run();

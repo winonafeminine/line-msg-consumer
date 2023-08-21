@@ -1,0 +1,24 @@
+syntax = "proto3";
+import "google/protobuf/wrappers.proto";
+
+option csharp_namespace = "Api.UserLib.Protos";
+
+package user_chat;
+
+// The greeting service definition.
+service UserChatGrpc {
+  // Sends a greeting
+  rpc AddUserChat (AddUserChatGrpcRequest) returns (UserChatGrpcReply);
+}
+
+// The request UserChat containing the userChat's name.
+message AddUserChatGrpcRequest {
+    google.protobuf.StringValue Data = 1; // need to serialize the model to string
+}
+
+// The response UserChat containing the greetings.
+message UserChatGrpcReply {
+    int32 StatusCode = 1;
+    google.protobuf.StringValue Data = 2;
+    google.protobuf.StringValue Message = 3;
+}

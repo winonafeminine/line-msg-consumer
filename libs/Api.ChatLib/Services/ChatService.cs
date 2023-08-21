@@ -38,7 +38,8 @@ namespace Api.ChatLib.Services
                             { "group", 1 },
                             { "created_date", 1 },
                             { "modified_date", 1 },
-                            { "latest_message", 1 }
+                            { "latest_message", 1 },
+                            { "platform_id", 1 }
                         })
                 };
             }

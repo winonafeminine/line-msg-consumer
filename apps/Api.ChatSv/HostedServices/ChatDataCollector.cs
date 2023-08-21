@@ -11,15 +11,12 @@ namespace Api.ChatSv.HostedServices
     {
         private readonly ILogger<ChatDataCollector> _logger;
         private readonly IMessageSubscriber _subscriber;
-        private readonly IChatConsumer _chatMsgConsumer;
-        private readonly IUserChatRepository _userChatRepo;
-
-        public ChatDataCollector(ILogger<ChatDataCollector> logger, IMessageSubscriber subscriber, IChatConsumer chatMsgConsumer, IUserChatRepository userChatRepo)
+        private readonly IServiceProvider _serviceProvider;
+        public ChatDataCollector(ILogger<ChatDataCollector> logger, IMessageSubscriber subscriber, IServiceProvider serviceProvider)
         {
             _logger = logger;
             _subscriber = subscriber;
-            _chatMsgConsumer = chatMsgConsumer;
-            _userChatRepo = userChatRepo;
+            _serviceProvider = serviceProvider;
         }
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -30,16 +27,21 @@ namespace Api.ChatSv.HostedServices
         public async Task<bool> ProcessMessage(string message, IDictionary<string, object> headers, string routingKey)
         {
             // await Task.Yield();
-            if (routingKey == RoutingKeys.UserChat["create"])
+            using (var scope = _serviceProvider.CreateAsyncScope())
             {
-                // _logger.LogInformation($"Routing key: {routingKey}\nMessage: {message}");
-                // await _chatMsgConsumer.ConsumeMessageCreate(message);
-                UserChatModel userChatModel = JsonConvert.DeserializeObject<UserChatModel>(message)!;
-                await _userChatRepo.AddUserChat(userChatModel);
-            }
-            else if (routingKey == RoutingKeys.UserChat["verify"])
-            {
-                await _chatMsgConsumer.ConsumeUserChatVerify(message);
+                IUserChatRepository _userChatRepo = scope.ServiceProvider.GetRequiredService<IUserChatRepository>();
+                IChatConsumer _chatConsumer = scope.ServiceProvider.GetRequiredService<IChatConsumer>();
+                if (routingKey == RoutingKeys.UserChat["create"])
+                {
+                    // _logger.LogInformation($"Routing key: {routingKey}\nMessage: {message}");
+                    // await _chatMsgConsumer.ConsumeMessageCreate(message);
+                    UserChatModel userChatModel = JsonConvert.DeserializeObject<UserChatModel>(message)!;
+                    await _userChatRepo.AddUserChat(userChatModel);
+                }
+                else if (routingKey == RoutingKeys.UserChat["verify"])
+                {
+                    await _chatConsumer.ConsumeUserChatVerify(message);
+                }
             }
             return true;
         }

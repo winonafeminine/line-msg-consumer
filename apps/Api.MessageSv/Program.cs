@@ -8,7 +8,6 @@ using Api.MessageSv.Grpcs;
 using Api.MessageSv.HostedServices;
 using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Interfaces;
-using Api.ReferenceLib.Services;
 using Api.ReferenceLib.Settings;
 using Api.ReferenceLib.Setttings;
 using Api.UserLib.Interfaces;
@@ -45,7 +44,7 @@ builder.Services.AddControllers()
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<IMessageService, MessageService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddSingleton<ILineMessageValidation, LineMessageValidation>();
 builder.Services.AddSingleton<IBasicConnection>(new BasicConnection(configuration["RabbitMQConfig:HostName"], true));
 // Register message subscriber
@@ -71,12 +70,11 @@ builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("Rabb
 builder.Services.Configure<LineChannelSetting>(configuration.GetSection("LineConfig:Channel"));
 builder.Services.Configure<GrpcConfigSetting>(configuration.GetSection("GrpcConfig"));
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
-builder.Services.AddSingleton<IUserRepository, UserRepository>();
-builder.Services.AddSingleton<IChatRepository, ChatRepository>();
-builder.Services.AddSingleton<IAuthGrpcClientService, AuthGrpcClientService>();
-builder.Services.AddSingleton<IScopePublisher, ScopePublisher>();
-builder.Services.AddSingleton<ISpecialKeywordHandler, SpecialKeywordHandler>();
-builder.Services.AddSingleton<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IChatRepository, ChatRepository>();
+builder.Services.AddScoped<IAuthGrpcClientService, AuthGrpcClientService>();
+builder.Services.AddScoped<ISpecialKeywordHandler, SpecialKeywordHandler>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddGrpc();
 
 var app = builder.Build();
@@ -99,6 +97,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapGrpcService<MessageGrpcServerService>();
+app.MapGrpcService<UserGrpcServerService>();
 
 
 app.Run();

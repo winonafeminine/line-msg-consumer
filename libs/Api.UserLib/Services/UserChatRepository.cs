@@ -43,6 +43,30 @@ namespace Api.UserLib.Services
             };
         }
 
+        public async Task<UserChatModel> FindUserChat(string groupId, string groupUserId)
+        {
+            UserChatModel userChatModel = new UserChatModel();
+
+            userChatModel = await _userChatCols
+                .Find(x=>x["group_id"] == groupId &&
+                    x["group_user_id"] == groupUserId
+                )
+                .As<UserChatModel>()
+                .FirstOrDefaultAsync();
+            
+            string resMsg = string.Empty;
+            if(userChatModel == null)
+            {
+                resMsg=$"User chat with group id {groupId} and user id {groupUserId} not found";
+                throw new ErrorResponseException(
+                    StatusCodes.Status404NotFound,
+                    resMsg,
+                    new List<Error>()
+                );
+            }
+            return userChatModel;
+        }
+
         public async Task<UserChatModel> FindUserChatByGroupId(string groupId)
         {
             UserChatModel userChatModel = new UserChatModel();
@@ -55,7 +79,7 @@ namespace Api.UserLib.Services
             string resMsg = string.Empty;
             if(userChatModel == null)
             {
-                resMsg=$"Chat with group id {groupId} not found";
+                resMsg=$"User chat with group id {groupId} not found";
                 throw new ErrorResponseException(
                     StatusCodes.Status404NotFound,
                     resMsg,
