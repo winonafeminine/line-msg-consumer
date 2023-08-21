@@ -26,6 +26,9 @@ WORKDIR /app
 # Copy the built application from the previous stage
 COPY --from=build-env /app/apps/Api.MessageSv/out .
 
+# Create the staticfiles folder
+RUN mkdir -p /app/staticfiles
+
 # Expose the port the API will listen on (change it if your API uses a different port)
 EXPOSE 5000
 EXPOSE 7000

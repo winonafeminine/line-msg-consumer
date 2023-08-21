@@ -1,4 +1,4 @@
-namespace Api.ReferenceLib.Interfaces
+namespace Api.CommonLib.Interfaces
 {
     public interface IMessageConsumer
     {

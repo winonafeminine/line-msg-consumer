@@ -7,6 +7,7 @@ namespace Api.ReferenceLib.Interfaces
         // line messaging api
         public Task<GetGroupMemberProfileDto> GetGroupMemberProfile(string groupId, string userId, string channelAccessToken);
         public Task<GetGroupSummaryDto> GetGroupSummary(string groupId, string channelAccessToken);
+        public Task<StaticfileDto> GetContent(string messageId, string accessToken);
 
         // line login
         public Task<LineLoginIssueTokenResponseDto> IssueLineLoginAccessToken(string code);

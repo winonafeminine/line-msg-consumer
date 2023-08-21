@@ -22,12 +22,12 @@ namespace Api.AuthSv.Controllers
             return StatusCode(StatusCodes.Status201Created, await _authRepo.CreateLineAuthState(authDto));
         }
 
-        [HttpGet]
-        [Route("line/states")]
-        public ActionResult<Response> GetLineAuthStates()
-        {
-            return StatusCode(StatusCodes.Status200OK, _authRepo.GetLineAuthStates());
-        }
+        // [HttpGet]
+        // [Route("line/states")]
+        // public ActionResult<Response> GetLineAuthStates()
+        // {
+        //     return StatusCode(StatusCodes.Status200OK, _authRepo.GetLineAuthStates());
+        // }
 
         [HttpPut]
         [Route("line/state/{state}")]

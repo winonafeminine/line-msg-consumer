@@ -1,5 +1,6 @@
 using Api.AuthLib.Grpcs;
 using Api.AuthLib.Interfaces;
+using Api.CommonLib.Interfaces;
 using Api.CommonLib.Services;
 using Api.CommonLib.Setttings;
 using Api.MessageLib.Interfaces;
@@ -8,6 +9,7 @@ using Api.MessageSv.Grpcs;
 using Api.MessageSv.HostedServices;
 using Api.ReferenceLib.Exceptions;
 using Api.ReferenceLib.Interfaces;
+using Api.ReferenceLib.Services;
 using Api.ReferenceLib.Settings;
 using Api.ReferenceLib.Setttings;
 using Api.UserLib.Interfaces;
@@ -70,12 +72,16 @@ builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("Rabb
 builder.Services.Configure<LineChannelSetting>(configuration.GetSection("LineConfig:Channel"));
 builder.Services.Configure<GrpcConfigSetting>(configuration.GetSection("GrpcConfig"));
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
+builder.Services.Configure<ObjectStorageSetting>(configuration.GetSection("ObjectStorageConfig"));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IChatRepository, ChatRepository>();
 builder.Services.AddScoped<IAuthGrpcClientService, AuthGrpcClientService>();
 builder.Services.AddScoped<ISpecialKeywordHandler, SpecialKeywordHandler>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddGrpc();
+builder.Services.AddScoped<ILineGroupInfo, LineGroupInfoService>();
+builder.Services.AddScoped<IMessageConsumer, MessageConsumer>();
+builder.Services.AddScoped<IObjectStorage, ObjectStorageService>();
 
 var app = builder.Build();
 

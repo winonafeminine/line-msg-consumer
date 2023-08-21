@@ -51,3 +51,23 @@ spec:
                   key: mongodbHostname
             - name: GrpcConfig__Auth__Address
               value: http://lmc-api-auth-sv.{{ .Release.Namespace }}:7000
+            - name: ObjectStorageConfig__ServiceUrl
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: objectStorageConfigServiceUrl
+            - name: ObjectStorageConfig__AccessKey
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: objectStorageConfigAccessKey
+            - name: ObjectStorageConfig__SecretKey
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: objectStorageConfigSecretKey
+            - name: ObjectStorageConfig__BucketName
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: objectStorageConfigBucketName

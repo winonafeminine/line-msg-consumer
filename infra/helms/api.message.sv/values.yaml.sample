@@ -23,6 +23,10 @@ secret:
     lineConfigChannelSecretId: ''
     lineConfigChannelClientId: ''
     lineConfigChannelChannelAccessToken: ''
+    objectStorageConfigServiceUrl: ''
+    objectStorageConfigAccessKey: ''
+    objectStorageConfigSecretKey: ''
+    objectStorageConfigBucketName: ''
 
 ingress:
   rules:
