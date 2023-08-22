@@ -1,14 +1,11 @@
-using System.Text.RegularExpressions;
 using Api.MessageLib.DTOs;
 using Api.MessageLib.Interfaces;
 using Api.MessageLib.Models;
 using Api.MessageLib.Parameters;
 using Api.MessageLib.Routes;
 using Api.ReferenceLib.Exceptions;
-using Api.ReferenceLib.Interfaces;
 using Api.ReferenceLib.Setttings;
 using Api.ReferenceLib.Stores;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -39,26 +36,6 @@ namespace Api.MessageLib.Services
             _publisher = publisher;
         }
 
-        private string GetValFromJson(string strContent, string keyName, string pattern)
-        {
-            Match match = Regex.Match(strContent, pattern);
-
-            if (match.Success)
-            {
-                keyName = match.Groups[1].Value.Replace("\\", "");
-                // _logger.LogInformation($"{keyName}: " + keyName);
-                return keyName;
-            }
-            else
-            {
-                _logger.LogError($"{keyName} not found.");
-                throw new ErrorResponseException(
-                  StatusCodes.Status404NotFound,
-                  $"{keyName} not found",
-                  new List<Error>()
-                );
-            }
-        }
         public async Task RetriveLineMessage(object content, string signature, string id)
         {
             // await Task.Yield();
@@ -75,25 +52,33 @@ namespace Api.MessageLib.Services
             string groupId = string.Empty;
             string groupUserId = string.Empty;
 
+            BsonDocument msgDoc = BsonDocument.Parse(
+                JsonConvert.SerializeObject(content)
+            );
+
             try
             {
+                BsonDocument firstEvent = msgDoc["events"][0]
+                    .ToBsonDocument();
+
                 // get the group id value using regex
-                string pattern = @"""groupId"":\s*""([^""]+)""";
-                groupId = GetValFromJson(strContent, "groupId", pattern);
+                groupId = firstEvent["source"]["groupId"].ToString()!;
 
                 // get the event type
-                pattern = @"""type"":\s*""([^""]+)""";
-                string eventType = GetValFromJson(strContent, "type", pattern);
+                string eventType = firstEvent["type"].ToString()!;
 
                 groupUserId = string.Empty;
                 string messageType = string.Empty;
 
                 // check if the event type=message
-                if (eventType == LineEventTypes.Message || eventType == LineEventTypes.MemberJoined)
+                if (eventType == LineEventTypes.Message)
                 {
                     // get the line userId
-                    pattern = @"""userId"":\s*""([^""]+)""";
-                    groupUserId = GetValFromJson(strContent, "userId", pattern);
+                    groupUserId = firstEvent["source"]["userId"].ToString()!;
+                }
+                else if (eventType == LineEventTypes.MemberJoined)
+                {
+                    groupUserId = firstEvent["joined"]["members"][0]["userId"].ToString()!;
                 }
             }
             // can not throw ask it will prevent verify in line console
