@@ -17,5 +17,12 @@ spec:
       containers:
         - name: {{ .Values.deployment.name }}-con
           image: {{ .Values.deployment.image.repo }}:{{ .Values.deployment.image.tag }}
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
           ports:
             - containerPort: {{ .Values.service.ports.default }} 
