@@ -3,7 +3,7 @@ deployment:
   image:
     repo: 13angs/lmc.app
     tag: latest
-      
+
 service:
   name: lmc-app-sv
   ports:
@@ -14,3 +14,4 @@ ingress:
   rules:
     - host: 'line-message-consumer.org'
     - host: 'dev.lmc.nextblackswan.com'
+    - host: 'lmc.nextblackswan.com'
