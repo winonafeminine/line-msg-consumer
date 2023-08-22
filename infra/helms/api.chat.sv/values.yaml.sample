@@ -20,3 +20,16 @@ ingress:
   rules:
     - host: 'line-message-consumer.org'
     - host: 'dev.lmc.nextblackswan.com'
+    - host: 'lmc.nextblackswan.com'
+
+secret:
+  name: lmc-api-chat-secret
+  data:
+    rabbitmqHost:
+      - 'amqp://root:password@rabbitmq-sv.default:5672'
+      - 'amqp://admin:password@rabbitmq-dev-srv.dev.svc.cluster.local:5672'
+      - 'amqp://admin:password@rabbitmq-prod-srv.prod.svc.cluster.local:5672'
+    mongoHost:
+      - 'mongodb://root:password@mongo-sv.default:27017'
+      - 'mongodb://root:password@mongodb-dev-srv.dev.svc.cluster.local:27017'
+      - 'mongodb://root:password@mongodb-prod-srv.prod.svc.cluster.local:27017'
