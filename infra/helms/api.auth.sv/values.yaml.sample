@@ -22,6 +22,12 @@ secret:
     lineConfigLineLoginRedirectUri: 'https://dev.lmc.nextblackswan.com/platform/verify'
     lineConfigLineLoginSecretId: ''
     lineConfigLineLoginClientId: ''
+    rabbitmqHost:
+      - 'amqp://root:password@rabbitmq-sv.default:5672'
+      - 'amqp://root:password@rabbitmq-sv.dev:5672'
+    mongoHost:
+      - 'mongodb://root:password@mongo-sv.default:27017'
+      - 'mongodb://root:password@mongo-sv.dev:27017'
 
 ingress:
   rules:

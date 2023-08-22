@@ -40,13 +40,13 @@ spec:
             - name: RabbitMQConfig__HostName
               valueFrom:
                 secretKeyRef:
-                  name: rabbitmq-secret
-                  key: hostName
+                  name: {{ .Values.secret.name }}
+                  key: rabbitmqHost
             - name: MongoConfig__HostName
               valueFrom:
                 secretKeyRef:
-                  name: mongo-secret
-                  key: mongodbHostname
+                  name: {{ .Values.secret.name }}
+                  key: mongoHost
             - name: GrpcConfig__Message__Address
               value: http://lmc-api-message-sv.{{ .Release.Namespace }}:7000
             - name: GrpcConfig__Chat__Address
