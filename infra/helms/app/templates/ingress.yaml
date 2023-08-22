@@ -14,12 +14,16 @@ spec:
   - hosts:
     {{- if eq .Release.Namespace "lmc-dev" }}
     - {{ index .Values.ingress.rules 1 "host" }}
+    {{- else if eq .Release.Namespace "lmc-prod" }}
+    - {{ index .Values.ingress.rules 2 "host" }}
     {{- end }}
     secretName: lmc-app-tls
   {{- end }}
   rules:
   {{- if eq .Release.Namespace "lmc-dev" }}
   - host: {{ index .Values.ingress.rules 1 "host" }}
+  {{- else if eq .Release.Namespace "lmc-prod" }}
+  - host: {{ index .Values.ingress.rules 2 "host" }}
   {{- else }}
   - host: {{ index .Values.ingress.rules 0 "host" }}
   {{- end }}
