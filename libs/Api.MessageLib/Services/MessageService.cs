@@ -4,6 +4,7 @@ using Api.MessageLib.Models;
 using Api.MessageLib.Parameters;
 using Api.MessageLib.Routes;
 using Api.ReferenceLib.Exceptions;
+using Api.ReferenceLib.Services;
 using Api.ReferenceLib.Setttings;
 using Api.ReferenceLib.Stores;
 using Microsoft.Extensions.Hosting;
@@ -51,16 +52,18 @@ namespace Api.MessageLib.Services
 
             string groupId = string.Empty;
             string groupUserId = string.Empty;
+            long timestamp = 0;
 
             BsonDocument msgDoc = BsonDocument.Parse(
                 JsonConvert.SerializeObject(content)
             );
 
+            BsonDocument firstEvent = msgDoc["events"][0]
+                .ToBsonDocument();
+
             try
             {
-                BsonDocument firstEvent = msgDoc["events"][0]
-                    .ToBsonDocument();
-
+                timestamp = Int64.Parse(firstEvent["timestamp"].ToString()!);
                 // get the group id value using regex
                 groupId = firstEvent["source"]["groupId"].ToString()!;
 
@@ -94,7 +97,9 @@ namespace Api.MessageLib.Services
                 GroupId = groupId,
                 GroupUserId = groupUserId,
                 MessageType = MessageTypes.Receive,
-                MessageObject = content
+                MessageObject = content,
+                CreatedDate = TimezoneService.FromMili(timestamp).DateTime,
+                ModifiedDate = TimezoneService.FromMili(timestamp).DateTime,
             };
 
             string messageModelStr = JsonConvert.SerializeObject(messageModel);
@@ -107,6 +112,13 @@ namespace Api.MessageLib.Services
             {
                 _skHandler.HandleGroupVerify(messageModelStr);
                 existingMessage = await _msgRepo.FindMessageByGroupId(messageModel.GroupId);
+                string webhookEventId = firstEvent["webhookEventId"].ToString()!;
+                var existingMessages = _msgRepo.FindMessageByWebhookId(webhookEventId);
+                if(existingMessages.Any())
+                {
+                    _logger.LogWarning("Message exist");
+                    return;
+                }
             }
             catch (ErrorResponseException ex)
             {
