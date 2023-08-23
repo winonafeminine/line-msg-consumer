@@ -35,17 +35,17 @@ spec:
             - name: LineConfig__Channel__SecretId
               valueFrom:
                 secretKeyRef:
-                  name: lmc-api-message-secret
+                  name: {{ .Values.secret.name }}
                   key: lineConfigChannelSecretId
             - name: LineConfig__Channel__ClientId
               valueFrom:
                 secretKeyRef:
-                  name: lmc-api-message-secret
+                  name: {{ .Values.secret.name }}
                   key: lineConfigChannelClientId
             - name: LineConfig__Channel__ChannelAccessToken
               valueFrom:
                 secretKeyRef:
-                  name: lmc-api-message-secret
+                  name: {{ .Values.secret.name }}
                   key: lineConfigChannelChannelAccessToken
             - name: GrpcConfig__Auth__Address
               value: http://lmc-api-auth-sv.{{ .Release.Namespace }}:7000

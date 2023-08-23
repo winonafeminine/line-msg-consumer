@@ -26,3 +26,15 @@ secret:
       - 'mongodb://root:password@mongo-sv.default:27017'
       - 'mongodb://root:password@mongodb-dev-srv.dev.svc.cluster.local:27017'
       - 'mongodb://root:password@mongodb-prod-srv.prod.svc.cluster.local:27017'
+    lineConfigChannelSecretId: 
+      - ''
+      - ''
+      - ''
+    lineConfigChannelClientId: 
+      - '2000187132'
+      - '2000187132'
+      - '2000486731'
+    lineConfigChannelChannelAccessToken: 
+      - ''
+      - ''
+      - ''

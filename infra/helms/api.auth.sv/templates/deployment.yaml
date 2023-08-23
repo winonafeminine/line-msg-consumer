@@ -30,32 +30,32 @@ spec:
             - name: LineConfig__Channel__SecretId
               valueFrom:
                 secretKeyRef:
-                  name: lmc-api-message-secret
+                  name: {{ .Values.secret.name }}
                   key: lineConfigChannelSecretId
             - name: LineConfig__Channel__ClientId
               valueFrom:
                 secretKeyRef:
-                  name: lmc-api-message-secret
+                  name: {{ .Values.secret.name }}
                   key: lineConfigChannelClientId
             - name: LineConfig__Channel__ChannelAccessToken
               valueFrom:
                 secretKeyRef:
-                  name: lmc-api-message-secret
+                  name: {{ .Values.secret.name }}
                   key: lineConfigChannelChannelAccessToken
             - name: LineConfig__LineLogin__RedirectUri
               valueFrom:
                 secretKeyRef:
-                  name: lmc-api-auth-secret
+                  name: {{ .Values.secret.name }}
                   key: lineConfigLineLoginRedirectUri
             - name: LineConfig__LineLogin__ClientId
               valueFrom:
                 secretKeyRef:
-                  name: lmc-api-auth-secret
+                  name: {{ .Values.secret.name }}
                   key: lineConfigLineLoginClientId
             - name: LineConfig__LineLogin__SecretId
               valueFrom:
                 secretKeyRef:
-                  name: lmc-api-auth-secret
+                  name: {{ .Values.secret.name }}
                   key: lineConfigLineLoginSecretId
             - name: MongoConfig__HostName
               valueFrom:

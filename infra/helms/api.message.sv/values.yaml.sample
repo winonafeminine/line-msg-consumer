@@ -20,13 +20,10 @@ service:
 secret:
   name: lmc-api-message-secret
   data:
-    lineConfigChannelSecretId: ''
-    lineConfigChannelClientId: ''
-    lineConfigChannelChannelAccessToken: ''
-    objectStorageConfigServiceUrl: ''
-    objectStorageConfigAccessKey: ''
-    objectStorageConfigSecretKey: ''
-    objectStorageConfigBucketName: ''
+    objectStorageConfigServiceUrl: 'ap-south-1.linodeobjects.com'
+    objectStorageConfigAccessKey: 'BSAV61XM2FQIJECZ27F0'
+    objectStorageConfigSecretKey: 'Er6uC5Z0UAko5H3UJipGpd1AYziFeFOkb7ZqpL7h'
+    objectStorageConfigBucketName: 'lmc-object-storage'
     rabbitmqHost:
       - 'amqp://root:password@rabbitmq-sv.default:5672'
       - 'amqp://admin:password@rabbitmq-dev-srv.dev.svc.cluster.local:5672'
@@ -35,6 +32,18 @@ secret:
       - 'mongodb://root:password@mongo-sv.default:27017'
       - 'mongodb://root:password@mongodb-dev-srv.dev.svc.cluster.local:27017'
       - 'mongodb://root:password@mongodb-prod-srv.prod.svc.cluster.local:27017'
+    lineConfigChannelSecretId: 
+      - ''
+      - ''
+      - ''
+    lineConfigChannelClientId: 
+      - '2000187132'
+      - '2000187132'
+      - '2000486731'
+    lineConfigChannelChannelAccessToken: 
+      - ''
+      - ''
+      - ''
 
 ingress:
   rules:
