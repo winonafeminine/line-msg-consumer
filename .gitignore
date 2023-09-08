@@ -41,3 +41,5 @@ Thumbs.db
 **kubeconfig.yaml
 **v*.*.*
 skaffold.yaml
+access_key.txt
+secret_key.txt
