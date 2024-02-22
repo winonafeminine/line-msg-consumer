@@ -1,0 +1,12 @@
+/workspaces/Lmc/libs/Api.LmcLib/bin/Debug/net6.0/Api.LmcLib.deps.json
+/workspaces/Lmc/libs/Api.LmcLib/bin/Debug/net6.0/Api.LmcLib.dll
+/workspaces/Lmc/libs/Api.LmcLib/bin/Debug/net6.0/Api.LmcLib.pdb
+/workspaces/Lmc/libs/Api.LmcLib/obj/Debug/net6.0/Api.LmcLib.csproj.AssemblyReference.cache
+/workspaces/Lmc/libs/Api.LmcLib/obj/Debug/net6.0/Api.LmcLib.GeneratedMSBuildEditorConfig.editorconfig
+/workspaces/Lmc/libs/Api.LmcLib/obj/Debug/net6.0/Api.LmcLib.AssemblyInfoInputs.cache
+/workspaces/Lmc/libs/Api.LmcLib/obj/Debug/net6.0/Api.LmcLib.AssemblyInfo.cs
+/workspaces/Lmc/libs/Api.LmcLib/obj/Debug/net6.0/Api.LmcLib.csproj.CoreCompileInputs.cache
+/workspaces/Lmc/libs/Api.LmcLib/obj/Debug/net6.0/Api.LmcLib.dll
+/workspaces/Lmc/libs/Api.LmcLib/obj/Debug/net6.0/refint/Api.LmcLib.dll
+/workspaces/Lmc/libs/Api.LmcLib/obj/Debug/net6.0/Api.LmcLib.pdb
+/workspaces/Lmc/libs/Api.LmcLib/obj/Debug/net6.0/ref/Api.LmcLib.dll
