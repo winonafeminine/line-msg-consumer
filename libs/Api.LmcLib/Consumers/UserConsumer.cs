@@ -1,17 +1,9 @@
 // using Api.LmcLib.Models;
-// using Api.ChatLib.Interfaces;
-// using Api.CommonLib.Interfaces;
-// using Api.CommonLib.Models;
-// using Api.MessageLib.Interfaces;
-// using Api.MessageLib.Models;
-// using Api.PlatformLib.DTOs;
-// using Api.ReferenceLib.DTOs;
-// using Api.ReferenceLib.Exceptions;
-// using Api.ReferenceLib.Interfaces;
-// using Api.ReferenceLib.Setttings;
-// using Api.ReferenceLib.Stores;
-// using Api.UserLib.Interfaces;
-// using Api.UserLib.Models;
+// using Api.LmcLib.Interfaces;
+// using Api.LmcLib.DTOs;
+// using Api.LmcLib.Exceptions;
+// using Api.LmcLib.Setttings;
+// using Api.LmcLib.Stores;
 // using Microsoft.Extensions.Logging;
 // using Microsoft.Extensions.Options;
 // using MongoDB.Bson;
@@ -19,7 +11,7 @@
 // using Newtonsoft.Json;
 // using Simple.RabbitMQ;
 
-// namespace Api.CommonLib.Consumers
+// namespace Api.LmcLib.Consumers
 // {
 //     public class UserConsumer : IUserConsumer
 //     {
@@ -29,23 +21,24 @@
 //         private readonly IUserRepository _userRepo;
 //         private readonly IOptions<LineChannelSetting> _channelSetting;
 //         private readonly IUserChatRepository _userChatRepo;
-//         private readonly IMessageGrpcClientService _msgGrpc;
-//         private readonly IChatGrpcClientService _chatGrpc;
+//         // private readonly IMessageGrpcClientService _msgGrpc;
+//         // private readonly IChatGrpcClientService _chatGrpc;
 //         private readonly IMessagePublisher _publisher;
-//         private readonly IUserGrpcClientService _userGrpc;
-//         private readonly IUserChatGrpcClientService _userChatGrpc;
+//         // private readonly IUserGrpcClientService _userGrpc;
+//         // private readonly IUserChatGrpcClientService _userChatGrpc;
 //         public UserConsumer(ILogger<UserConsumer> logger,
 //             IOptions<MongoConfigSetting> mongoConfig,
 //             ILineGroupInfo lineUserInfo,
 //             IUserRepository userRepo,
 //             IOptions<LineChannelSetting> channelSetting,
 //             IUserChatRepository userChatRepo,
-//             IMessageGrpcClientService msgGrpc,
-//             IChatGrpcClientService chatGrpc,
+//             // IMessageGrpcClientService msgGrpc,
+//             // IChatGrpcClientService chatGrpc,
 //             IServiceProvider serviceProvider,
-//             IMessagePublisher publisher,
-//             IUserGrpcClientService userGrpc,
-//             IUserChatGrpcClientService userChatGrpc)
+//             IMessagePublisher publisher
+//             // IUserGrpcClientService userGrpc,
+//             // IUserChatGrpcClientService userChatGrpc
+//             )
 //         {
 //             _logger = logger;
 //             IMongoClient mongoClient = new MongoClient(mongoConfig.Value.HostName);
@@ -55,11 +48,11 @@
 //             _userRepo = userRepo;
 //             _channelSetting = channelSetting;
 //             _userChatRepo = userChatRepo;
-//             _msgGrpc = msgGrpc;
-//             _chatGrpc = chatGrpc;
+//             // _msgGrpc = msgGrpc;
+//             // _chatGrpc = chatGrpc;
 //             _publisher = publisher;
-//             _userGrpc = userGrpc;
-//             _userChatGrpc = userChatGrpc;
+//             // _userGrpc = userGrpc;
+//             // _userChatGrpc = userChatGrpc;
 //         }
 
 //         public async Task ConsumeAuthUpdate(string message)
@@ -107,15 +100,15 @@
 //             // {
 //             //     _publisher.Dispose();
 //             // }
-//             try
-//             {
-//                 await _userGrpc.AddUser(userModel);
-//             }
-//             catch (ErrorResponseException ex)
-//             {
-//                 _logger.LogError(ex.Description);
-//             }
-//             return;
+//             // try
+//             // {
+//             //     await _userGrpc.AddUser(userModel);
+//             // }
+//             // catch (ErrorResponseException ex)
+//             // {
+//             //     _logger.LogError(ex.Description);
+//             // }
+//             // return;
 //         }
 
 //         public async Task ConsumeMessageCreate(string message)
@@ -127,15 +120,15 @@
 //                 .DeserializeObject<MessageModel>(message)!;
 
 //             ChatModel chatModel = new ChatModel();
-//             try
-//             {
-//                 chatModel = await _chatGrpc.GetChat(msgModel.GroupId!);
-//             }
-//             catch (ErrorResponseException ex)
-//             {
-//                 _logger.LogError(ex.Description);
-//                 return;
-//             }
+//             // try
+//             // {
+//             //     chatModel = await _chatGrpc.GetChat(msgModel.GroupId!);
+//             // }
+//             // catch (ErrorResponseException ex)
+//             // {
+//             //     _logger.LogError(ex.Description);
+//             //     return;
+//             // }
 
 //             UserModel userModel = new UserModel
 //             {

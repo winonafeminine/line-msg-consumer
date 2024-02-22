@@ -29,11 +29,11 @@ namespace Api.AuthSv.Controllers
         //     return StatusCode(StatusCodes.Status200OK, _authRepo.GetLineAuthStates());
         // }
 
-        // [HttpPut]
-        // [Route("line/state/{state}")]
-        // public async Task<ActionResult<Response>> UpdateLineAuthState([FromRoute] string state, [FromBody] AuthDto authDto)
-        // {
-        //     return StatusCode(StatusCodes.Status200OK, await _authRepo.UpdateLineAuthState(state, authDto));
-        // }
+        [HttpPut]
+        [Route("line/state/{state}")]
+        public async Task<ActionResult<Response>> UpdateLineAuthState([FromRoute] string state, [FromBody] AuthDto authDto)
+        {
+            return StatusCode(StatusCodes.Status200OK, await _authRepo.UpdateLineAuthState(state, authDto));
+        }
     }
 }
