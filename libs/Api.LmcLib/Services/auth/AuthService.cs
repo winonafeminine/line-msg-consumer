@@ -11,7 +11,6 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using Newtonsoft.Json;
 using Simple.RabbitMQ;
-using Api.LmcLib.Services;
 
 namespace Api.LmcLib.Services
 {
@@ -24,7 +23,8 @@ namespace Api.LmcLib.Services
         private readonly IHostEnvironment _hostEnv;
         private readonly IMessagePublisher _publisher;
         private readonly IAuthRepository _authRepo;
-        public AuthService(ILogger<AuthService> logger, IOptions<AuthLineConfigSetting> lineConfigSetting, ILineGroupInfo lineGroup, IJwtToken jwtToken, IHostEnvironment hostEnv, IMessagePublisher publisher, IAuthRepository authRepo)
+        private readonly IPlatformRepository _platformRepo;
+        public AuthService(ILogger<AuthService> logger, IOptions<AuthLineConfigSetting> lineConfigSetting, ILineGroupInfo lineGroup, IJwtToken jwtToken, IHostEnvironment hostEnv, IMessagePublisher publisher, IAuthRepository authRepo, IPlatformRepository platformRepo)
         {
             _logger = logger;
             _lineConfigSetting = lineConfigSetting;
@@ -33,6 +33,8 @@ namespace Api.LmcLib.Services
             _hostEnv = hostEnv;
             _publisher = publisher;
             _authRepo = authRepo;
+            _platformRepo = platformRepo;
+
         }
         public async Task<Response> CreateLineAuthState(AuthDto auth)
         {
@@ -67,7 +69,8 @@ namespace Api.LmcLib.Services
         public async Task<Response> UpdateLineAuthState(string state, AuthDto auth)
         {
             LineAuthStateModel lineAuthState = await _authRepo.FindAuth(state);
-
+            JwtPayloadData payload = new JwtPayloadData();
+            PlatformModel platformModel = new PlatformModel();
             string responseMessage = "";
 
             if (lineAuthState == null)
@@ -80,20 +83,37 @@ namespace Api.LmcLib.Services
                     new List<Error>()
                 );
             }
+            // generate the platform_id
+            string platformId = ObjectId.GenerateNewId().ToString();
+            string secretKey = SecretKeyGenerator.GenerateSecretKey();
+            // generate the platform access token
+            string accessToken = _jwtToken.GenerateJwtToken(secretKey, JwtIssuers.Platform, platformId, DateTime.UtcNow.AddMonths(6));
+
+            PlatformModel newPlatform = new PlatformModel
+            {
+                PlatformId = platformId,
+                SecretKey = secretKey,
+                AccessToken = accessToken
+
+            };
+            platformModel = newPlatform;
+            try
+            {
+                // Use the injected _platformRepository to add the new platform
+                await _platformRepo.AddPlatform(platformModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error adding new platform: {ex.Message}");
+                // Handle the exception as needed
+            }
+
 
             // issue line login access token
             LineLoginIssueTokenResponseDto tokenResponse = new LineLoginIssueTokenResponseDto();
 
             // get line user profile
             LineLoginUserProfileResponseDto userProfile = new LineLoginUserProfileResponseDto();
-
-            // generate the platform_id
-            string platformId = ObjectId.GenerateNewId().ToString();
-
-            // generate the platform access token
-            string secretKey = SecretKeyGenerator.GenerateSecretKey();
-            string accessToken = _jwtToken.GenerateJwtToken(secretKey, JwtIssuers.Platform, platformId, DateTime.UtcNow.AddMonths(6));
-
             // if (!_hostEnv.IsDevelopment())
             // {
             // }

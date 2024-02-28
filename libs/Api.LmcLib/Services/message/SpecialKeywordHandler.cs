@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Simple.RabbitMQ;
 
-namespace Api.MessageLib.Services
+namespace Api.LmcLib.Services
 {
     public class SpecialKeywordHandler : ISpecialKeywordHandler
     {
@@ -18,6 +18,7 @@ namespace Api.MessageLib.Services
         }
         public bool HandleGroupVerify(string message)
         {
+            // Console.WriteLine(message);
             // not contain the key words
             if (!message.Contains(SpecialKeywords.GroupVerify))
             {
@@ -31,6 +32,7 @@ namespace Api.MessageLib.Services
             try
             {
                 _publisher.Publish(message, routingKey, null);
+                Console.WriteLine("success");
             }
             catch (Exception ex)
             {

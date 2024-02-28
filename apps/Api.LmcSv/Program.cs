@@ -8,6 +8,8 @@ using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
 using Simple.RabbitMQ;
 using Api.LmcLib.Setttings;
+using Api.LmcSv.HostedServices;
+
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -52,19 +54,31 @@ builder.Services.AddScoped<IMessagePublisher>(x =>
         configuration["RabbitMQConfig:ExchangeName"], // exhange name
         ExchangeType.Topic // exchange type
     ));
+builder.Services.AddHostedService<LmcDataCollector>();
 builder.Services.Configure<AuthLineConfigSetting>(configuration.GetSection("LineConfig:LineLogin"));
 builder.Services.Configure<LineChannelSetting>(configuration.GetSection("LineConfig:Channel"));
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.Configure<RabbitmqConfigSetting>(configuration.GetSection("RabbitMQConfig"));
 builder.Services.AddScoped<ILineGroupInfo, LineGroupInfoService>();
-// builder.Services.AddGrpc();
 builder.Services.AddScoped<IJwtToken, JwtTokenService>();
 builder.Services.Configure<MongoConfigSetting>(configuration.GetSection("MongoConfig"));
 builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
-// builder.Services.AddHostedService<AuthDataCollector>();
 builder.Services.AddScoped<IAuthConsumer, AuthConsumer>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-
+builder.Services.AddScoped<IAuthValidateJwtToken, AuthValidateJwtToken>();
+builder.Services.AddScoped<IPlatformService, PlatformService>();
+builder.Services.AddScoped<IChatRepository, ChatRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ISpecialKeywordHandler, SpecialKeywordHandler>();
+builder.Services.AddScoped<IMessageConsumer, MessageConsumer>();
+builder.Services.AddScoped<IObjectStorage, ObjectStorageService>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<ILineMessageValidation, LineMessageValidation>();
+builder.Services.AddScoped<IChatConsumer, ChatConsumer>();
+builder.Services.AddScoped<IUserChatRepository, UserChatRepository>();
+builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IUserConsumer, UserConsumer>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

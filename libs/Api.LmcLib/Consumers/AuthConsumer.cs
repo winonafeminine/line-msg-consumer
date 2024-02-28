@@ -21,6 +21,7 @@ namespace Api.LmcLib.Consumers
 
         public async Task ConsumeAuthUpdate(string message)
         {
+            Console.WriteLine(message);
             // _logger.LogInformation(message);
             LineAuthStateModel authModel = JsonConvert
                 .DeserializeObject<LineAuthStateModel>(message)!;

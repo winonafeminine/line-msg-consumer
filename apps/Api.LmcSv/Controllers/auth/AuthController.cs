@@ -3,7 +3,7 @@ using Api.LmcLib.Interfaces;
 using Api.LmcLib.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.AuthSv.Controllers
+namespace Api.LmcSv.Controllers
 {
     [ApiController]
     [Route("api/auth/v1")]

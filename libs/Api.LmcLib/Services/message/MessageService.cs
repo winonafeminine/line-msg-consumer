@@ -146,6 +146,7 @@ namespace Api.LmcLib.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
+                
             }
             finally
             {

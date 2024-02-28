@@ -9,7 +9,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 
-namespace Api.UserLib.Services
+namespace Api.LmcLib.Services
 {
     public class UserRepository : IUserRepository
     {
@@ -64,12 +64,13 @@ namespace Api.UserLib.Services
 
         public async Task<UserModel> FindUser(string userId)
         {
+            // Console.WriteLine(userId);
             // find the existing user
             var existingUser = await _userCols
                 .Find<BsonDocument>(x => x["group_user_id"] == userId)
                 .As<UserModel>()
                 .FirstOrDefaultAsync();
-
+            // Console.WriteLine("1");
             if (existingUser != null)
             {
                 // _logger.LogError("user existed!");

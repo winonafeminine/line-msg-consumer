@@ -153,9 +153,6 @@ namespace Api.AuthLib.Services
             return await _authRepo.RemoveStateByPlatformId(platformId);
         }
 
-        public Task<LineAuthStateModel> CreateAuth(AuthDto auth)
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }

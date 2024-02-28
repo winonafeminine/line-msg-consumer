@@ -61,5 +61,17 @@
             ],
             "problemMatcher": "$msCompile"
         },
+        {
+            "label": "Api.LmcSv.Build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/apps/Api.LmcSv/Api.LmcSv.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
     ]
 }
