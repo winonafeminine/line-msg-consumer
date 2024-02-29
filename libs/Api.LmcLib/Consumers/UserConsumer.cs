@@ -174,7 +174,7 @@ namespace Api.LmcLib.Consumers
                 GroupUserId = msgModel.GroupUserId,
                 PlatformId = chatModel.PlatformId
             };
-
+            Console.WriteLine(userChatModel);
             bool isUserChatExist = false;
 
             try
@@ -261,6 +261,7 @@ namespace Api.LmcLib.Consumers
                 {
                     GroupId = messageModel.GroupId,
                     PlatformId = existingUser.Platform!.PlatformId,
+                    GroupUserId = messageModel.GroupUserId
                 };
 
                 await _userChatRepo.AddUserChat(userChat);
@@ -302,7 +303,7 @@ namespace Api.LmcLib.Consumers
                             GroupId = messageModel.GroupId
                         }
                     };
-                    await _chatRepo.AddChat(chat);
+                    // await _chatRepo.AddChat(chat);
                     await _userChatRepo.AddUserChat(userChat);
                 }
                 catch (ErrorResponseException ex)

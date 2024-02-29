@@ -266,6 +266,7 @@ namespace Api.CommonLib.Consumers
                 {
                     GroupId = messageModel.GroupId,
                     PlatformId = existingUser.Platform!.PlatformId,
+                    
                 };
 
                 await _userChatRepo.AddUserChat(userChat);

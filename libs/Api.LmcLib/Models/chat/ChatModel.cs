@@ -25,6 +25,7 @@ namespace Api.LmcLib.Models
         [JsonProperty("platform_id")]
         [BsonElement("platform_id")]
         public virtual string? PlatformId { get; set; }
+        public string? GroupUserId { get; internal set; }
     }
 
     public class ChatGroupModel

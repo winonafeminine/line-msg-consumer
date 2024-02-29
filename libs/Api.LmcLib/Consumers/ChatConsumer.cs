@@ -36,6 +36,8 @@ namespace Api.LmcLib.Consumers
                     GroupId=userChatModel.GroupId,
                 },
                 PlatformId = userChatModel.PlatformId
+                
+                
             };
 
             GetGroupSummaryDto groupInfo = new GetGroupSummaryDto();
