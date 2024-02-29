@@ -32,7 +32,7 @@ namespace Api.LmcLib.Services
             BsonDocument document = BsonDocument.Parse(
                 strChat
             );
-            Console.WriteLine(document.ToJson());
+            // Console.WriteLine(document.ToJson());
             await _chatCols.InsertOneAsync(document);
             _logger.LogInformation("New Chat added!");
             return new Response
